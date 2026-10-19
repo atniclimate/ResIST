@@ -1,0 +1,31 @@
+{% if suggestion %}
+<div class="panel mb-16" style="background: var(--warm-white); padding: 16px 20px;">
+    <p class="text-tertiary" style="font-size: 13px; margin: 0;">{{ suggestion }}</p>
+</div>
+{% endif %}
+
+{% if resolutions %}
+<div class="results-list">
+    {% for res in resolutions %}
+    <a href="/resolution/{{ res.id }}" class="resolution-card" hx-boost="true">
+        <div class="resolution-card-header">
+            <span class="resolution-id">{{ res.resolution_number or 'RES' }}</span>
+            <span class="resolution-date">{% if res.convention_year %}{{ res.convention_year }}{% endif %}</span>
+        </div>
+
+        {% if res.title %}
+        <h3 class="resolution-title">{{ res.title }}</h3>
+        {% endif %}
+
+        {% if res.summary %}
+        <p class="resolution-summary">{{ res.summary[:200] }}{% if res.summary|length > 200 %}...{% endif %}</p>
+        {% endif %}
+    </a>
+    {% endfor %}
+</div>
+{% elif not suggestion %}
+<div class="empty-state">
+    <h3>No Resolutions Found</h3>
+    <p>No resolutions match all selected topics.</p>
+</div>
+{% endif %}

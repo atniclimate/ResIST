@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>ATNI Evidence Package</title>
+</head>
+<body>
+    <div class="cover">
+        <h1>ATNI Resolution Evidence Package</h1>
+        <p><strong>Topics:</strong> {{ topics|join(', ') }}</p>
+        <p><strong>Resolutions:</strong> {{ resolution_count }}</p>
+        <p><strong>Generated:</strong> {{ generated_date }}</p>
+    </div>
+
+    <h2>Resolutions</h2>
+
+    {% for res in resolutions %}
+    <div class="resolution">
+        <h3>{{ res.resolution_number or 'Resolution ' ~ res.id }}</h3>
+        {% if res.convention_year %}<p>Year: {{ res.convention_year }}</p>{% endif %}
+
+        {% if res.summary %}
+        <p class="summary">{{ res.summary }}</p>
+        {% endif %}
+
+        {% if res.statements %}
+        <p><strong>Key Statements:</strong></p>
+        <ul class="statements">
+            {% for stmt in res.statements[:5] %}
+            <li><strong>{{ stmt.statement_type|upper }}:</strong> {{ stmt.text[:300] }}...</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+
+        {% if res.citations %}
+        <p class="citations"><strong>Citations:</strong>
+            {% for c in res.citations[:5] %}{{ c.citation_text }}{% if not loop.last %}; {% endif %}{% endfor %}
+        </p>
+        {% endif %}
+    </div>
+    {% endfor %}
+
+    {% if related %}
+    <div class="see-also">
+        <h2>See Also</h2>
+        <p>The following related resolutions may strengthen your case:</p>
+        <ul>
+            {% for rel in related[:5] %}
+            <li><strong>{{ rel.resolution_number or 'Resolution ' ~ rel.id }}</strong>
+                {% if rel.summary %} - {{ rel.summary[:100] }}...{% endif %}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+</body>
+</html>

@@ -1,0 +1,17 @@
+{% if suggestions %}
+<div style="border: 1px solid var(--line); background: var(--white);">
+    {% for suggestion in suggestions %}
+    <button type="button" class="topic-suggestion-btn"
+            hx-post="/topics/add"
+            hx-target="#topic-control"
+            hx-swap="innerHTML"
+            hx-vals='{"topic": "{{ suggestion }}", "selected": "{{ current_selected }}"}'>
+        {{ suggestion|replace('_', ' ')|title }}
+    </button>
+    {% endfor %}
+</div>
+{% else %}
+<div style="padding: 12px 16px; font-size: 13px; color: var(--text-tertiary); border: 1px solid var(--line); background: var(--white);">
+    No matching topics
+</div>
+{% endif %}

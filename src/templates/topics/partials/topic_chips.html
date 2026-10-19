@@ -1,0 +1,38 @@
+<input type="hidden" name="selected" value="{{ selected_topics|join(',') }}">
+
+<div class="tag-group mb-16">
+    {% for topic in selected_topics %}
+    <button type="button" class="tag active"
+            hx-post="/topics/remove"
+            hx-target="#topic-control"
+            hx-swap="innerHTML"
+            hx-vals='{"topic": "{{ topic }}", "selected": "{{ selected_topics|join(',') }}"}'>
+        {{ topic|replace('_', ' ')|title }} <span class="remove">&times;</span>
+    </button>
+    {% endfor %}
+</div>
+
+<div class="topic-input-wrapper" style="position: relative;">
+    <input type="text" id="topic-input" name="q"
+           placeholder="Add topic..."
+           autocomplete="off"
+           hx-get="/topics/suggest"
+           hx-target="#topic-dropdown"
+           hx-trigger="input changed delay:300ms, focus"
+           hx-include="[name='selected']">
+    <div id="topic-dropdown" class="topic-dropdown"></div>
+</div>
+
+{% if selected_topics %}
+<p class="results-count mt-16">{{ result_count }} resolution(s) match</p>
+<div hx-get="/topics/results"
+     hx-include="[name='selected']"
+     hx-target="#results"
+     hx-trigger="load"
+     hx-swap="innerHTML">
+</div>
+<script>var ec = document.getElementById('export-controls'); if (ec) ec.style.display = 'block';</script>
+{% else %}
+<p class="text-tertiary mt-16" style="font-size: 13px;">Select topics to search</p>
+<script>var ec = document.getElementById('export-controls'); if (ec) ec.style.display = 'none';</script>
+{% endif %}

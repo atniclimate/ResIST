@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+
+{% block title %}{% if resolution %}{{ resolution.resolution_number or "Resolution" }} - ATNI ResIST{% else %}Not Found - ATNI ResIST{% endif %}{% endblock %}
+
+{% block content %}
+{% if not_found %}
+<div class="empty-state">
+    <h3>Resolution Not Found</h3>
+    <p>The requested resolution could not be found.</p>
+    <a href="/search" class="btn btn-primary mt-16">Back to Search</a>
+</div>
+{% else %}
+
+<!-- Back Link -->
+<a href="/search" class="back-link">&larr; Back to Search</a>
+
+<!-- Detail Header -->
+<div class="detail-header">
+    <span class="resolution-id">{{ resolution.resolution_number or "Resolution" }}</span>
+    {% if resolution.title %}
+    <h1 class="resolution-title">{{ resolution.title }}</h1>
+    {% endif %}
+</div>
+
+<!-- Metadata Grid -->
+<div class="metadata-grid">
+    {% if sponsors %}
+    <div class="metadata-panel">
+        <div class="metadata-label">Sponsors</div>
+        <div class="metadata-value">
+            {% for sponsor in sponsors %}
+            <a href="/search?sponsor={{ sponsor.name | urlencode }}">{{ sponsor.name }}</a>{% if not loop.last %}, {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    {% if resolution.committee %}
+    <div class="metadata-panel">
+        <div class="metadata-label">Committee</div>
+        <div class="metadata-value">{{ resolution.committee }}</div>
+    </div>
+    {% endif %}
+
+    {% if resolution.convention_year %}
+    <div class="metadata-panel">
+        <div class="metadata-label">Year</div>
+        <div class="metadata-value">{{ resolution.convention_year }}</div>
+    </div>
+    {% endif %}
+
+    {% if resolution.convention_name or resolution.convention_location %}
+    <div class="metadata-panel convention-panel">
+        <div class="metadata-label">Convention</div>
+        <div class="metadata-value">{{ resolution.convention_name or "Annual Convention" }}{% if resolution.convention_location %}, {{ resolution.convention_location }}{% endif %}</div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Summary Panel -->
+{% if resolution.summary %}
+<div class="content-panel">
+    <h2>Summary</h2>
+    <p>{{ resolution.summary }}</p>
+</div>
+{% endif %}
+
+<!-- Themes and Citations Two-Column -->
+{% if themes or citations %}
+<div class="two-column-panel">
+    {% if themes %}
+    <div class="content-panel">
+        <h2>Themes</h2>
+        <div class="tag-group">
+            {% for theme in themes %}
+            <a href="/topics/{{ theme }}" class="tag">{{ theme | replace("_", " ") }}</a>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    {% if citations %}
+    <div class="content-panel">
+        <h2>Legal Citations</h2>
+        <ul class="citation-list">
+            {% for citation in citations %}
+            <li>
+                {% if citation.linked_resolution_id %}
+                <a href="/resolution/{{ citation.linked_resolution_id }}" class="citation-text" hx-boost="true">
+                    {{ citation.text }}
+                </a>
+                {% else %}
+                <span class="citation-text">{{ citation.text }}</span>
+                {% if citation.normalized and citation.normalized != citation.text %}
+                <span class="text-tertiary" style="font-size: 11px; margin-left: 4px;">({{ citation.normalized }})</span>
+                {% endif %}
+                {% endif %}
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+</div>
+{% endif %}
+
+<!-- Full Text removed - summary and statements are sufficient -->
+
+<!-- Statements Panel -->
+{% if statements %}
+<div class="content-panel statements-section">
+    <h2>Statements</h2>
+
+    {% set whereas_statements = statements | selectattr('statement_type', 'equalto', 'whereas') | list %}
+    {% set resolved_statements = statements | selectattr('statement_type', 'equalto', 'resolved') | list %}
+
+    {% if whereas_statements %}
+    <h3>Whereas Clauses</h3>
+    <ol class="statements-list">
+    {% for stmt in whereas_statements | sort(attribute='index') %}
+        <li>
+            {{ stmt.text }}
+            {% if stmt.function %}
+            <span class="statement-meta">({{ stmt.function }})</span>
+            {% endif %}
+        </li>
+    {% endfor %}
+    </ol>
+    {% endif %}
+
+    {% if resolved_statements %}
+    <h3>Resolved Clauses</h3>
+    <ol class="statements-list">
+    {% for stmt in resolved_statements | sort(attribute='index') %}
+        <li>
+            {{ stmt.text }}
+            {% if stmt.action_type %}
+            <span class="statement-meta">({{ stmt.action_type }})</span>
+            {% endif %}
+        </li>
+    {% endfor %}
+    </ol>
+    {% endif %}
+
+    {% if resolution.parse_confidence or resolution.needs_review %}
+    <div class="text-tertiary mt-16" style="font-size: 11px; text-align: right;">
+        {% if resolution.parse_confidence %}
+        Parse confidence: {{ (resolution.parse_confidence * 100) | round(1) }}%
+        {% endif %}
+        {% if resolution.needs_review %}
+        <span style="color: var(--orange); margin-left: 12px;">⚠ Flagged for review</span>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endif %}
+
+<!-- Related Resolutions -->
+{% if related_resolutions %}
+<div class="content-panel">
+    <h2>Related Resolutions</h2>
+    <div class="related-resolutions">
+        {% for related in related_resolutions %}
+        <a href="/resolution/{{ related.id }}" class="related-chip" hx-boost="true">{{ related.resolution_number }}</a>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- Footer Actions -->
+<div class="panel mt-16" style="padding: 16px 24px;">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <a href="/search" class="btn btn-secondary">Back to Search</a>
+        <button class="btn btn-secondary btn-download" disabled title="Download coming soon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            Download
+        </button>
+    </div>
+</div>
+
+{% endif %}
+{% endblock %}
