@@ -1,0 +1,54 @@
+{
+  "ok": true,
+  "sources": [
+    {
+      "id": "federal-register",
+      "label": "Federal Register",
+      "level": "federal",
+      "status": "live",
+      "note": "Rules, proposed rules, notices and Presidential documents, with the official text read from GovInfo."
+    },
+    {
+      "id": "govinfo",
+      "label": "GovInfo",
+      "level": "federal",
+      "status": "live",
+      "note": "Search is live. Policy text is not read for this source in the demo, so no issues are identified."
+    },
+    {
+      "id": "congress",
+      "label": "Congress.gov",
+      "level": "federal",
+      "status": "live",
+      "note": "Look up one bill by reference, such as hr 1234 119. Policy text is not read in the demo."
+    },
+    {
+      "id": "regulations",
+      "label": "Regulations.gov",
+      "level": "federal",
+      "status": "live",
+      "note": "Search is live. Policy text is not read for this source in the demo, so no issues are identified."
+    },
+    {
+      "id": "washington",
+      "label": "Washington State Legislature",
+      "level": "state",
+      "status": "live",
+      "note": "Look up a bill by number, such as HB 1100 or SB 5100. Official bill text is read from the Legislature."
+    },
+    {
+      "id": "oregon",
+      "label": "Oregon Legislature",
+      "level": "state",
+      "status": "not_available",
+      "note": "Oregon's data service needs an agreement and credentials that Policy Sentinel has not accepted, so it is off."
+    },
+    {
+      "id": "idaho",
+      "label": "Idaho Legislature",
+      "level": "state",
+      "status": "not_available",
+      "note": "No Idaho source is enabled in this demo; this remains a recorded gap."
+    }
+  ]
+}

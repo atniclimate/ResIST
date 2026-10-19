@@ -1,0 +1,69 @@
+{
+  "ok": true,
+  "source": "federal-register",
+  "query": "Executive Order 13175",
+  "page": 1,
+  "total": 10000,
+  "results": [
+    {
+      "sourceId": "federal-register",
+      "identifier": "90 FR 60570 (FR Doc. 2025-23880)",
+      "title": "Office of the Attorney General; Consolidation of the Office of the Executive Secretariat Into the Justice Management Division",
+      "issuingBody": "Justice Department",
+      "kind": "Rule",
+      "date": "2025-12-29",
+      "officialUrl": "https://www.federalregister.gov/d/2025-23880",
+      "textUrl": null,
+      "retrievedAt": "2026-10-19T19:12:31.071Z",
+      "textAvailable": true
+    },
+    {
+      "sourceId": "federal-register",
+      "identifier": "91 FR 11140 (FR Doc. 2026-04570)",
+      "title": "Paper and Paper-Based Packaging Promotion, Research and Information Order Termination",
+      "issuingBody": "Agriculture Department; Agricultural Marketing Service",
+      "kind": "Rule",
+      "date": "2026-03-09",
+      "officialUrl": "https://www.federalregister.gov/d/2026-04570",
+      "textUrl": null,
+      "retrievedAt": "2026-10-19T19:12:31.071Z",
+      "textAvailable": true
+    },
+    {
+      "sourceId": "federal-register",
+      "identifier": "89 FR 20538 (FR Doc. 2024-06055)",
+      "title": "Revised VA Tribal Consultation Policy and Directive 8603",
+      "issuingBody": "Veterans Affairs Department",
+      "kind": "Notice",
+      "date": "2024-03-22",
+      "officialUrl": "https://www.federalregister.gov/d/2024-06055",
+      "textUrl": null,
+      "retrievedAt": "2026-10-19T19:12:31.071Z",
+      "textAvailable": true
+    },
+    {
+      "sourceId": "federal-register",
+      "identifier": "91 FR 11441 (FR Doc. 2026-04694)",
+      "title": "Updates to the Popcorn Promotion, Research, and Consumer Information Order",
+      "issuingBody": "Agriculture Department; Agricultural Marketing Service",
+      "kind": "Rule",
+      "date": "2026-03-10",
+      "officialUrl": "https://www.federalregister.gov/d/2026-04694",
+      "textUrl": null,
+      "retrievedAt": "2026-10-19T19:12:31.071Z",
+      "textAvailable": true
+    },
+    {
+      "sourceId": "federal-register",
+      "identifier": "91 FR 23015 (FR Doc. 2026-08348)",
+      "title": "Approval of Missouri's Request for Partial Program Delegation of Clean Air Act 112(r) Prevention of Accidental Release Program",
+      "issuingBody": "Environmental Protection Agency",
+      "kind": "Rule",
+      "date": "2026-04-29",
+      "officialUrl": "https://www.federalregister.gov/d/2026-08348",
+      "textUrl": null,
+      "retrievedAt": "2026-10-19T19:12:31.071Z",
+      "textAvailable": true
+    }
+  ]
+}

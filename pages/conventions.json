@@ -1,0 +1,23 @@
+{
+  "_note": "Convention details offered in the draft editor. Add or correct an entry when ATNI announces a convention; leave a value empty while it is unknown (the Word file keeps a fillable placeholder). Sources: the official 2026 resolution template and the certification of ATNI Resolution 26-51. No contact details here.",
+  "conventions": [
+    {
+      "id": "next",
+      "label": "Next convention (details not yet announced)",
+      "convention": "", "year": 2027, "location": "", "venue": "", "dates": "", "draftDue": "", "finalDue": "", "formCode": ""
+    },
+    {
+      "id": "2026-annual",
+      "label": "2026 Annual Convention, Snoqualmie, Washington",
+      "convention": "2026 Annual Convention", "year": 2026, "location": "Snoqualmie, Washington",
+      "venue": "Snoqualmie Casino and Hotel", "dates": "September 13-17, 2026", "draftDue": "August 28, 2026",
+      "finalDue": "12:00 PM on September 16, 2026", "formCode": "ATNIANN2026"
+    },
+    {
+      "id": "2026-midyear",
+      "label": "2026 Midyear Convention, Ferndale, Washington",
+      "convention": "2026 Midyear Convention", "year": 2026, "location": "Ferndale, Washington",
+      "venue": "Silver Reef Casino Resort", "dates": "May 17 - 21, 2026", "draftDue": "", "finalDue": "", "formCode": ""
+    }
+  ]
+}

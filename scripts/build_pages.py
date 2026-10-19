@@ -1,8 +1,8 @@
-"""Build the static ResIST site (pages/index.html + the database) for GitHub Pages (D-053).
+"""Build the static ResIST site (everything in pages/ + the database) for GitHub Pages (D-053, D-054).
 
 Usage:  python scripts/build_pages.py [docs/resolutions]
 
-Writes RESIST_DATA_DIR/exchange/pages/: index.html, atni-logo.jpg, .nojekyll, build.json and a read-only copy
+Writes RESIST_DATA_DIR/exchange/pages/: a copy of pages/, .nojekyll, build.json and a read-only copy
 of datapool/db/resolutions.db with a `source` table (document SHA-256 -> atnitribes.org URL) added. The
 output carries corpus text, so it stays in the pool; publishing it is a separate, deliberate step.
 Only ATNI web-published (T0, D-052) material is in the database, which is asserted, not assumed.
@@ -23,7 +23,7 @@ sys.path.insert(0, str(ROOT))
 from src.storage.database import DATA_DIR, DATABASE_PATH  # noqa: E402
 
 CONTACT = re.compile(r"[\w.+-]+@[\w-]+\.[\w.]+|\(?\b\d{3}\)?[-. ]\d{3}[-. ]\d{4}\b")
-MASK = "[contact removed — see source PDF]"
+MASK = "[contact removed; see source PDF]"
 
 
 def main(res_dir: Path) -> int:
@@ -77,8 +77,7 @@ def main(res_dir: Path) -> int:
              "built": datetime.now(UTC).strftime("%Y-%m-%d %H:%M UTC"),
              "db_sha256": hashlib.sha256(db_out.read_bytes()).hexdigest()}
     (out / "build.json").write_text(json.dumps(build, indent=1), encoding="utf-8")
-    shutil.copy(ROOT / "pages" / "index.html", out / "index.html")
-    shutil.copy(ROOT / "assets" / "atni_logo_tan2-300x300.jpg", out / "atni-logo.jpg")
+    shutil.copytree(ROOT / "pages", out, dirs_exist_ok=True)
     (out / ".nojekyll").write_text("", encoding="utf-8")
     print(json.dumps({"out": str(out), **build}))
     return 0
