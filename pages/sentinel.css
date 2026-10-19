@@ -1,0 +1,28 @@
+/* Policy Sentinel lookup panel. The dialog frame, header and body come from site.css; this adds only the form,
+   result rows and flag list. Colors are the semantic --atni-* variables. */
+
+dialog.sentinel .sn-form { display: grid; gap: 0 var(--atni-space-step-4); grid-template-columns: 1fr; }
+@media (min-width: 40rem) { dialog.sentinel .sn-form { grid-template-columns: minmax(0, 14rem) minmax(0, 1fr); } }
+dialog.sentinel .sn-submit { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: var(--atni-space-step-2) var(--atni-space-step-4); margin: 0 0 var(--atni-space-step-4); }
+dialog.sentinel .sn-submit .meta { flex: 1 1 16rem; margin: 0; }
+
+dialog.sentinel .sn-list { list-style: none; margin: 0; padding: 0; }
+dialog.sentinel .sn-item { padding: var(--atni-space-step-4) 0; border-top: 1px solid var(--atni-non-text-rule); }
+dialog.sentinel .sn-title { font-family: var(--atni-type-family-display); font-weight: var(--atni-type-weight-display-medium); color: var(--atni-text-heading); margin: 0 0 var(--atni-space-step-1); }
+dialog.sentinel .sn-item .meta, dialog.sentinel .sn-detail .meta { margin: 0 0 var(--atni-space-step-2); }
+dialog.sentinel .sn-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--atni-space-step-2) var(--atni-space-step-4); margin: var(--atni-space-step-2) 0 0; }
+
+dialog.sentinel .sn-out[hidden] { display: none; }
+dialog.sentinel .sn-detail { margin-top: var(--atni-space-step-4); }
+dialog.sentinel .sn-detail:empty { display: none; }
+dialog.sentinel .sn-detail h3:focus-visible { outline-offset: 4px; }
+dialog.sentinel .sn-detail h3 { margin-bottom: var(--atni-space-step-2); }
+dialog.sentinel .sn-flags { border: 0; padding: 0; margin: var(--atni-space-step-4) 0; min-width: 0; }
+dialog.sentinel .sn-flags legend { padding: 0; margin-bottom: var(--atni-space-step-2); font-family: var(--atni-type-family-display); font-weight: var(--atni-type-weight-display-medium); font-size: var(--atni-type-label-size); letter-spacing: var(--atni-type-label-tracking); color: var(--atni-text-secondary); }
+/* A flag chosen for the notes takes the same red left rule as a carried clause. */
+dialog.sentinel .sn-flag { padding: var(--atni-space-step-2) var(--atni-space-step-3); margin-bottom: var(--atni-space-step-2); border-left: 3px solid var(--atni-non-text-rule); background: var(--atni-ground-overlay); overflow-wrap: anywhere; }
+dialog.sentinel .sn-flag:has(input:checked) { border-left-color: var(--atni-non-text-accent); }
+dialog.sentinel .sn-flag .meta { display: inline-block; }
+dialog.sentinel .sn-flag code { font-size: 0.85em; }
+dialog.sentinel .sn-links { margin: var(--atni-space-step-5) 0 0; padding-top: var(--atni-space-step-4); border-top: 1px solid var(--atni-non-text-rule); }
+dialog.sentinel .sn-links:empty { display: none; }

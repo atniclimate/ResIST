@@ -1,0 +1,71 @@
+{
+  "ok": true,
+  "citation": {
+    "sourceId": "federal-register",
+    "identifier": "90 FR 60570 (FR Doc. 2025-23880)",
+    "title": "Office of the Attorney General; Consolidation of the Office of the Executive Secretariat Into the Justice Management Division",
+    "issuingBody": "Justice Department",
+    "kind": "Rule",
+    "date": "2025-12-29",
+    "officialUrl": "https://www.federalregister.gov/d/2025-23880",
+    "textUrl": "https://www.govinfo.gov/content/pkg/FR-2025-12-29/html/2025-23880.htm",
+    "retrievedAt": "2026-10-19T19:12:31.359Z",
+    "textAvailable": true
+  },
+  "receipt": {
+    "sha256": "b3ee0b8f7d68c5883adaab8020965fe2cde4f4223cb1749ce5e8a61352979683",
+    "bytes": 8950,
+    "retrievedAt": "2026-10-19T19:12:31.359Z",
+    "textUrl": "https://www.govinfo.gov/content/pkg/FR-2025-12-29/html/2025-23880.htm"
+  },
+  "engine": {
+    "rulesVersion": "demo-rules-1.0.2"
+  },
+  "issues": [
+    {
+      "id": "consultation_language-1",
+      "type": "consultation_language",
+      "label": "Consultation wording",
+      "quote": "Executive Order 13175 (Consultation and Coordination With Indian Tribal Governments)",
+      "locator": "/html[1]/body[1]/pre[1]/paragraph[37]",
+      "rule": "The sentence contains consult, consultation, government-to-government, Tribal implications, or Executive Order 13175.",
+      "limits": "Wording only. It does not show that consultation happened, that it was adequate, or that any right attaches to it."
+    },
+    {
+      "id": "tribal_reference-1",
+      "type": "tribal_reference",
+      "label": "Tribal wording",
+      "quote": "The Unfunded Mandates Reform Act of 1995, 2 U.S.C. 1531-1538, requires Federal agencies to determine whether a rule, if promulgated, will result in the expenditure by State, local, or Tribal governments, in the aggregate, or by the private sector, of $100 million (adjusted annually for inflation) or more in any one year.",
+      "locator": "/html[1]/body[1]/pre[1]/paragraph[34]",
+      "rule": "The sentence contains Indian Tribe, Indian Tribal, Tribal, Tribe, or Tribes.",
+      "limits": "This marks where the text uses the word. It says nothing about effect on any particular Nation, and it does not establish that a Nation is named."
+    },
+    {
+      "id": "date_or_deadline-1",
+      "type": "date_or_deadline",
+      "label": "Date or deadline",
+      "quote": "Effective December 29, 2025.",
+      "locator": "/html[1]/body[1]/pre[1]/paragraph[12]",
+      "rule": "The sentence contains a calendar date together with words such as effective, comments, due, compliance, must be received, or no later than.",
+      "limits": "Dates are read from the text as written. Extensions, corrections and later notices can change them."
+    },
+    {
+      "id": "status_signal-1",
+      "type": "status_signal",
+      "label": "Status signal",
+      "quote": "Final rule.",
+      "locator": "/html[1]/body[1]/pre[1]/paragraph[9]",
+      "rule": "The sentence contains words such as proposed, final, withdrawn, rescind, extension of comment period, correction, or supersede.",
+      "limits": "The words come from the document itself. They do not give the current legal status of the policy."
+    },
+    {
+      "id": "cross_reference-1",
+      "type": "cross_reference",
+      "label": "Cross-reference",
+      "quote": "28 CFR Part 0",
+      "locator": "/html[1]/body[1]/pre[1]/paragraph[5]",
+      "rule": "The sentence cites a Code of Federal Regulations part or section, a U.S. Code section, an Executive Order, or a Public Law.",
+      "limits": "The citation is listed as written. The cited provision is not retrieved or checked here, and it may have changed."
+    }
+  ]
+}
