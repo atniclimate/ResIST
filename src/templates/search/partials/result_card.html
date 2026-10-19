@@ -1,0 +1,32 @@
+<a href="/resolution/{{ result.id }}?highlight_query={{ query | urlencode }}" class="resolution-card">
+    <div class="resolution-card-header">
+        <span class="resolution-id">{{ result.resolution_number or "RES" }}</span>
+        <span class="resolution-date">
+            {% if result.date_adopted %}{{ result.date_adopted }}{% elif result.convention_year %}{{ result.convention_year }}{% endif %}
+        </span>
+    </div>
+
+    {% if result.title %}
+    <h3 class="resolution-title">{{ result.title }}</h3>
+    {% endif %}
+
+    {% if result.summary %}
+    <p class="resolution-summary">{{ result.summary[:300] }}{% if result.summary|length > 300 %}...{% endif %}</p>
+    {% elif result.snippet %}
+    {# Snippet should be pre-truncated by backend, but add CSS overflow as safety #}
+    <p class="resolution-summary snippet-text">{{ result.snippet | safe }}</p>
+    {% endif %}
+
+    <div class="resolution-card-footer">
+        <div class="tag-group">
+            {% if result.themes %}
+            {% for theme in result.themes[:3] %}
+            <span class="tag">{{ theme | replace("_", " ") }}</span>
+            {% endfor %}
+            {% endif %}
+        </div>
+        {% if result.sponsor_names %}
+        <span class="resolution-sponsor">{{ result.sponsor_names | join(", ") }}</span>
+        {% endif %}
+    </div>
+</a>

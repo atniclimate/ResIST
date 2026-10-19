@@ -1,0 +1,56 @@
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Local data
+*.db
+!data/.gitkeep
+
+# Uploads: runtime scratch for the upload endpoint (src/ingestion/intake.py).
+# Real PDFs moved to datapool/inbox/ and fixtures to tests/fixtures/adversarial/ at R0.4;
+# the directory itself is deleted at R2b when the datapool separation lands.
+uploads/*
+!uploads/.gitkeep
+
+# Logs
+*.log
+
+# Environment
+.env
+.env.local
+
+# Build artifacts (only ignored by a machine-global gitignore otherwise -- would be tracked on a fresh clone)
+*.egg-info/
+build/
+dist/
+
+# Test and tooling caches
+.pytest_cache/
+.remember/
+
+# Datapool: every byte of corpus data (RESIST_DATA_DIR). Gitignored whole.
+datapool/*
+!datapool/.gitkeep
+!datapool/README.md
+
+# Corpus and runtime state (pool data; migrates to datapool/ at R2b). Never tracked.
+data/*
+!data/.gitkeep
+source-documents/

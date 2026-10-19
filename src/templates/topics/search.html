@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Topics & Themes - ATNI ResIST{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="page-header">
+    <h1>Topics & Themes</h1>
+    <p>Explore resolutions organized by theme. Click a topic to see all related resolutions.</p>
+</div>
+
+<!-- Theme Grid -->
+<div class="theme-grid mb-24">
+    {% for theme in themes %}
+    <a href="/topics/{{ theme.id }}" class="theme-panel">
+        <div class="theme-name">{{ theme.name }}</div>
+        <div class="theme-count">{{ theme.resolution_count }} resolution{% if theme.resolution_count != 1 %}s{% endif %}</div>
+    </a>
+    {% else %}
+    <div class="empty-state" style="grid-column: 1 / -1;">
+        <h3>No Topics Available</h3>
+        <p>Topics will appear here once resolutions have been processed and tagged.</p>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Advanced Citation Search (Collapsed by default) -->
+<details class="mb-16">
+    <summary>Advanced: Citation Type Search</summary>
+    <p class="mb-16" style="font-size: 13px;">Search for resolutions by citation type. Select multiple types to find resolutions referencing all of them.</p>
+
+    <section>
+        <div id="topic-control">
+            {% include "topics/partials/topic_chips.html" %}
+        </div>
+    </section>
+
+    <section id="export-controls" {% if not selected_topics %}style="display:none"{% endif %} class="mt-16">
+        <div class="panel-grid-2" style="gap: 16px;">
+            <div class="filter-group">
+                <label>Export Format</label>
+                <div style="display: flex; gap: 16px;">
+                    <label style="display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 400; text-transform: none; letter-spacing: 0;">
+                        <input type="radio" name="format" value="docx" checked style="width: auto;"> Word (.docx)
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 400; text-transform: none; letter-spacing: 0;">
+                        <input type="radio" name="format" value="pdf" style="width: auto;"> PDF
+                    </label>
+                </div>
+            </div>
+            <div style="display: flex; align-items: flex-end;">
+                <button type="button" id="export-btn" class="btn btn-primary"
+                        hx-get="/export/package"
+                        hx-include="[name='selected'], [name='format']"
+                        hx-indicator="#export-spinner">
+                    Generate Evidence Package
+                </button>
+                <span id="export-spinner" class="htmx-indicator" style="margin-left: 12px;">Generating...</span>
+            </div>
+        </div>
+    </section>
+
+    <section id="results" class="mt-24">
+        {% if selected_topics %}
+        <div hx-get="/topics/results"
+             hx-include="[name='selected']"
+             hx-target="#results"
+             hx-trigger="load">
+            <span class="htmx-indicator" aria-busy="true">Loading...</span>
+        </div>
+        {% endif %}
+    </section>
+</details>
+{% endblock %}

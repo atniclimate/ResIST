@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Character encoding and viewport -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- HTMX configuration for error handling -->
+    <!-- Include all defaults plus custom 422 handling: https://htmx.org/docs/#config -->
+    <meta name="htmx-config" content='{"responseHandling":[{"code":"204","swap":false},{"code":"[23]..","swap":true},{"code":"422","swap":true,"error":false},{"code":"[45]..","swap":false,"error":true},{"code":"...","swap":false}]}'>
+
+    <!-- Page title -->
+    <title>{% block title %}ATNI ResIST{% endblock %}</title>
+
+    <!-- Meta description for SEO -->
+    <meta name="description" content="ATNI Resolution Information Synthesis Tool - Search and explore 50+ years of ATNI resolutions">
+
+    <!-- Preconnect to Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <!-- Lexend Font - Load before render -->
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Design System CSS -->
+    <link rel="stylesheet" href="/static/css/design-system.css">
+
+    <!-- HTMX - synchronous load (not deferred) for immediate availability -->
+    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+
+    <!-- Page-specific head content -->
+    {% block head %}{% endblock %}
+</head>
+<body>
+    <!-- Site Header -->
+    <header class="site-header">
+        <div class="container">
+            <div class="header-inner">
+                <!-- Main Navigation -->
+                <nav class="main-nav">
+                    <a href="/search" class="nav-tab {% if active_page == 'search' %}active{% endif %}">Search</a>
+                    <a href="/topics" class="nav-tab {% if active_page == 'topics' %}active{% endif %}">Topics</a>
+                    <span class="nav-tab disabled">Archive</span>
+                    <span class="nav-tab disabled">Impact</span>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="content-wrapper">
+        <div class="container">
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <!-- Site Footer -->
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-inner">
+                <div class="footer-brand">
+                    <img src="/assets/atni_logo_tan2-300x300.jpg"
+                         alt="ATNI"
+                         onerror="this.style.display='none';">
+                    <span>Affiliated Tribes of Northwest Indians</span>
+                </div>
+                <div class="footer-meta">
+                    ATNI Resolution Information Synthesis Tool - Prototype v0.1
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Page-specific scripts -->
+    {% block scripts %}{% endblock %}
+</body>
+</html>

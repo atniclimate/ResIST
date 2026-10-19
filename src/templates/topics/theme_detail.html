@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}{{ theme.name }} - ATNI ResIST{% endblock %}
+
+{% block content %}
+<!-- Back Link -->
+<a href="/topics" class="back-link">&larr; Back to Topics</a>
+
+<!-- Page Header -->
+<div class="page-header">
+    <h1>{{ theme.name }}</h1>
+    {% if theme.description %}
+    <p>{{ theme.description }}</p>
+    {% endif %}
+</div>
+
+<!-- Results Count -->
+<p class="results-count">{{ resolutions|length }} resolution{% if resolutions|length != 1 %}s{% endif %} in this topic</p>
+
+<!-- Resolution Results -->
+{% if resolutions %}
+<div class="results-list">
+    {% for res in resolutions %}
+    <a href="/resolution/{{ res.id }}" class="resolution-card">
+        <div class="resolution-card-header">
+            <span class="resolution-id">{{ res.resolution_number or "RES" }}</span>
+            <span class="resolution-date">
+                {% if res.date_adopted %}{{ res.date_adopted }}{% elif res.convention_year %}{{ res.convention_year }}{% endif %}
+            </span>
+        </div>
+
+        {% if res.title %}
+        <h3 class="resolution-title">{{ res.title }}</h3>
+        {% endif %}
+
+        {% if res.summary %}
+        <p class="resolution-summary">{{ res.summary[:300] }}{% if res.summary|length > 300 %}...{% endif %}</p>
+        {% endif %}
+
+        <div class="resolution-card-footer">
+            <div class="tag-group">
+                {% if res.themes %}
+                {% for t in res.themes[:3] %}
+                <span class="tag">{{ t | replace("_", " ") }}</span>
+                {% endfor %}
+                {% endif %}
+            </div>
+            {% if res.sponsor_names %}
+            <span class="resolution-sponsor">{{ res.sponsor_names | join(", ") }}</span>
+            {% endif %}
+        </div>
+    </a>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+    <h3>No Resolutions Found</h3>
+    <p>No resolutions have been tagged with this topic yet.</p>
+</div>
+{% endif %}
+{% endblock %}

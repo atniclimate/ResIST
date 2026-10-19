@@ -1,0 +1,136 @@
+#!/bin/sh
+# ATNI-ResIST pre-commit guard (R0.14).
+#
+# Makes defects H07, H08, H09 and H10 unrepeatable, and enforces the CLAUDE.md rule
+# that personal contact details never enter a tracked file.
+#
+# Version-controlled at scripts/hooks/pre-commit and run from there via
+#   git config core.hooksPath scripts/hooks
+# (scripts/install-hooks.ps1 does exactly that). No Python, no pre-commit package,
+# no network: a POSIX sh script and git plumbing only, so it works in the offline
+# venv and in Git Bash on Windows.
+#
+# Bypass, when you have a reason and can name it in the commit message:
+#   git commit --no-verify
+#
+# Checks, all against STAGED content, never the working tree:
+#   1. no database file staged            (H08: data/resolutions.db was force-added)
+#   2. no Python bytecode staged          (H09: 23 tracked .pyc files)
+#   3. no datetime.utcnow( in staged .py  (H07: naive UTC timestamps)
+#   4. no CRLF in a staged text blob      (H10: line-ending noise; .gitattributes says eol=lf)
+#   5. no email address or phone number   (CLAUDE.md: names/roles/affiliations only, in the
+#                                          datapool, never with contact details)
+
+set -u
+
+fail=0
+CR=$(printf '\r')
+
+say()    { printf '%s\n' "$*" >&2; }
+reject() {
+    fail=1
+    say ""
+    say "pre-commit REJECTED -- $1"
+    shift
+    for offender in "$@"; do
+        say "    $offender"
+    done
+}
+
+staged_paths=$(git diff --cached --name-only --no-renames --diff-filter=ACM)
+if [ -z "$staged_paths" ]; then
+    exit 0
+fi
+
+# Text blobs only: --numstat prints "-<TAB>-<TAB>path" for binary, so drop lines starting with "-".
+staged_text=$(git diff --cached --numstat --no-renames --diff-filter=ACM | grep -v '^-' | cut -f3-)
+
+old_ifs=$IFS
+IFS='
+'
+
+# --- 1. database files -------------------------------------------------------
+offenders=$(printf '%s\n' "$staged_paths" | grep -Ei '\.(db|sqlite|sqlite3)$' || true)
+if [ -n "$offenders" ]; then
+    reject "a database file is staged. Corpus and runtime state live in the datapool, never in git." $offenders
+fi
+
+# --- 2. Python bytecode ------------------------------------------------------
+offenders=$(printf '%s\n' "$staged_paths" | grep -E '(^|/)__pycache__/|\.py[co]$' || true)
+if [ -n "$offenders" ]; then
+    reject "Python bytecode is staged." $offenders
+fi
+
+# --- 3. naive UTC timestamps -------------------------------------------------
+offenders=""
+for path in $staged_text; do
+    case "$path" in
+        *.py) ;;
+        *) continue ;;
+    esac
+    if git show ":$path" | grep -qE '\.utcnow[[:space:]]*\('; then
+        offenders="${offenders:+$offenders
+}$path"
+    fi
+done
+if [ -n "$offenders" ]; then
+    reject "datetime.utcnow() is staged. Use datetime.now(UTC) -- utcnow() returns a naive datetime." $offenders
+fi
+
+# --- 4. line-ending normalization still in force -----------------------------
+# .gitattributes says "* text=auto eol=lf", so git normalizes CRLF to LF in the index
+# at `git add` time and a CR cannot reach a normalized blob. The failure mode worth
+# guarding is therefore the rule being weakened, not a stray CR: a path whose effective
+# `text` attribute is unset (`-text` or `binary` in .gitattributes) skips normalization
+# and stores CRLF verbatim. Both the cause and the symptom are checked.
+if ! git show ":.gitattributes" 2>/dev/null | grep -q 'text=auto'; then
+    reject "the staged .gitattributes no longer sets 'text=auto'. Line-ending normalization (H10) depends on it." ".gitattributes"
+fi
+offenders=""
+for path in $staged_text; do
+    attr=$(git check-attr text -- "$path" | sed 's/.*: //')
+    if [ "$attr" = "unset" ]; then
+        offenders="${offenders:+$offenders
+}$path (text attribute is unset, so CRLF is stored verbatim)"
+        continue
+    fi
+    if git show ":$path" | grep -q "$CR"; then
+        offenders="${offenders:+$offenders
+}$path (CR in the staged blob)"
+    fi
+done
+if [ -n "$offenders" ]; then
+    reject "line endings are not normalized. Run: git add --renormalize ." $offenders
+fi
+
+# --- 5. contact details ------------------------------------------------------
+# Rosters carry names, roles and affiliations only, and only inside the gitignored
+# datapool. An address or phone number in a TRACKED file is the failure this catches.
+# example.com / example.org / noreply@ are documentation placeholders and are allowed.
+offenders=""
+for path in $staged_text; do
+    hit=$(git show ":$path" \
+        | grep -nEi '[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}|(\+?1[-. ])?\(?[0-9]{3}\)?[-. ][0-9]{3}[-. ][0-9]{4}' \
+        | grep -vEi '@example\.(com|org|net)|noreply@|resist-allow-contact' \
+        | head -3 || true)
+    if [ -n "$hit" ]; then
+        for line in $hit; do
+            offenders="${offenders:+$offenders
+}$path:$line"
+        done
+    fi
+done
+if [ -n "$offenders" ]; then
+    reject "what looks like an email address or phone number is staged. Contact details never enter a tracked file (CLAUDE.md). Append the marker  resist-allow-contact  to the line if this is a false positive." $offenders
+fi
+
+IFS=$old_ifs
+
+if [ "$fail" -ne 0 ]; then
+    say ""
+    say "Nothing was committed. Fix the above, or bypass deliberately with: git commit --no-verify"
+    say ""
+    exit 1
+fi
+
+exit 0

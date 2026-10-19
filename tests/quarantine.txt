@@ -1,0 +1,38 @@
+# tests/quarantine.txt -- R0.7 quarantine register. One line per test: node id | cause | owner | expiry.
+# Cause Q1: Starlette 1.6 removed the old TemplateResponse(name, {"request": ...}) signature; 14 call sites in src/api/ use it.
+#   Scheduled fix: roadmap R5.2 (R5.1 rebuilds these routers anyway). Quarantined 2026-09-04.
+tests/test_export.py::test_export_controls_in_topics_page | Q1 TemplateResponse old signature (14 sites) | owner=project owner (ATNI Tribal Climate Liaison) | expires=2026-12-31 or R5.2 exit, whichever first
+tests/test_export.py::test_export_button_has_correct_htmx_wiring | Q1 TemplateResponse old signature (14 sites) | owner=project owner (ATNI Tribal Climate Liaison) | expires=2026-12-31 or R5.2 exit, whichever first
+tests/test_topics.py::test_topics_page_loads | Q1 TemplateResponse old signature (14 sites) | owner=project owner (ATNI Tribal Climate Liaison) | expires=2026-12-31 or R5.2 exit, whichever first
+tests/test_topics.py::test_themes_page_shows_grid | Q1 TemplateResponse old signature (14 sites) | owner=project owner (ATNI Tribal Climate Liaison) | expires=2026-12-31 or R5.2 exit, whichever first
+tests/test_topics.py::test_themes_have_counts | Q1 TemplateResponse old signature (14 sites) | owner=project owner (ATNI Tribal Climate Liaison) | expires=2026-12-31 or R5.2 exit, whichever first
+tests/test_topics.py::test_theme_detail_page | Q1 TemplateResponse old signature (14 sites) | owner=project owner (ATNI Tribal Climate Liaison) | expires=2026-12-31 or R5.2 exit, whichever first
+tests/test_topics.py::test_topics_suggest_returns_suggestions | Q1 TemplateResponse old signature (14 sites) | owner=project owner (ATNI Tribal Climate Liaison) | expires=2026-12-31 or R5.2 exit, whichever first
+tests/test_topics.py::test_topics_suggest_excludes_selected | Q1 TemplateResponse old signature (14 sites) | owner=project owner (ATNI Tribal Climate Liaison) | expires=2026-12-31 or R5.2 exit, whichever first
+tests/test_topics.py::test_topics_add_updates_chips | Q1 TemplateResponse old signature (14 sites) | owner=project owner (ATNI Tribal Climate Liaison) | expires=2026-12-31 or R5.2 exit, whichever first
+tests/test_topics.py::test_topics_remove_updates_chips | Q1 TemplateResponse old signature (14 sites) | owner=project owner (ATNI Tribal Climate Liaison) | expires=2026-12-31 or R5.2 exit, whichever first
+tests/test_topics.py::test_topics_results_returns_resolutions | Q1 TemplateResponse old signature (14 sites) | owner=project owner (ATNI Tribal Climate Liaison) | expires=2026-12-31 or R5.2 exit, whichever first
+tests/test_topics.py::test_topics_results_empty_suggestion | Q1 TemplateResponse old signature (14 sites) | owner=project owner (ATNI Tribal Climate Liaison) | expires=2026-12-31 or R5.2 exit, whichever first
+tests/test_topics.py::test_topics_results_empty_selection | Q1 TemplateResponse old signature (14 sites) | owner=project owner (ATNI Tribal Climate Liaison) | expires=2026-12-31 or R5.2 exit, whichever first
+tests/test_topics.py::test_topics_nav_link_exists | Q1 TemplateResponse old signature (14 sites) | owner=project owner (ATNI Tribal Climate Liaison) | expires=2026-12-31 or R5.2 exit, whichever first
+tests/test_topics.py::test_topics_dropdown_htmx_wiring | Q1 TemplateResponse old signature (14 sites) | owner=project owner (ATNI Tribal Climate Liaison) | expires=2026-12-31 or R5.2 exit, whichever first
+tests/test_topics.py::test_topic_chip_htmx_wiring | Q1 TemplateResponse old signature (14 sites) | owner=project owner (ATNI Tribal Climate Liaison) | expires=2026-12-31 or R5.2 exit, whichever first
+tests/test_topics.py::test_topics_page_has_hidden_selected_input | Q1 TemplateResponse old signature (14 sites) | owner=project owner (ATNI Tribal Climate Liaison) | expires=2026-12-31 or R5.2 exit, whichever first
+tests/test_topics.py::test_topics_suggest_respects_query | Q1 TemplateResponse old signature (14 sites) | owner=project owner (ATNI Tribal Climate Liaison) | expires=2026-12-31 or R5.2 exit, whichever first
+tests/test_topics.py::test_topics_multiple_add_accumulates | Q1 TemplateResponse old signature (14 sites) | owner=project owner (ATNI Tribal Climate Liaison) | expires=2026-12-31 or R5.2 exit, whichever first
+FAILED tests/test_topics_security.py::test_topics_remove_handles_valid_topics
+FAILED tests/test_topics_security.py::test_topics_results_works_with_max_topics
+tests/test_topics_security.py::test_topics_add_with_9_topics_works | Q1 TemplateResponse old signature (14 sites) | owner=project owner (ATNI Tribal Climate Liaison) | expires=2026-12-31 or R5.2 exit, whichever first
+tests/test_ui.py::test_search_page_loads | Q1 TemplateResponse old signature (14 sites) | owner=project owner (ATNI Tribal Climate Liaison) | expires=2026-12-31 or R5.2 exit, whichever first
+tests/test_ui.py::test_search_htmx_returns_fragment | Q1 TemplateResponse old signature (14 sites) | owner=project owner (ATNI Tribal Climate Liaison) | expires=2026-12-31 or R5.2 exit, whichever first
+tests/test_ui.py::test_resolution_detail_404 | Q1 TemplateResponse old signature (14 sites) | owner=project owner (ATNI Tribal Climate Liaison) | expires=2026-12-31 or R5.2 exit, whichever first
+tests/test_ui.py::test_search_form_has_filters | Q1 TemplateResponse old signature (14 sites) | owner=project owner (ATNI Tribal Climate Liaison) | expires=2026-12-31 or R5.2 exit, whichever first
+tests/test_ui.py::test_search_with_empty_query | Q1 TemplateResponse old signature (14 sites) | owner=project owner (ATNI Tribal Climate Liaison) | expires=2026-12-31 or R5.2 exit, whichever first
+tests/test_ui.py::test_search_htmx_includes_result_structure | Q1 TemplateResponse old signature (14 sites) | owner=project owner (ATNI Tribal Climate Liaison) | expires=2026-12-31 or R5.2 exit, whichever first
+tests/test_ui.py::test_timeline_page_loads | Q1 TemplateResponse old signature (14 sites) | owner=project owner (ATNI Tribal Climate Liaison) | expires=2026-12-31 or R5.2 exit, whichever first
+tests/test_ui.py::test_timeline_page_has_filters | Q1 TemplateResponse old signature (14 sites) | owner=project owner (ATNI Tribal Climate Liaison) | expires=2026-12-31 or R5.2 exit, whichever first
+tests/test_ui.py::test_theme_search_endpoint | Q1 TemplateResponse old signature (14 sites) | owner=project owner (ATNI Tribal Climate Liaison) | expires=2026-12-31 or R5.2 exit, whichever first
+tests/test_ui.py::test_theme_search_htmx | Q1 TemplateResponse old signature (14 sites) | owner=project owner (ATNI Tribal Climate Liaison) | expires=2026-12-31 or R5.2 exit, whichever first
+tests/test_ui.py::test_resolution_detail_structure | Q1 TemplateResponse old signature (14 sites) | owner=project owner (ATNI Tribal Climate Liaison) | expires=2026-12-31 or R5.2 exit, whichever first
+tests/test_topics_security.py::test_topics_remove_handles_valid_topics | Q1 TemplateResponse old signature (14 sites) | owner=project owner (ATNI Tribal Climate Liaison) | expires=2026-12-31 or R5.2 exit, whichever first
+tests/test_topics_security.py::test_topics_results_works_with_max_topics | Q1 TemplateResponse old signature (14 sites) | owner=project owner (ATNI Tribal Climate Liaison) | expires=2026-12-31 or R5.2 exit, whichever first

@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block title %}Timeline - ATNI-ResIST{% endblock %}
+
+{% block head %}
+<!-- vis-timeline CSS -->
+<link rel="stylesheet" href="https://unpkg.com/vis-timeline@7/styles/vis-timeline-graph2d.min.css">
+<!-- vis-timeline JS -->
+<script src="https://unpkg.com/vis-timeline@7/standalone/umd/vis-timeline-graph2d.min.js"></script>
+<style>
+    #timeline {
+        width: 100%;
+        height: 500px;
+        border: 1px solid var(--pico-muted-border-color);
+        border-radius: var(--pico-border-radius);
+        margin-bottom: 1rem;
+    }
+    #detail-pane {
+        min-height: 200px;
+    }
+    #detail-pane:empty::before {
+        content: "Click a resolution on the timeline to view details.";
+        color: var(--pico-muted-color);
+        font-style: italic;
+    }
+    .timeline-filters {
+        margin-bottom: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<header>
+    <h1>Resolution Timeline</h1>
+    <p>Explore ATNI resolutions over time. Click a resolution to view details.</p>
+</header>
+
+<section class="timeline-filters">
+    <form id="timeline-filter-form" method="get" action="/timeline">
+        <details>
+            <summary>Filters</summary>
+            <div class="grid">
+                <label>
+                    Year From
+                    <select name="year_start" id="year_start">
+                        <option value="">Any</option>
+                        {% for year in available_years %}
+                        <option value="{{ year }}" {% if year_start == year %}selected{% endif %}>{{ year }}</option>
+                        {% endfor %}
+                    </select>
+                </label>
+
+                <label>
+                    Year To
+                    <select name="year_end" id="year_end">
+                        <option value="">Any</option>
+                        {% for year in available_years %}
+                        <option value="{{ year }}" {% if year_end == year %}selected{% endif %}>{{ year }}</option>
+                        {% endfor %}
+                    </select>
+                </label>
+            </div>
+
+            <div class="grid">
+                <label>
+                    Sponsoring Tribe
+                    <select name="sponsor" id="sponsor">
+                        <option value="">Any</option>
+                        {% for s in sponsors %}
+                        <option value="{{ s }}" {% if sponsor == s %}selected{% endif %}>{{ s }}</option>
+                        {% endfor %}
+                    </select>
+                </label>
+
+                <label>
+                    Originating Committee
+                    <select name="committee" id="committee">
+                        <option value="">Any</option>
+                        {% for c in committees %}
+                        <option value="{{ c }}" {% if committee == c %}selected{% endif %}>{{ c }}</option>
+                        {% endfor %}
+                    </select>
+                </label>
+            </div>
+
+            <button type="submit">Apply Filters</button>
+        </details>
+    </form>
+</section>
+
+<section>
+    <div id="timeline"></div>
+</section>
+
+<section id="detail-pane">
+    <!-- Resolution details load here when timeline item is selected -->
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/timeline.js" defer></script>
+{% endblock %}

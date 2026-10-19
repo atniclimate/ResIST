@@ -1,0 +1,19 @@
+# R0.1 -- settle line endings once. Index is LF; working copies on Windows are normalized on checkin.
+* text=auto eol=lf
+
+# Binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.pdf binary
+*.db binary
+*.sqlite binary
+*.sqlite3 binary
+*.docx binary
+*.pptx binary
+*.xlsx binary
+*.pyc binary
+*.ico binary
+*.woff binary
+*.woff2 binary

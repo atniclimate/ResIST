@@ -1,0 +1,18 @@
+{% if not query %}
+<div class="empty-state">
+    <h3>Start Searching</h3>
+    <p>Enter a search term to find resolutions.</p>
+</div>
+{% elif result_count == 0 %}
+<div class="empty-state">
+    <h3>No Results Found</h3>
+    <p>No resolutions found for "{{ query }}". Try different search terms or adjust your filters.</p>
+</div>
+{% else %}
+<p class="results-count">{{ result_count }} resolution{% if result_count != 1 %}s{% endif %} found</p>
+<div class="results-list">
+{% for result in results %}
+{% include "search/partials/result_card.html" %}
+{% endfor %}
+</div>
+{% endif %}

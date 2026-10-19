@@ -1,0 +1,27 @@
+ATNI-ResIST (Resolution Information Synthesis Tool)
+Copyright (C) 2026 ATNI Climate / Affiliated Tribes of Northwest Indians
+
+This program is free software: you can redistribute it and/or modify it under the terms of the
+GNU Affero General Public License as published by the Free Software Foundation, either version 3
+of the License, or (at your option) any later version. See LICENSE.
+
+This repository contains code only. It contains no resolution documents or corpus data; Tribal
+resolutions and anything derived from them stay on ATNI-controlled infrastructure.
+
+Third-party components (installed as dependencies, not vendored; exact versions are pinned in
+constraints/dev-py311.lock.txt):
+
+- PyMuPDF (pymupdf), Artifex Software, Inc. -- GNU AGPL v3. This is why the project is AGPL.
+- FastAPI, Uvicorn, SQLModel, Pydantic, python-multipart, httpx -- MIT / BSD-3-Clause
+- SQLAlchemy -- MIT
+- Jinja2 -- BSD-3-Clause
+- eyecite (Free Law Project) -- BSD-2-Clause
+- NetworkX -- BSD-3-Clause
+- python-dateutil -- Apache-2.0 / BSD-3-Clause
+- sumy -- Apache-2.0
+- NLTK -- Apache-2.0
+- python-docx -- MIT
+- Pillow -- MIT-CMU (HPND)
+- Optional: PaddleOCR and PaddlePaddle -- Apache-2.0; pytesseract -- Apache-2.0;
+  WeasyPrint -- BSD-3-Clause
+- Front end: HTMX 2.x -- 0BSD (loaded from a CDN today; to be vendored locally)

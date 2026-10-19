@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+
+{% block title %}Search Resolutions - ATNI ResIST{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="page-header">
+    <h1>Search Resolutions</h1>
+    <p>Search 50+ years of ATNI resolution history by keyword, number, or citation.</p>
+</div>
+
+<!-- Search Bar Panel -->
+<div class="panel mb-16">
+    <form>
+        <div class="search-bar">
+            <input
+                type="search"
+                name="q"
+                placeholder="Search resolutions by keyword, number, or citation..."
+                value="{{ query }}"
+                hx-get="/search"
+                hx-target="#results"
+                hx-trigger="keyup delay:500ms changed"
+                hx-include="[name='year_start'], [name='year_end'], [name='sponsor'], [name='committee']"
+                aria-label="Search query"
+            >
+            <button type="button" class="clear-btn"
+                    hx-get="/search"
+                    hx-target="#results"
+                    hx-vals='{"q": ""}'
+                    hx-include="[name='year_start'], [name='year_end'], [name='sponsor'], [name='committee']">&times;</button>
+        </div>
+        <div style="margin-top: 12px;">
+            <button type="button" class="btn btn-primary"
+                    hx-get="/search"
+                    hx-target="#results"
+                    hx-push-url="true"
+                    hx-include="[name='q'], [name='year_start'], [name='year_end'], [name='sponsor'], [name='committee']">Search</button>
+        </div>
+    </form>
+</div>
+
+<!-- Filter Section -->
+<details class="mb-16">
+    <summary>Filters</summary>
+    <div class="filter-grid">
+        <div class="filter-group">
+            <label for="year_start">Year From</label>
+            <select name="year_start" id="year_start"
+                    hx-get="/search"
+                    hx-target="#results"
+                    hx-include="[name='q'], [name='year_end'], [name='sponsor'], [name='committee']">
+                <option value="">Any</option>
+                {% for year in available_years %}
+                <option value="{{ year }}" {% if year_start == year %}selected{% endif %}>{{ year }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="filter-group">
+            <label for="year_end">Year To</label>
+            <select name="year_end" id="year_end"
+                    hx-get="/search"
+                    hx-target="#results"
+                    hx-include="[name='q'], [name='year_start'], [name='sponsor'], [name='committee']">
+                <option value="">Any</option>
+                {% for year in available_years %}
+                <option value="{{ year }}" {% if year_end == year %}selected{% endif %}>{{ year }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="filter-group">
+            <label for="sponsor">Sponsoring Tribe</label>
+            <select name="sponsor" id="sponsor"
+                    hx-get="/search"
+                    hx-target="#results"
+                    hx-include="[name='q'], [name='year_start'], [name='year_end'], [name='committee']">
+                <option value="">Any</option>
+                {% for s in sponsors %}
+                <option value="{{ s }}" {% if sponsor == s %}selected{% endif %}>{{ s }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="filter-group">
+            <label for="committee">Originating Committee</label>
+            <select name="committee" id="committee"
+                    hx-get="/search"
+                    hx-target="#results"
+                    hx-include="[name='q'], [name='year_start'], [name='year_end'], [name='sponsor']">
+                <option value="">Any</option>
+                {% for c in committees %}
+                <option value="{{ c }}" {% if committee == c %}selected{% endif %}>{{ c }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+</details>
+
+<!-- Active Filters Display -->
+{% if query or year_start or year_end or sponsor or committee %}
+<div class="active-filters">
+    <span class="active-filters-label">Active Filters:</span>
+    {% if query %}
+    <span class="tag">
+        "{{ query }}"
+        <span class="remove"
+              hx-get="/search"
+              hx-target="#results"
+              hx-vals='{"q": ""}'
+              hx-include="[name='year_start'], [name='year_end'], [name='sponsor'], [name='committee']">&times;</span>
+    </span>
+    {% endif %}
+    {% if year_start %}
+    <span class="tag">
+        From {{ year_start }}
+        <span class="remove"
+              hx-get="/search"
+              hx-target="#results"
+              hx-vals='{"year_start": ""}'
+              hx-include="[name='q'], [name='year_end'], [name='sponsor'], [name='committee']">&times;</span>
+    </span>
+    {% endif %}
+    {% if year_end %}
+    <span class="tag">
+        To {{ year_end }}
+        <span class="remove"
+              hx-get="/search"
+              hx-target="#results"
+              hx-vals='{"year_end": ""}'
+              hx-include="[name='q'], [name='year_start'], [name='sponsor'], [name='committee']">&times;</span>
+    </span>
+    {% endif %}
+    {% if sponsor %}
+    <span class="tag">
+        {{ sponsor }}
+        <span class="remove"
+              hx-get="/search"
+              hx-target="#results"
+              hx-vals='{"sponsor": ""}'
+              hx-include="[name='q'], [name='year_start'], [name='year_end'], [name='committee']">&times;</span>
+    </span>
+    {% endif %}
+    {% if committee %}
+    <span class="tag">
+        {{ committee }}
+        <span class="remove"
+              hx-get="/search"
+              hx-target="#results"
+              hx-vals='{"committee": ""}'
+              hx-include="[name='q'], [name='year_start'], [name='year_end'], [name='sponsor']">&times;</span>
+    </span>
+    {% endif %}
+    <a href="/search" class="clear-all-link">Clear All</a>
+</div>
+{% endif %}
+
+<!-- Results Section -->
+<section id="results">
+    {% include "search/partials/result_list.html" %}
+</section>
+{% endblock %}
