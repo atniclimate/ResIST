@@ -1,0 +1,312 @@
+/* Vendored from the ATNI design system (atniclimate/atni-design-system de9cd8b, dist/css/fonts.css and
+   dist/css/tokens.css). Fix values there and re-vendor; do not hand-edit. Fonts are OFL, see fonts/. */
+
+@font-face {
+  font-family: "League Spartan";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: local("League Spartan Medium"), local("LeagueSpartan-Medium"), url("fonts/LeagueSpartan-Medium.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "League Spartan";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: local("League Spartan SemiBold"), local("LeagueSpartan-SemiBold"), url("fonts/LeagueSpartan-SemiBold.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Noto Sans";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local("Noto Sans Regular"), local("NotoSans-Regular"), url("fonts/NotoSans-Regular.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Noto Sans";
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local("Noto Sans Italic"), local("NotoSans-Italic"), url("fonts/NotoSans-Italic.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Noto Sans";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local("Noto Sans Bold"), local("NotoSans-Bold"), url("fonts/NotoSans-Bold.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Noto Sans";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: local("Noto Sans Medium"), local("NotoSans-Medium"), url("fonts/NotoSans-Medium.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Noto Sans Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local("Noto Sans Mono Regular"), local("NotoSansMono-Regular"), url("fonts/NotoSansMono-Regular.woff2") format("woff2");
+}
+
+:root {
+  --atni-color-core-atni-red: #E13D33;
+  --atni-color-core-red-alt: #B02821;
+  --atni-color-core-red-alt-hover: #8C1F19;
+  --atni-color-core-black-bg: #010B13;
+  --atni-color-core-grey: #636363;
+  --atni-color-core-grey-alt: #3B3B3B;
+  --atni-color-core-grey-element: #141414;
+  --atni-color-core-grey-overlay: #1E242C;
+  --atni-color-core-surface: #FFFFFF;
+  --atni-color-core-surface-tint: #F4F7FB;
+  --atni-color-core-white: #FFFFFF;
+  --atni-color-core-text-on-dark: #E8ECF0;
+  --atni-color-core-red-on-dark: #F26B5E;
+  --atni-color-program-red-element: #C30101;
+  --atni-color-program-program-grey: #98A1B4;
+  --atni-color-program-tribal-magenta: #9732B4;
+  --atni-color-support-hairline: #E7ECF3;
+  --atni-color-support-tag-neutral-bg: #EEF1F6;
+  --atni-color-support-de-emphasized: #C6CBD4;
+  --atni-color-support-muted-on-dark: #8A94A6;
+  --atni-color-support-muted-on-light: #667085;
+  --atni-color-status-active-text: #167650;
+  --atni-color-status-active-bg: #E6F9F1;
+  --atni-color-status-review-text: #8A5A0B;
+  --atni-color-status-review-bg: #FDF3E2;
+  --atni-color-status-reserved-text: #9333A3;
+  --atni-color-status-reserved-bg: #F6E6F8;
+  --atni-color-callout-prefer-bg: #EAF7F0;
+  --atni-color-callout-avoid-bg: #FBEEED;
+  --atni-color-callout-sovereignty-bg: #F9EDFB;
+  --atni-color-chart-1: #2F7FC1;
+  --atni-color-chart-2: #E13D33;
+  --atni-color-chart-3: #1E9A6E;
+  --atni-color-chart-4: #B8800E;
+  --atni-color-chart-5: #6E6FD0;
+  --atni-color-chart-6: #A8673A;
+  --atni-color-office-dk1: #010B13;
+  --atni-color-office-lt1: #FFFFFF;
+  --atni-color-office-dk2: #3B3B3B;
+  --atni-color-office-lt2: #F4F7FB;
+  --atni-color-office-accent1: #2F7FC1;
+  --atni-color-office-accent2: #E13D33;
+  --atni-color-office-accent3: #1E9A6E;
+  --atni-color-office-accent4: #B8800E;
+  --atni-color-office-accent5: #6E6FD0;
+  --atni-color-office-accent6: #A8673A;
+  --atni-color-office-hlink: #B02821;
+  --atni-color-office-folHlink: #8C1F19;
+  --atni-space-step-1: 4px;
+  --atni-space-step-2: 8px;
+  --atni-space-step-3: 12px;
+  --atni-space-step-4: 16px;
+  --atni-space-step-5: 24px;
+  --atni-space-step-6: 32px;
+  --atni-space-step-7: 48px;
+  --atni-space-step-8: 64px;
+  --atni-space-step-9: 96px;
+  --atni-space-section-gap: 96px;
+  --atni-space-section-pad: 64px;
+  --atni-space-gutter-mobile: 16px;
+  --atni-space-measure: 32rem;
+  --atni-space-page-max: 1080px;
+  --atni-space-radius: 0px;
+  --atni-space-touch-min: 24px;
+  --atni-space-touch-primary: 44px;
+  --atni-type-family-display: "League Spartan", "Noto Sans", sans-serif;
+  --atni-type-family-body: "Noto Sans", sans-serif;
+  --atni-type-family-mono: "Noto Sans Mono", monospace;
+  --atni-type-weight-display-medium: 500;
+  --atni-type-weight-display-semibold: 600;
+  --atni-type-weight-body-regular: 400;
+  --atni-type-weight-body-medium: 500;
+  --atni-type-weight-body-bold: 700;
+  --atni-type-weight-mono-regular: 400;
+  --atni-type-anchor-web: 16px;
+  --atni-type-anchor-room: 28px;
+  --atni-type-anchor-hall: 36px;
+  --atni-type-anchor-deck-floor: 24px;
+  --atni-type-title-family: var(--atni-type-family-display);
+  --atni-type-title-weight: var(--atni-type-weight-display-semibold);
+  --atni-type-title-size: 2.55rem;
+  --atni-type-title-line-height: 1.14;
+  --atni-type-title-tracking: -0.025em;
+  --atni-type-title-color: var(--atni-text-heading);
+  --atni-type-heading-1-family: var(--atni-type-family-display);
+  --atni-type-heading-1-weight: var(--atni-type-weight-display-semibold);
+  --atni-type-heading-1-size: 2.25rem;
+  --atni-type-heading-1-line-height: 1.1;
+  --atni-type-heading-1-tracking: -0.025em;
+  --atni-type-heading-1-color: var(--atni-text-heading);
+  --atni-type-heading-2-family: var(--atni-type-family-display);
+  --atni-type-heading-2-weight: var(--atni-type-weight-display-semibold);
+  --atni-type-heading-2-size: 1.75rem;
+  --atni-type-heading-2-line-height: 1.15;
+  --atni-type-heading-2-tracking: -0.025em;
+  --atni-type-heading-2-color: var(--atni-text-heading);
+  --atni-type-heading-3-family: var(--atni-type-family-display);
+  --atni-type-heading-3-weight: var(--atni-type-weight-display-semibold);
+  --atni-type-heading-3-size: 1.17rem;
+  --atni-type-heading-3-line-height: 1.2;
+  --atni-type-heading-3-tracking: -0.01em;
+  --atni-type-heading-3-color: var(--atni-text-heading-3);
+  --atni-type-eyebrow-family: var(--atni-type-family-display);
+  --atni-type-eyebrow-weight: var(--atni-type-weight-display-medium);
+  --atni-type-eyebrow-size: 0.8125rem;
+  --atni-type-eyebrow-line-height: 1.4;
+  --atni-type-eyebrow-tracking: 0.08em;
+  --atni-type-eyebrow-color: var(--atni-text-red);
+  --atni-type-lead-family: var(--atni-type-family-display);
+  --atni-type-lead-weight: var(--atni-type-weight-display-medium);
+  --atni-type-lead-size: 1.25rem;
+  --atni-type-lead-line-height: 1.3;
+  --atni-type-lead-tracking: 0em;
+  --atni-type-lead-color: var(--atni-text-secondary);
+  --atni-type-body-family: var(--atni-type-family-body);
+  --atni-type-body-weight: var(--atni-type-weight-body-regular);
+  --atni-type-body-size: 1rem;
+  --atni-type-body-line-height: 1.6;
+  --atni-type-body-tracking: 0em;
+  --atni-type-body-color: var(--atni-text-body);
+  --atni-type-body-dark-family: var(--atni-type-family-body);
+  --atni-type-body-dark-weight: var(--atni-type-weight-body-medium);
+  --atni-type-body-dark-size: 1rem;
+  --atni-type-body-dark-line-height: 1.6;
+  --atni-type-body-dark-tracking: 0em;
+  --atni-type-body-dark-color: var(--atni-text-body);
+  --atni-type-quote-family: var(--atni-type-family-body);
+  --atni-type-quote-weight: var(--atni-type-weight-body-regular);
+  --atni-type-quote-size: 1.3125rem;
+  --atni-type-quote-line-height: 1.4;
+  --atni-type-quote-tracking: 0em;
+  --atni-type-quote-color: var(--atni-text-heading);
+  --atni-type-caption-family: var(--atni-type-family-body);
+  --atni-type-caption-weight: var(--atni-type-weight-body-regular);
+  --atni-type-caption-size: 0.8125rem;
+  --atni-type-caption-line-height: 1.4;
+  --atni-type-caption-tracking: 0em;
+  --atni-type-caption-color: var(--atni-text-secondary);
+  --atni-type-code-family: var(--atni-type-family-mono);
+  --atni-type-code-weight: var(--atni-type-weight-mono-regular);
+  --atni-type-code-size: 0.875rem;
+  --atni-type-code-line-height: 1.5;
+  --atni-type-code-tracking: 0em;
+  --atni-type-code-color: var(--atni-text-secondary);
+  --atni-type-button-family: var(--atni-type-family-display);
+  --atni-type-button-weight: var(--atni-type-weight-display-medium);
+  --atni-type-button-size: 0.875rem;
+  --atni-type-button-line-height: 1.2;
+  --atni-type-button-tracking: 0em;
+  --atni-type-button-color: var(--atni-non-text-button-text);
+  --atni-type-label-family: var(--atni-type-family-display);
+  --atni-type-label-weight: var(--atni-type-weight-display-medium);
+  --atni-type-label-size: 0.75rem;
+  --atni-type-label-line-height: 1.4;
+  --atni-type-label-tracking: 0.06em;
+  --atni-type-label-color: var(--atni-text-secondary);
+}
+:root,
+[data-theme="dark"] {
+  color-scheme: dark;
+  --atni-ground-base: var(--atni-color-core-black-bg);
+  --atni-ground-raised: var(--atni-color-core-grey-element);
+  --atni-ground-overlay: var(--atni-color-core-grey-overlay);
+  --atni-text-heading: var(--atni-color-core-white);
+  --atni-text-heading-3: var(--atni-color-core-white);
+  --atni-text-body: var(--atni-color-core-text-on-dark);
+  --atni-text-secondary: var(--atni-color-support-de-emphasized);
+  --atni-text-muted: var(--atni-color-support-muted-on-dark);
+  --atni-text-red: var(--atni-color-core-red-on-dark);
+  --atni-text-link: var(--atni-color-core-red-on-dark);
+  --atni-text-link-hover: var(--atni-color-core-white);
+  --atni-text-large-display-red: var(--atni-color-core-atni-red);
+  --atni-non-text-accent: var(--atni-color-core-atni-red);
+  --atni-non-text-rule: var(--atni-color-core-grey-overlay);
+  --atni-non-text-rule-heavy: var(--atni-color-core-grey-element);
+  --atni-non-text-button-fill: var(--atni-color-core-red-alt);
+  --atni-non-text-button-text: var(--atni-color-core-white);
+  --atni-non-text-button-border: var(--atni-color-core-red-on-dark);
+  --atni-type-body-weight: var(--atni-type-weight-body-medium);
+}
+[data-theme="light"] {
+  color-scheme: light;
+  --atni-ground-base: var(--atni-color-core-surface-tint);
+  --atni-ground-raised: var(--atni-color-core-surface);
+  --atni-ground-overlay: var(--atni-color-core-surface);
+  --atni-text-heading: var(--atni-color-core-black-bg);
+  --atni-text-heading-3: var(--atni-color-core-grey-alt);
+  --atni-text-body: var(--atni-color-core-grey);
+  --atni-text-secondary: var(--atni-color-core-grey-alt);
+  --atni-text-muted: var(--atni-color-support-muted-on-light);
+  --atni-text-red: var(--atni-color-core-red-alt);
+  --atni-text-link: var(--atni-color-core-red-alt);
+  --atni-text-link-hover: var(--atni-color-core-red-alt-hover);
+  --atni-text-large-display-red: var(--atni-color-core-atni-red);
+  --atni-non-text-accent: var(--atni-color-core-atni-red);
+  --atni-non-text-rule: var(--atni-color-support-hairline);
+  --atni-non-text-rule-heavy: var(--atni-color-core-grey-element);
+  --atni-non-text-button-fill: var(--atni-color-core-red-alt);
+  --atni-non-text-button-text: var(--atni-color-core-white);
+  --atni-non-text-button-border: var(--atni-color-core-red-alt);
+  --atni-type-body-weight: var(--atni-type-weight-body-regular);
+}
+/* Opt-in OS preference: set data-theme="auto" on the root element. Dark stays the default (R-24). */
+@media (prefers-color-scheme: light) {
+  [data-theme="auto"] {
+    color-scheme: light;
+    --atni-ground-base: var(--atni-color-core-surface-tint);
+    --atni-ground-raised: var(--atni-color-core-surface);
+    --atni-ground-overlay: var(--atni-color-core-surface);
+    --atni-text-heading: var(--atni-color-core-black-bg);
+    --atni-text-heading-3: var(--atni-color-core-grey-alt);
+    --atni-text-body: var(--atni-color-core-grey);
+    --atni-text-secondary: var(--atni-color-core-grey-alt);
+    --atni-text-muted: var(--atni-color-support-muted-on-light);
+    --atni-text-red: var(--atni-color-core-red-alt);
+    --atni-text-link: var(--atni-color-core-red-alt);
+    --atni-text-link-hover: var(--atni-color-core-red-alt-hover);
+    --atni-text-large-display-red: var(--atni-color-core-atni-red);
+    --atni-non-text-accent: var(--atni-color-core-atni-red);
+    --atni-non-text-rule: var(--atni-color-support-hairline);
+    --atni-non-text-rule-heavy: var(--atni-color-core-grey-element);
+    --atni-non-text-button-fill: var(--atni-color-core-red-alt);
+    --atni-non-text-button-text: var(--atni-color-core-white);
+    --atni-non-text-button-border: var(--atni-color-core-red-alt);
+    --atni-type-body-weight: var(--atni-type-weight-body-regular);
+  }
+}
+/* Print is always light. */
+@media print {
+  :root, [data-theme] {
+    color-scheme: light;
+    --atni-ground-base: var(--atni-color-core-surface-tint);
+    --atni-ground-raised: var(--atni-color-core-surface);
+    --atni-ground-overlay: var(--atni-color-core-surface);
+    --atni-text-heading: var(--atni-color-core-black-bg);
+    --atni-text-heading-3: var(--atni-color-core-grey-alt);
+    --atni-text-body: var(--atni-color-core-grey);
+    --atni-text-secondary: var(--atni-color-core-grey-alt);
+    --atni-text-muted: var(--atni-color-support-muted-on-light);
+    --atni-text-red: var(--atni-color-core-red-alt);
+    --atni-text-link: var(--atni-color-core-red-alt);
+    --atni-text-link-hover: var(--atni-color-core-red-alt-hover);
+    --atni-text-large-display-red: var(--atni-color-core-atni-red);
+    --atni-non-text-accent: var(--atni-color-core-atni-red);
+    --atni-non-text-rule: var(--atni-color-support-hairline);
+    --atni-non-text-rule-heavy: var(--atni-color-core-grey-element);
+    --atni-non-text-button-fill: var(--atni-color-core-red-alt);
+    --atni-non-text-button-text: var(--atni-color-core-white);
+    --atni-non-text-button-border: var(--atni-color-core-red-alt);
+    --atni-type-body-weight: var(--atni-type-weight-body-regular);
+  }
+}
