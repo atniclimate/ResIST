@@ -1,0 +1,9 @@
+{
+ "resolutions": 1157,
+ "year_min": 2007,
+ "year_max": 2026,
+ "needs_review": 27,
+ "commit": "efc63bc",
+ "built": "2026-10-19 18:00 UTC",
+ "db_sha256": "a0a676fb60d5f8cddb9f2b33f41aca97b2f0c4b8fb220de6ac3a0e7fb79c86cc"
+}
