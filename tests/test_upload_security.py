@@ -1,40 +1,15 @@
 """Security tests for upload endpoint."""
+import os
 import pytest
 from io import BytesIO
-from fastapi.testclient import TestClient
 from pathlib import Path
-import tempfile
+from fastapi.testclient import TestClient
 
 from src.main import app
-from src.storage.database import get_engine, init_db
-import src.storage.database as db_module
 
 
 @pytest.fixture
-def test_env(tmp_path):
-    """Set up isolated test environment with temp database."""
-    db_path = tmp_path / "test.db"
-
-    # Save original values
-    original_db_path = db_module.DATABASE_PATH
-    original_engine = db_module._engine
-
-    # Override database path
-    db_module.DATABASE_PATH = db_path
-    db_module._engine = None
-
-    # Initialize fresh DB
-    init_db()
-
-    yield {"db_path": db_path, "tmp_path": tmp_path}
-
-    # Cleanup
-    db_module.DATABASE_PATH = original_db_path
-    db_module._engine = original_engine
-
-
-@pytest.fixture
-def client(test_env):
+def client(data_root):
     """Create test client with fresh database."""
     with TestClient(app) as c:
         yield c
@@ -166,3 +141,32 @@ def test_filename_with_only_extension(client):
         if response.status_code == 200:
             filename_result = response.json()["filename"]
             assert "/" not in filename_result and "\\" not in filename_result
+
+
+# Adversarial input -> the file tests/fixtures/adversarial/ preserves as the sanitizer's output (its README).
+ADVERSARIAL = [
+    ("../../../etc/passwd.txt", "passwd.txt"),
+    # Only Windows basename() splits on backslash; elsewhere the separators are stripped, not split.
+    pytest.param("..\\..\\..\\windows\\system32\\config\\sam.txt", "sam.txt",
+                 marks=pytest.mark.skipif(os.name != "nt", reason="backslash is a separator only on Windows")),
+    ("../../sensitive.txt", "sensitive.txt"),
+    ("../parent.txt", "parent.txt"),
+    ("./../escape.txt", "escape.txt"),
+    ("subdir/../../../etc/shadow.txt", "shadow.txt"),
+    ("some/path/valid_file.txt", "valid_file.txt"),
+    ("resolution_2024.txt", "resolution_2024.txt"),
+    ("ATNI-Resolution-123.txt", "ATNI-Resolution-123.txt"),
+    ("document_with_underscores.txt", "document_with_underscores.txt"),
+    ("file.name.multiple.dots.txt", "file.name.multiple.dots.txt"),
+]
+
+
+@pytest.mark.parametrize("posted, expected", ADVERSARIAL)
+def test_upload_lands_only_as_fixture_name(client, data_root, posted, expected):
+    """The sanitized name matches the R0.4 fixture, and the write stays inside the data_root inbox."""
+    fixture = Path(__file__).parent / "fixtures" / "adversarial" / expected
+    assert fixture.is_file(), f"fixture missing: {fixture}"
+    response = client.post("/api/upload", files={"file": (posted, BytesIO(fixture.read_bytes()), "text/plain")})
+    assert response.status_code == 200
+    assert response.json()["filename"] == expected
+    assert sorted(p.name for p in (data_root / "inbox").iterdir()) == [expected]

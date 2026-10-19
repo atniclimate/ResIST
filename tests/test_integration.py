@@ -1,52 +1,21 @@
 """End-to-end integration tests for upload -> search flow."""
 import pytest
-import tempfile
-import os
-from pathlib import Path
 from fastapi.testclient import TestClient
 from sqlmodel import Session
 
 from src.main import app
-from src.storage.database import get_engine, init_db
+from src.storage.database import get_engine
 from src.storage.repository import search_resolutions, get_resolution_by_document_id
-from src.analysis.graph import ResolutionGraph, GRAPH_PATH
-import src.storage.database as db_module
+from src.analysis.graph import ResolutionGraph
 
 
 @pytest.fixture
-def test_env(tmp_path):
-    """Set up isolated test environment with temp database and graph."""
-    # Create temp database
-    db_path = tmp_path / "test.db"
-
-    # Save original values
-    original_db_path = db_module.DATABASE_PATH
-    original_engine = db_module._engine
-    original_graph_path = GRAPH_PATH
-
-    # Override database path
-    db_module.DATABASE_PATH = db_path
-    db_module._engine = None
-
-    # Override graph path
-    graph_path = tmp_path / "test_graph.json"
-    import src.analysis.graph as graph_module
-    original_graph_default = graph_module.GRAPH_PATH
-    graph_module.GRAPH_PATH = graph_path
-
-    # Initialize fresh DB
-    init_db()
-
-    yield {
-        "db_path": db_path,
-        "graph_path": graph_path,
-        "tmp_path": tmp_path
+def test_env(data_root, tmp_path):
+    """Paths the data_root fixture (tests/conftest.py) set up for this test."""
+    return {
+        "graph_path": data_root / "derived" / "resolution_graph.json",
+        "tmp_path": tmp_path,
     }
-
-    # Cleanup
-    db_module.DATABASE_PATH = original_db_path
-    db_module._engine = original_engine
-    graph_module.GRAPH_PATH = original_graph_default
 
 
 @pytest.fixture

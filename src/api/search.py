@@ -234,6 +234,7 @@ async def search_page(
     # If HTMX request, return only the results fragment
     if hx_request:
         return templates.TemplateResponse(
+            request,
             "search/partials/result_list.html",
             {
                 "request": request,
@@ -249,6 +250,7 @@ async def search_page(
     committees = get_all_committees(engine)
 
     return templates.TemplateResponse(
+        request,
         "search/results.html",
         {
             "request": request,
@@ -289,6 +291,7 @@ async def resolution_detail(
 
         if not resolution:
             return templates.TemplateResponse(
+                request,
                 "resolution/detail.html",
                 {
                     "request": request,
@@ -325,7 +328,7 @@ async def resolution_detail(
             # For now, return the full detail template
             pass
 
-        return templates.TemplateResponse(template, context)
+        return templates.TemplateResponse(request, template, context)
 
 
 def get_resolution_themes(citations: List[Citation]) -> List[str]:
@@ -461,6 +464,7 @@ async def timeline_page(
     committees = get_all_committees(engine)
 
     return templates.TemplateResponse(
+        request,
         "timeline/view.html",
         {
             "request": request,
@@ -521,6 +525,7 @@ async def theme_search(
     # If HTMX request, return only results fragment
     if hx_request:
         return templates.TemplateResponse(
+            request,
             "search/partials/result_list.html",
             {
                 "request": request,
@@ -536,6 +541,7 @@ async def theme_search(
     committees = get_all_committees(engine)
 
     return templates.TemplateResponse(
+        request,
         "search/results.html",
         {
             "request": request,

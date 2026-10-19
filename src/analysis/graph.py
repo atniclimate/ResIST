@@ -5,8 +5,10 @@ from typing import Dict, List, Any, Optional
 import networkx as nx
 from networkx.readwrite import json_graph
 
-# Default graph storage location
-GRAPH_PATH = Path(__file__).parent.parent.parent / "data" / "resolution_graph.json"
+from src.storage.database import DATA_DIR
+
+# Default graph storage location: derived from corpus content, so pool data
+GRAPH_PATH = DATA_DIR / "derived" / "resolution_graph.json"
 
 
 class ResolutionGraph:

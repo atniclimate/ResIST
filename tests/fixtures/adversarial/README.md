@@ -23,6 +23,11 @@ Two consequences, both recorded rather than worked around:
    on the `data_root` pattern. Until then `uploads/` still collects `.txt` residue on every run —
    but never a `.pdf`, which is the R0.4 acceptance check.
 
+**Update 2026-10-19 (R0.12):** done. `test_upload_lands_only_as_fixture_name` in
+`tests/test_upload_security.py` posts each fixture's bytes under the adversarial name in the table below.
+It asserts that the sanitized name is the fixture's own name and that the write stayed inside the test's
+`data_root` inbox. Test runs no longer write to `uploads/`.
+
 ## The attack surface these fixtures represent
 
 The vector is the *filename*, not the content. A filename containing a traversal sequence cannot

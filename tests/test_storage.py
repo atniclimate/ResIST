@@ -2,44 +2,15 @@
 import pytest
 from datetime import date
 from sqlmodel import Session
-import os
-import tempfile
-from pathlib import Path
 
 from src.models.document import ParseResult
 
 
-# Override database path before importing storage
-@pytest.fixture(scope="module", autouse=True)
-def setup_test_db():
-    """Use a temporary database for tests."""
-    # Create temp file
-    fd, temp_path = tempfile.mkstemp(suffix=".db")
-    os.close(fd)
-
-    # Override the database path in the storage module
-    import src.storage.database as db_module
-    original_path = db_module.DATABASE_PATH
-    db_module.DATABASE_PATH = Path(temp_path)
-    db_module._engine = None  # Reset singleton
-
-    yield temp_path
-
-    # Cleanup
-    db_module.DATABASE_PATH = original_path
-    db_module._engine = None
-    try:
-        os.unlink(temp_path)
-    except Exception:
-        pass
-
-
-@pytest.fixture(scope="module")
-def db_engine(setup_test_db):
-    """Initialize test database."""
-    from src.storage import init_db
-    engine = init_db()
-    yield engine
+@pytest.fixture
+def db_engine(data_root):
+    """The data_root database (tests/conftest.py), already initialized."""
+    from src.storage import get_engine
+    return get_engine()
 
 
 @pytest.fixture
@@ -100,11 +71,12 @@ def test_get_resolution(session):
 
 def test_list_resolutions(session):
     """Test listing resolutions with pagination."""
-    from src.storage import list_resolutions
+    from src.storage import list_resolutions, save_resolution
 
+    # Each test gets a fresh data_root database, so seed one row rather than relying on test order
+    save_resolution(session, ParseResult(document_id="test-doc-list-001", resolution_number="24-LIST"), "List me.")
     results = list_resolutions(session, limit=10)
     assert isinstance(results, list)
-    # Should have at least the resolutions from previous tests
     assert len(results) >= 1
 
 
