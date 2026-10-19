@@ -1,10 +1,12 @@
 """Database engine and session management."""
+import os
 from sqlmodel import SQLModel, Session, create_engine
 from pathlib import Path
 from typing import Generator
 
-# Database file location
-DATABASE_PATH = Path(__file__).parent.parent.parent / "data" / "resolutions.db"
+# All corpus data lives in the datapool (D-008): RESIST_DATA_DIR, default ./datapool at the repo root
+DATA_DIR = Path(os.environ.get("RESIST_DATA_DIR") or Path(__file__).parent.parent.parent / "datapool")
+DATABASE_PATH = DATA_DIR / "db" / "resolutions.db"
 
 _engine = None
 

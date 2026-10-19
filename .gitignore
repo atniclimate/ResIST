@@ -54,3 +54,6 @@ datapool/*
 data/*
 !data/.gitkeep
 source-documents/
+
+# Acquired resolution originals (ATNI table, NCAI): corpus data, never tracked even when T0.
+docs/resolutions/*

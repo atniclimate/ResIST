@@ -191,6 +191,7 @@ async def topics_page(request: Request):
         themes = get_all_themes(session)
 
     return templates.TemplateResponse(
+        request,
         "topics/search.html",
         {
             "request": request,
@@ -238,6 +239,7 @@ async def topics_suggest(
     suggestions = suggestions[:10]
 
     return templates.TemplateResponse(
+        request,
         "topics/partials/topic_dropdown.html",
         {
             "request": request,
@@ -270,6 +272,7 @@ async def topics_add(
         raise HTTPException(status_code=400, detail=str(e))
 
     return templates.TemplateResponse(
+        request,
         "topics/partials/topic_chips.html",
         {
             "request": request,
@@ -302,6 +305,7 @@ async def topics_remove(
         raise HTTPException(status_code=400, detail=str(e))
 
     return templates.TemplateResponse(
+        request,
         "topics/partials/topic_chips.html",
         {
             "request": request,
@@ -328,6 +332,7 @@ async def topics_results(
 
     if not selected_topics:
         return templates.TemplateResponse(
+            request,
             "topics/partials/intersection_results.html",
             {
                 "request": request,
@@ -351,6 +356,7 @@ async def topics_results(
             raise HTTPException(status_code=400, detail=str(e))
 
     return templates.TemplateResponse(
+        request,
         "topics/partials/intersection_results.html",
         {
             "request": request,
@@ -386,6 +392,7 @@ async def theme_detail_page(request: Request, theme_id: int):
         ]
 
     return templates.TemplateResponse(
+        request,
         "topics/theme_detail.html",
         {
             "request": request,

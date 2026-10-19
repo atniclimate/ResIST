@@ -20,11 +20,11 @@ PATTERNS = {
         re.IGNORECASE
     ),
     'whereas': re.compile(
-        r'WHEREAS[,:]?\s*(.+?)(?=WHEREAS|NOW,?\s*THEREFORE|BE\s*IT\s*(?:FURTHER\s*)?RESOLVED|$)',
+        r'WHEREAS[,:]?\s*(.+?)(?=WHEREAS|NOW,?\s*THEREFORE|BE\s*IT\s*(?:FURTHER\s*|FINALLY\s*)?RESOLVED|$)',
         re.IGNORECASE | re.DOTALL
     ),
     'resolved': re.compile(
-        r'(?:NOW,?\s*THEREFORE,?\s*)?BE\s*IT\s*(?:FURTHER\s*)?RESOLVED[,:]?\s*(.+?)(?=BE\s*IT\s*(?:FURTHER\s*)?RESOLVED|CERTIFICATION|ADOPTED|$)',
+        r'(?:NOW,?\s*THEREFORE,?\s*)?BE\s*IT\s*(?:FURTHER\s*|FINALLY\s*)?RESOLVED[,:]?\s*(.+?)(?=BE\s*IT\s*(?:FURTHER\s*|FINALLY\s*)?RESOLVED|CERTIFICATION|ADOPTED|$)',
         re.IGNORECASE | re.DOTALL
     ),
     'convention': re.compile(
@@ -58,6 +58,15 @@ def clean_text(text: str) -> str:
     """Normalize whitespace and remove artifacts."""
     text = re.sub(r'\s+', ' ', text)
     return text.strip().rstrip(';,.')
+
+
+def normalize_resolution_number(raw: Optional[str]) -> Optional[str]:
+    """RES_11_01, Res-18-24, #23-40, 2023-41, ATNI-RES-23-40, 20230921_23-40_x.pdf -> 'YY-NN'; else None."""
+    if not raw:
+        return None
+    s = re.sub(r'(?<!\d)\d{8}_', '', raw)  # a YYYYMMDD_ filename prefix is a date, not the number
+    m = re.search(r'(?<!\d)(\d{2}|\d{4})\s*[-_/]\s*(\d{1,3})(?!\d)', s)
+    return f"{m.group(1)[-2:]}-{int(m.group(2)):02d}" if m else None
 
 
 def parse_date(text: str) -> Optional[date]:
@@ -133,8 +142,9 @@ def parse_resolution(text: str, document_id: str) -> ParseResult:
         for name, role in sig_matches
     ]
 
-    # Citations
-    citations = extract_citations(text)
+    # Citations; the document's own header number is not a citation of itself
+    own = f"ATNI-RES-{resolution_number}" if resolution_number else None
+    citations = [c for c in extract_citations(text) if c["normalized"] != own]
 
     # Calculate parse confidence based on completeness
     required_fields = [resolution_number, whereas_statements, resolved_statements]

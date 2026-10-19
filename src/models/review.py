@@ -2,7 +2,8 @@ from sqlmodel import SQLModel, Field, create_engine, Session
 from typing import Optional
 from datetime import datetime, UTC
 from enum import Enum
-from pathlib import Path
+
+from src.storage.database import DATA_DIR
 
 class ReviewStatus(str, Enum):
     PENDING = "pending"
@@ -27,7 +28,7 @@ class ReviewQueue(SQLModel, table=True):
     priority: int = Field(default=100)
 
 # Database setup
-DATABASE_PATH = Path("./data/review_queue.db")
+DATABASE_PATH = DATA_DIR / "db" / "review_queue.db"
 
 def get_engine():
     DATABASE_PATH.parent.mkdir(parents=True, exist_ok=True)

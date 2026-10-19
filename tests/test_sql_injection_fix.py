@@ -1,12 +1,8 @@
 """Test SQL injection vulnerability fix in search.py"""
 
 import pytest
-import os
-import tempfile
-from pathlib import Path
 from src.api.search import escape_like_pattern, search_with_filters
 from src.storage.repository import save_resolution
-from src.models.resolution import Resolution, Sponsor
 
 
 def test_escape_like_pattern():
@@ -27,31 +23,10 @@ def test_escape_like_pattern():
 
 
 @pytest.fixture
-def test_engine():
-    """Create a temporary test database."""
-    # Create temp file
-    fd, temp_path = tempfile.mkstemp(suffix=".db")
-    os.close(fd)
-
-    # Override the database path
-    import src.storage.database as db_module
-    original_path = db_module.DATABASE_PATH
-    db_module.DATABASE_PATH = Path(temp_path)
-    db_module._engine = None  # Reset singleton
-
-    # Initialize database
-    from src.storage import init_db
-    engine = init_db()
-
-    yield engine
-
-    # Cleanup
-    db_module.DATABASE_PATH = original_path
-    db_module._engine = None
-    try:
-        os.unlink(temp_path)
-    except Exception:
-        pass
+def test_engine(data_root):
+    """The data_root database (tests/conftest.py), already initialized."""
+    from src.storage import get_engine
+    return get_engine()
 
 
 def test_sponsor_filter_with_wildcards(test_engine):

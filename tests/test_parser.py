@@ -180,5 +180,29 @@ class TestClassifier:
         assert classify_resolved_action(text) is None
 
 
+def test_real_resolution_keeps_finally_and_drops_self_citation():
+    """Res-23-40 (real, T0): every BE IT [FURTHER|FINALLY] RESOLVED clause kept; own number not a citation."""
+    import re
+    from pathlib import Path
+    from src.ingestion.intake import extract_text_from_native_pdf
+
+    text = extract_text_from_native_pdf(Path(__file__).parent / "fixtures" / "atni" / "Res-23-40.pdf")
+    result = parse_resolution(text, "res-23-40")
+    markers = re.findall(r"\bBE\s+IT\s+(?:FURTHER\s+|FINALLY\s+)?RESOLVED\b", text, re.I)
+    assert re.search(r"FINALLY\s+RESOLVED", text, re.I)
+    assert len(result.resolved_statements) == len(markers)
+    assert f"ATNI-RES-{result.resolution_number}" not in {c["normalized"] for c in result.citations}
+
+
+@pytest.mark.parametrize("raw, expected", [
+    ("RES_11_01", "11-01"), ("Res_08_05", "08-05"), ("Res-18-24.pdf", "18-24"), ("#23-40", "23-40"),
+    ("ATNI-RES-2023-41", "23-41"), ("20230921_23-40_Climate.pdf", "23-40"), ("RES_25_100", "25-100"),
+    ("Letter", None), ("ATNI-RES-2023", None), ("", None),
+])
+def test_normalize_resolution_number(raw, expected):
+    from src.ingestion.parser import normalize_resolution_number
+    assert normalize_resolution_number(raw) == expected
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])

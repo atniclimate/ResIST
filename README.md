@@ -6,24 +6,27 @@ knowledge base. It is built on classical information retrieval (SQLite FTS5 with
 citation graphs), not on language-model generation. The tool directs a reader to what a resolution says.
 It never writes resolution language and never speaks for a Nation.
 
-This repository is **code only**. It contains no resolutions and no corpus data. Tribal resolution
-records stay on infrastructure their owners control.
+**Try it:** [atniclimate.github.io/ResIST](https://atniclimate.github.io/ResIST/) searches 1,157 ATNI
+resolutions (2007–2026) in your browser. It is a static build of this code, published from the
+`gh-pages` branch. The text is ATNI's own, quoted verbatim from the PDFs it publishes at
+atnitribes.org. Each record links to its source PDF, which is authoritative.
 
 ## Status
 
-Early prototype (`0.2.0.dev0`) under active rework. On a fresh clone, `pytest` gives 82 passed, 33
-skipped (quarantined) and 5 failed: those five expect an already-initialized local database, and the
-test fixtures that fix this are in progress. The web pages currently return errors until the template calls are migrated to the current Starlette
-API, so verify work with `pytest`, not the browser. The OCR engine still targets the PaddleOCR 2.x API.
+Early prototype (`0.2.0.dev0`) under active rework. `pytest` on a fresh clone gives 142 passed, 0 failed.
+The OCR engine class still targets the PaddleOCR 2.x API. Bulk ingest uses the Tesseract command line
+for image-only pages.
 
 ## What it does
 
-- **Intake:** PDF/image upload, PyMuPDF text extraction, and OCR (PaddleOCR primary, Tesseract fallback),
-  with a human review queue for low-confidence output.
-- **Parsing:** WHEREAS/RESOLVED clause structure, sponsors, dates, and legal citations (`eyecite`).
-- **Search:** SQLite FTS5 with `bm25()` ranking. The index preserves Indigenous orthography
-  (`remove_diacritics 0`); folding happens on the query side only.
+- **Intake:** PDF/image upload, PyMuPDF text extraction, and OCR, with a human review queue for
+  low-confidence output.
+- **Parsing:** WHEREAS / RESOLVED (including FURTHER and FINALLY) clause structure, ATNI resolution-number
+  normalization, and legal citations (`eyecite` plus ATNI cross-references).
+- **Search:** SQLite FTS5 with `bm25()` ranking.
 - **Topics, timeline, citation graph** (NetworkX), and DOCX evidence-package export.
+- **Static site:** `pages/index.html` runs the same FTS5 index in the browser with the official SQLite
+  WASM build.
 
 ## Install and test (Windows, PowerShell, Python 3.11)
 
@@ -37,8 +40,17 @@ uv pip install --python .venv\Scripts\python.exe --no-deps -e .
 .\scripts\install-hooks.ps1    # optional: the pre-commit guard (no databases, no contact details)
 ```
 
-OCR engines are an optional extra (`.[ocr]`). Run the server with
-`uvicorn src.main:app --host 127.0.0.1 --port 8000`. It binds to loopback only, by design.
+## Build a corpus and run it
+
+```powershell
+# Put ATNI resolution PDFs and their manifest under docs\resolutions\ (see scripts\ingest_atni.py), then:
+.\.venv\Scripts\python.exe scripts\ingest_atni.py     # -> datapool\db\resolutions.db (idempotent by SHA-256)
+uvicorn src.main:app --host 127.0.0.1 --port 8000     # the web app, loopback only by design
+.\.venv\Scripts\python.exe scripts\build_pages.py     # -> datapool\exchange\pages\ (the static site)
+```
+
+OCR engines for the upload path are an optional extra (`.[ocr]`). Bulk ingest needs the Tesseract
+executable for scanned pages.
 
 ## Data and sovereignty
 
@@ -46,8 +58,11 @@ OCR engines are an optional extra (`.[ocr]`). Run the server with
   `./datapool`). The rule is simple: anything derived from corpus content is pool data, and anything
   that would be identical on a machine that has never seen a resolution is code.
 - **No network at runtime.** Ingest, OCR, parsing, indexing, search and reports make no network calls.
-- **No generated text.** No LLM drafting, summarizing or paraphrasing. Reports contain only boilerplate
-  and verbatim, cited resolution text.
+- **No generated text.** No LLM drafting, summarizing or paraphrasing. Output is verbatim, cited
+  resolution text and fixed boilerplate.
+- **What is public.** Only resolutions ATNI itself publishes on atnitribes.org, classified T0 by the
+  project owner. Email addresses and phone numbers are masked in the static site. Committee material
+  and other organizations' resolutions are never published.
 - **CARE principles** (Collective Benefit, Authority to Control, Responsibility, Ethics) and ATNI's Tiered
   Sovereign Data Framework (TSDF) govern how records are classified and handled.
 
@@ -56,8 +71,9 @@ OCR engines are an optional extra (`.[ocr]`). Run the server with
 ```
 src/        api/ (FastAPI routes)  ingestion/ (intake, OCR, parser, citations)  storage/ (SQLite, FTS5)
             analysis/ (graph, similarity, keywords)  export/ (DOCX/PDF)  templates/  static/
-tests/      pytest suite; tests/fixtures/ holds synthetic test inputs only
-scripts/    seed_themes.py, the pre-commit hook and its installer
+pages/      the static in-browser site (index.html)
+tests/      pytest suite; tests/fixtures/atni/ holds real, public ATNI resolution PDFs
+scripts/    ingest_atni.py, build_pages.py, seed_themes.py, the pre-commit hook and its installer
 constraints/  hash-locked dependency pins for Python 3.11
 datapool/   the (empty) data root skeleton
 ```
