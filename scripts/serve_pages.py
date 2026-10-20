@@ -16,7 +16,8 @@ FROM_BUILD = {"/resolutions.db", "/build.json", "/capabilities.json"}  # corpus-
 
 
 class Handler(SimpleHTTPRequestHandler):
-    extensions_map = {**SimpleHTTPRequestHandler.extensions_map, ".js": "text/javascript", ".woff2": "font/woff2"}
+    extensions_map = {**SimpleHTTPRequestHandler.extensions_map, ".js": "text/javascript", ".mjs": "text/javascript",
+                      ".wasm": "application/wasm", ".woff2": "font/woff2"}
 
     def translate_path(self, path):
         clean = path.split("?", 1)[0].split("#", 1)[0]

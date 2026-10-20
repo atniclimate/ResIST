@@ -11,7 +11,7 @@ from pathlib import Path
 
 import pytest
 
-from resist.models import IndexDoc
+from resist.models import ClauseText, IndexDoc
 from tests import originals as o
 
 
@@ -51,6 +51,16 @@ def index_docs() -> tuple[IndexDoc, ...]:
     return tuple(
         IndexDoc(sha, normalize_resolution_number(p.name), None, extract_text_from_native_pdf(p), o.doc_ref(sha).tier)
         for sha, p in sorted(o.fixtures().items())
+    )
+
+
+@lru_cache(maxsize=1)
+def clause_texts() -> tuple[ClauseText, ...]:
+    """A ClauseText per committed fixture: the whole native text, with the document's own logical id (U1-U9
+    for kind resolver, design 4.1). own is empty when the file name yields no number."""
+    return tuple(
+        ClauseText(d.sha256, d.text, None, (f"atni:res:{d.number}",) if d.number else ())
+        for d in index_docs()
     )
 
 

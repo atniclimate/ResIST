@@ -67,12 +67,14 @@ def test_invalid_pool_yaml_is_503(isolated, client):
 
 def test_components(isolated, client):
     comps = client.get("/api/v1/capabilities").json()["components"]
-    assert len(comps) == 7  # six LR-A defaults plus docx-python (LR-D)
+    assert len(comps) == 11  # seven (LR-A defaults + docx-python), the three LR-E resolvers, LR-E2's citeurl
     for c in comps:
         assert set(c) == {"kind", "name", "version", "ok", "reason", "remediation"}
     by = {(c["kind"], c["name"]): c for c in comps}
     assert by[("index", "fts5")]["ok"] is False and by[("index", "fts5")]["reason"] == "index-absent"
     assert by[("analytics", "null")]["ok"] is False
+    assert by[("resolver", "atni-number")]["ok"] is True
+    assert by[("resolver", "citeurl")]["ok"] is True
 
 
 def test_static_document(isolated):

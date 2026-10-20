@@ -28,6 +28,8 @@ dependencies = [
   "jinja2>=3.1,<4",
   "pymupdf>=1.26,<2",            # AGPL-3.0; PdfBackend seam at R2.23 keeps pypdfium2 swappable
   "eyecite>=2.7,<3",
+  "citeurl>=12.0,<13",           # MIT; R1.20 CiteURL cases (owner-approved G34 install, docs/security 2026-10-20)
+  "markdown>=3.11,<4",           # BSD-3; citeurl/__init__ imports it but does not declare it (upstream bug; owner-approved 2026-10-20)
   "networkx>=3.0,<4",
   "python-dateutil>=2.9,<3",
   "sumy>=0.11,<1",
@@ -74,10 +76,17 @@ fts5 = "resist.index.fts5:Fts5Index"
 [project.entry-points."resist.analytics"]
 null = "resist.analytics.null:NullAnalytics"
 
+# LR-E (R1.20, R1.26): reference resolvers. BUILTIN in resist/registry.py also backs these.
+[project.entry-points."resist.reference_resolvers"]
+atni-number = "resist.refs.atni_number:AtniNumberResolver"
+eyecite = "resist.refs.eyecite_resolver:EyeciteResolver"
+instruments = "resist.refs.instruments:InstrumentResolver"
+citeurl = "resist.refs.citeurl_resolver:CiteurlResolver"
+
 [tool.setuptools]
 packages = ["src", "src.api", "src.export", "src.ingestion", "src.ingestion.ocr", "src.storage", "src.analysis", "src.models",
             "resist", "resist.models", "resist.contracts", "resist.adapters", "resist.services", "resist.ocr",
-            "resist.index", "resist.analytics", "resist.web", "resist.db"]
+            "resist.index", "resist.analytics", "resist.web", "resist.db", "resist.refs"]
 
 [tool.setuptools.package-data]
 resist = ["data/*.toml"]

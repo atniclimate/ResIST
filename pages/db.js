@@ -1,6 +1,7 @@
 // The resolution database, loaded once into the browser (D-053). No query ever leaves the device.
-// Version pinned; FTS5 is required and the stock sql.js build lacks it.
-import sqlite3InitModule from "https://cdn.jsdelivr.net/npm/@sqlite.org/sqlite-wasm@3.53.0-build1/dist/index.mjs";
+// Version pinned; FTS5 is required and the stock sql.js build lacks it. Vendored (@sqlite.org/sqlite-wasm
+// 3.53.0-build1, SHA-256 in NOTICE), so loading the page makes no outbound request (D-074, closes D-070 item 7).
+import sqlite3InitModule from "./vendor/sqlite-wasm/index.mjs";
 import { useDatabase } from "./query.js";
 
 let db;

@@ -76,9 +76,10 @@ def test_incomplete_pin_never_spawns(path, version, sha, no_popen, pool):
 def test_real_pins_file_parses(no_popen):
     pins = load_pins()
     assert {"tesseract", "soffice", "wordcraft", "ocr-cli", "qtqt-python"} <= set(pins)
-    assert not pins["tesseract"].complete
+    assert pins["tesseract"].complete and pins["tesseract"].version == "5.4.0.20240606"  # pinned 2026-10-20
     assert pins["soffice"].complete
-    av = CliTool("tesseract", pins=pins, firewall=lambda: state(), enabled=["tesseract"]).available()
+    assert not pins["ocr-cli"].complete  # still a placeholder until adopted
+    av = CliTool("ocr-cli", pins=pins, firewall=lambda: state(), enabled=["ocr-cli"]).available()
     assert not av.ok
     assert "pin-placeholder" in av.reason
     assert not is_fail(av)

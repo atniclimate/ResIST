@@ -24,22 +24,25 @@ def test_app_redirects_to_slash(isolated, client):
 def test_page_code_is_served(isolated, client):
     r = client.get("/app/")
     assert r.status_code == 200 and r.headers["content-type"].startswith("text/html")
-    for name in ("app.js", "db.js"):
+    for name in ("app.js", "db.js", "vendor/sqlite-wasm/index.mjs"):
         r = client.get(f"/app/{name}")
         assert r.status_code == 200 and r.headers["content-type"].startswith("text/javascript")
+    r = client.get("/app/vendor/sqlite-wasm/sqlite3.wasm")
+    assert r.status_code == 200 and r.headers["content-type"] == "application/wasm"
 
 
 def test_app_sends_csp(isolated, client):
-    """The CDN module runs with the local origin's authority; CSP limits its egress to the CDN and this server."""
+    """SQLite WASM is vendored (D-074): CSP keeps every script and connection on this origin."""
     import base64
     import hashlib
     import re
     from resist.web.pages import PAGES
     csp = client.get("/app/").headers["content-security-policy"]
+    assert "http" not in csp  # no CDN, no Sentinel Worker host
     directives = dict(d.strip().split(" ", 1) for d in csp.split(";"))
-    assert directives["connect-src"] == "'self' https://cdn.jsdelivr.net"  # no Sentinel Worker host
+    assert directives["connect-src"] == "'self'"
     script = directives["script-src"].split()
-    assert script[:3] == ["'self'", "https://cdn.jsdelivr.net", "'wasm-unsafe-eval'"]
+    assert script[:2] == ["'self'", "'wasm-unsafe-eval'"]
     assert "'unsafe-inline'" not in script and "'unsafe-eval'" not in script
     for body in re.findall(r"<script>(.*?)</script>", (PAGES / "index.html").read_text(encoding="utf-8"), re.S):
         h = base64.b64encode(hashlib.sha256(body.encode()).digest()).decode()

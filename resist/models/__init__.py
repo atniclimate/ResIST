@@ -1,7 +1,7 @@
 """Shared frozen-dataclass DTOs (report 09 section 2; design 1.3). No ORM, no framework.
 
 Collections are tuples so instances stay frozen. The only dict field is DocumentResult.extra.
-U9 (no model provenance) is checked in __post_init__ of Provenance, Computation and DocumentResult.
+U9 (no model provenance) is checked in __post_init__ of Provenance, Computation, DocumentResult and RefCandidate.
 """
 
 import dataclasses
@@ -263,3 +263,41 @@ class MeasureSpec(Record):
 class Measure(Record):
     id: str
     computation: Computation
+
+
+Family = Literal["atni_resolution", "ncai_resolution", "un_instrument", "us_statute_and_eo", "state_bill",
+                 "standard", "principles_framework", "license"]          # D-031's eight families
+RefState = Literal["resolved", "ambiguous", "unlinked"]                 # report 09 section 4
+
+
+@dataclass(frozen=True)
+class ClauseText(Record):
+    """Text handed to a ReferenceResolver: a statement or a whole document's text. Offsets in the candidates it
+    yields are into `text`; text_sha256 = sha256(text) identifies it (statement.text_sha256 for a stored clause)."""
+    sha256: Sha256                 # the citing document
+    text: str
+    page: int | None = None        # copied into every Span
+    own: tuple[str, ...] = ()      # the citing document's own logical ids, e.g. ("atni:res:21-20", "atni:res:21-120")
+
+
+@dataclass(frozen=True)
+class RefCandidate(Record):
+    span: Span                     # quote == text[start:end], verbatim (U2)
+    family: Family
+    state: RefState
+    extractors: tuple[str, ...]    # resolver names, sorted, non-empty; U9-checked
+    normalized: str                # canonical key: "atni:res:25-41", "25-41" (issuer None), "UNDRIP", "IEEE 2890-2025"
+    issuer: str | None = None      # "atni" | "ncai" | None (never the citing document's issuer by default, D-042)
+    number: str | None = None      # issuer number: atni via normalize_resolution_number; ncai the token as printed
+    logical_id: str | None = None  # f"{issuer}:res:{number}" or None (same rule as resist.services.works.logical_id)
+    registry_id: str | None = None # instrument id from instruments.toml, or a work_id after link()
+    cited_version: str | None = None  # the version string exactly as printed ("2025", "4.0"), D-044
+    pointer: str | None = None     # "Article 3"
+
+    def __post_init__(self):
+        if not self.extractors:
+            raise BadInput("no-extractor")
+        for e in self.extractors:
+            _check_provenance(e, "extractors")
+        if self.family not in get_args(Family) or self.state not in get_args(RefState):
+            raise BadInput("unknown-family-or-state")

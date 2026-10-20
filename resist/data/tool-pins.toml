@@ -6,7 +6,7 @@
 [tesseract]
 path = "C:/Program Files/Tesseract-OCR/tesseract.exe"
 sha256 = "babb405f4366b480d02cd8ff2bac8d497170f6c1711ce6f3d5d8bf0fb7fa6ed9"
-version = "<pinned at adoption>"    # unknown without running --version once (owner-authorized)
+version = "5.4.0.20240606"    # from the owner's --version run, 2026-10-20 (outbound block rule applied the same day)
 
 [soffice]
 path = "C:/Program Files/LibreOffice/program/soffice.exe"

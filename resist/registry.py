@@ -19,6 +19,7 @@ KINDS: dict[str, str] = {
     "router": "resist.page_routers",
     "index": "resist.indexes",
     "analytics": "resist.analytics",
+    "resolver": "resist.reference_resolvers",
 }
 SELECTOR: dict[str, tuple[str, str]] = {  # extractor: ("extract", media_type)
     "pdf": ("pdf", "backend"),
@@ -35,6 +36,10 @@ BUILTIN: dict[tuple[str, str], str] = {
     ("router", "min-text-50"): "resist.ocr.route:MinTextRouter",
     ("index", "fts5"): "resist.index.fts5:Fts5Index",
     ("analytics", "null"): "resist.analytics.null:NullAnalytics",
+    ("resolver", "atni-number"): "resist.refs.atni_number:AtniNumberResolver",
+    ("resolver", "citeurl"): "resist.refs.citeurl_resolver:CiteurlResolver",
+    ("resolver", "eyecite"): "resist.refs.eyecite_resolver:EyeciteResolver",
+    ("resolver", "instruments"): "resist.refs.instruments:InstrumentResolver",
 }
 _REGISTERED: dict[tuple[str, str], Callable[[], object]] = {}
 
