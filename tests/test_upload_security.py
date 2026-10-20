@@ -15,7 +15,7 @@ REAL_TEXT = extract_text_from_native_pdf(Path(__file__).parent / "fixtures" / "a
 @pytest.fixture
 def client(data_root):
     """Create test client with fresh database."""
-    with TestClient(app) as c:
+    with TestClient(app, base_url="http://127.0.0.1") as c:
         yield c
 
 
@@ -174,3 +174,11 @@ def test_upload_lands_only_as_fixture_name(client, data_root, posted, expected):
     assert response.status_code == 200
     assert response.json()["filename"] == expected
     assert sorted(p.name for p in (data_root / "inbox").iterdir()) == [expected]
+
+
+def test_doc_upload_rejected(client, data_root):
+    """Legacy .doc is refused with a 400 before anything is saved (R1.25)."""
+    body = (Path(__file__).parent / "fixtures" / "atni" / "Res-23-40.pdf").read_bytes()
+    response = client.post("/api/upload", files={"file": ("resolution.doc", BytesIO(body), "application/msword")})
+    assert response.status_code == 400
+    assert list((data_root / "inbox").iterdir()) == []

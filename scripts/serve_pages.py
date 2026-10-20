@@ -12,7 +12,7 @@ sys.path.insert(0, str(ROOT))
 from src.storage.database import DATA_DIR  # noqa: E402
 
 BUILT = DATA_DIR / "exchange" / "pages"
-FROM_BUILD = {"/resolutions.db", "/build.json"}  # corpus-derived, so they exist only in the pool
+FROM_BUILD = {"/resolutions.db", "/build.json", "/capabilities.json"}  # corpus-derived, so they exist only in the pool
 
 
 class Handler(SimpleHTTPRequestHandler):

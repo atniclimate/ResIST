@@ -6,19 +6,24 @@ from datetime import datetime
 
 from src.models.document import IntakeResult, OCRResult
 from src.ingestion.ocr.paddleocr_engine import PaddleOCREngine
+from resist.errors import BadInput, DependencyError
 
 UPLOAD_DIR = Path("./uploads")
 UPLOAD_DIR.mkdir(exist_ok=True)
 
-def detect_file_type(file_path: Path) -> Literal["pdf", "image", "text"]:
-    """Detect file type from extension."""
+def detect_file_type(file_path: Path) -> Literal["pdf", "image", "text", "docx"]:
+    """Detect file type from extension. Legacy .doc is refused (python-docx reads only .docx)."""
     suffix = file_path.suffix.lower()
     if suffix == '.pdf':
         return "pdf"
     elif suffix in {'.jpg', '.jpeg', '.png', '.tiff', '.tif'}:
         return "image"
-    elif suffix in {'.txt', '.doc', '.docx'}:
+    elif suffix == '.txt':
         return "text"
+    elif suffix == '.docx':
+        return "docx"
+    elif suffix == '.doc':
+        raise BadInput("legacy-doc-unsupported: save as .docx")
     raise ValueError(f"Unsupported file type: {suffix}")
 
 def detect_pdf_type(pdf_path: Path) -> Literal["pdf-native", "pdf-scanned", "pdf-mixed"]:
@@ -115,7 +120,20 @@ def process_document(file_path: Path, original_filename: str) -> Tuple[IntakeRes
         ocr_result = OCRResult(document_id, text, conf, region_confs, "paddleocr")
         return intake, ocr_result
 
-    else:  # text
+    elif file_type == "docx":
+        from resist.ocr.docx_python import read_docx  # lazy: python-docx loads only for a .docx
+
+        try:
+            text, _extra = read_docx(str(file_path))
+        except DependencyError:
+            raise
+        except Exception as e:  # the type name only, never message text
+            raise BadInput(f"docx-unreadable: {type(e).__name__}") from None
+        intake = IntakeResult(document_id, file_path, "docx", original_filename, file_size)
+        ocr_result = OCRResult(document_id, text, 1.0, [1.0], "docx-native")
+        return intake, ocr_result
+
+    else:  # text (.txt)
         text = file_path.read_text(encoding='utf-8', errors='replace')
         intake = IntakeResult(document_id, file_path, "text", original_filename, file_size)
         ocr_result = OCRResult(document_id, text, 1.0, [1.0], "text-extraction")

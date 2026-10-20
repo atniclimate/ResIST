@@ -8,7 +8,7 @@ class IntakeResult:
     """Output from intake stage"""
     document_id: str
     file_path: Path
-    format: Literal["pdf-native", "pdf-scanned", "image", "text"]
+    format: Literal["pdf-native", "pdf-scanned", "image", "text", "docx"]
     original_filename: str
     file_size_bytes: int
 

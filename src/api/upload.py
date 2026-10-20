@@ -12,10 +12,11 @@ from src.storage.repository import save_resolution
 from src.storage.database import get_engine
 from src.analysis.graph import ResolutionGraph, build_graph_from_resolutions
 from src.analysis.linker import link_all_references
+from resist.errors import BadInput
 
 router = APIRouter()
 
-ALLOWED_EXTENSIONS = {".pdf", ".jpg", ".jpeg", ".png", ".tiff", ".tif", ".txt", ".doc", ".docx"}
+ALLOWED_EXTENSIONS = {".pdf", ".jpg", ".jpeg", ".png", ".tiff", ".tif", ".txt", ".docx"}  # no legacy .doc (R1.25)
 MAX_FILE_SIZE = 50 * 1024 * 1024  # 50MB
 
 @router.post("/api/upload")
@@ -62,7 +63,10 @@ async def upload_document(file: UploadFile = File(...)):
         await file.close()
 
     # Process document (OCR) - use sanitized filename
-    intake, ocr_result = process_document(save_path, safe_filename)
+    try:
+        intake, ocr_result = process_document(save_path, safe_filename)
+    except BadInput as e:  # the message is a reason code, never document text
+        raise HTTPException(status_code=400, detail=str(e))
 
     # Parse resolution structure
     parse_result = parse_resolution(ocr_result.raw_text, intake.document_id)

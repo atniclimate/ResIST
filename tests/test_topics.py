@@ -3,7 +3,7 @@ import pytest
 from fastapi.testclient import TestClient
 from src.main import app
 
-client = TestClient(app)
+client = TestClient(app, base_url="http://127.0.0.1")
 
 
 def test_topics_page_loads():

@@ -16,9 +16,11 @@ docx = pytest.importorskip("docx")
 from docx.oxml.ns import nsmap  # noqa: E402  (includes w14)
 from lxml import etree  # noqa: E402  (python-docx depends on lxml)
 
+from resist.config import data_dir  # noqa: E402
+
 ROOT = Path(__file__).resolve().parent.parent
 NODE = shutil.which("node")
-DB = ROOT / "datapool" / "exchange" / "pages" / "resolutions.db"
+DB = data_dir() / "exchange" / "pages" / "resolutions.db"  # RESIST_DATA_DIR, read at import (D-064 item 4)
 LEADS = ("WHEREAS,", "THEREFORE, BE IT RESOLVED,", "BE IT FURTHER RESOLVED,", "BE IT FINALLY RESOLVED,")
 
 pytestmark = pytest.mark.skipif(NODE is None, reason="node is not installed")
@@ -192,7 +194,8 @@ def test_drafting_notes(built):
     d = docx.Document(built / "full.docx")
     notes = text(d.element.body)
     assert "Prepared with ResIST." in notes
-    assert "Verbatim, page header removed" in notes and "SHA-256 5b62a9708e4081fd" in notes
+    # Since LR-D (D-071) the stored clause carries no running header, so no "page header removed" note applies
+    assert "Verbatim" in notes and "SHA-256 5b62a9708e4081fd" in notes
     assert "Read by Policy Sentinel on 10/19/2026; text SHA-256 b3ee0b8f7d68c588" in notes
     assert "Consultation wording: “Executive Order 13175" in notes
     assert "Drafter's note: Check the consultation section before the committee meets." in notes

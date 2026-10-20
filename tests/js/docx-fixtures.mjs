@@ -20,7 +20,7 @@ const R2651 = {
 };
 // [statementType, index, text] exactly as stored.
 export const STATEMENTS = [
-  ["whereas", 3, "the ATNI Youth Committee expresses concern that overreliance on artificial intelligence (AI) in education may negatively affect critical thinking, creativity, writing, AFFILIATED TRIBES OF NORTHWEST INDIANS RESOLUTION #2026 – 051 2026 ANNUAL CONVENTION PAGE 2 motor skills, learning strategies, traditional teaching practices, cultural transmission, language revitalization, and relationships with Indigenous knowledge keepers, educators, parents, and Elders; and"],
+  ["whereas", 3, "the ATNI Youth Committee expresses concern that overreliance on artificial intelligence (AI) in education may negatively affect critical thinking, creativity, writing, motor skills, learning strategies, traditional teaching practices, cultural transmission, language revitalization, and relationships with Indigenous knowledge keepers, educators, parents, and Elders; and"],
   ["resolved", 0, "that ATNI urges both Tribal and Public Schools to exercise caution and establish strong ethical safeguards governing the use of artificial intelligence (AI) in Tribal educational systems; and"],
   ["resolved", 3, "that ATNI urges State and Federal Governments to consult with Tribes in creating stronger safeguards to protect American Indian/ Alaska Native youth from potential harms associated with the use of AI in schools; and"],
 ];

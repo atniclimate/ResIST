@@ -1,7 +1,5 @@
 # tests/quarantine.txt -- R0.7 quarantine register. One line per test: node id | cause | owner | expiry.
-tests/test_parser.py::test_res_26_34_clauses_exclude_running_header | S04 running-header defect: the page header "AFFILIATED TRIBES OF NORTHWEST INDIANS RESOLUTION #2026 - 034 ... PAGE n" is extracted into the 3 clauses of Res-26-34 that cross a page break (WHEREAS 4, WHEREAS 10, RESOLVED 2); added 2026-10-19 (R0.22) | owner=parser | expires=S04
-tests/test_parser.py::test_spaced_header_number_is_the_own_number[Res-23-40.pdf-23-40] | S04 own-number defect: the spaced header "#2023 – 40" is read as "2023"; added 2026-10-19 (R0.22) | owner=parser | expires=S04
-tests/test_parser.py::test_spaced_header_number_is_the_own_number[Res-2021-20.pdf-21-20] | S04 own-number defect: "#2021 – 20" is read as "2021"; added 2026-10-19 (R0.22) | owner=parser | expires=S04
-tests/test_parser.py::test_spaced_header_number_is_the_own_number[Res-26-34.pdf-26-34] | S04 own-number defect: "# 2026 - 034" is read as "2026"; added 2026-10-19 (R0.22) | owner=parser | expires=S04
 # Cause Q1 (Starlette 1.6 TemplateResponse signature, 33 tests, quarantined 2026-09-04) was retired
 #   2026-10-19 when all 14 call sites moved to the request-first signature (commit 6c15a2a, R5.2).
+# Cause S04 (parser own number and running header, 4 tests, quarantined 2026-10-19) was retired
+#   2026-10-20 in LR-D (R1.13).

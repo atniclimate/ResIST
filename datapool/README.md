@@ -22,6 +22,7 @@ that would be identical on a machine that has never seen a resolution is code.
 | `vendor/models/` | Pre-staged, checksummed OCR and NLP weights (DG-9: no network downloads) | n/a |
 | `logs/` | JSONL run logs, acquisition and inventory logs | n/a |
 | `tmp/` | Scratch; safe to empty | yes |
+| `app/` | Per-installation app state: the Edge --app window profile (`app/edge-profile/`, drafts in its localStorage) | no |
 
 `pool.yaml` at this root records the pool id, owner, TSDF pin, and counts.
 

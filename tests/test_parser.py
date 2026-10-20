@@ -5,12 +5,15 @@ Every resolution text here is real, published ATNI text (T0, D-052): whole docum
 time from tests/fixtures/atni/, or short verbatim excerpts whose source is named in a comment.
 """
 import re
+from collections import Counter
 from functools import lru_cache
 from pathlib import Path
 
+import pymupdf
 import pytest
-from src.ingestion.parser import parse_resolution
-from src.ingestion.citations import extract_citations, normalize_citation, classify_citation_type
+from src.ingestion.parser import RUNNING_HEADER, parse_resolution, strip_running_headers
+from src.ingestion.citations import (ATNI_RESOLUTION_PATTERN, extract_citations, normalize_citation,
+                                     classify_citation_type)
 from src.ingestion.classifier import classify_whereas_function, classify_resolved_action
 from src.ingestion.intake import detect_pdf_type, extract_text_from_native_pdf
 
@@ -201,7 +204,7 @@ def test_res_2021_20_two_issuer_numbers():
 
     text = atni_text("Res-2021-20.pdf")
     printed = re.findall(r"RESOLUTION\s*#[^\n]*", text)
-    # The title header uses an en dash, which the normalizer does not accept; the running header uses "-".
+    # both headers normalize to 21-20 (en dash accepted since R1.13)
     assert {normalize_resolution_number(p) for p in printed} - {None} == {"21-20"}
     assert "120" not in text
     assert normalize_resolution_number("RES_21_120") == "21-120"
@@ -210,7 +213,7 @@ def test_res_2021_20_two_issuer_numbers():
 @pytest.mark.parametrize("name, number", [("Res-23-40.pdf", "23-40"), ("Res-2021-20.pdf", "21-20"),
                                           ("Res-26-34.pdf", "26-34")])
 def test_spaced_header_number_is_the_own_number(name, number):
-    """S04: spaced headers ("#2023 – 40", "# 2026 - 034") are read as the year only today (quarantined)."""
+    """S04: spaced headers ("#2023 – 40", "# 2026 - 034") are read as the own number, not the year only."""
     from src.ingestion.parser import normalize_resolution_number
 
     parsed = parse_resolution(atni_text(name), name).resolution_number
@@ -230,20 +233,99 @@ def test_res_26_34_uc1_clauses_and_citations():
 
 
 def test_res_26_34_clauses_exclude_running_header():
-    """S04: a clause crossing a page break must not carry the page's running header (quarantined)."""
+    """S04: a clause crossing a page break must not carry the page's running header."""
     result = parse_resolution(atni_text("Res-26-34.pdf"), "res-26-34")
-    clauses = result.whereas_statements + result.resolved_statements
-    assert not [c["text"][:60] for c in clauses if "AFFILIATED TRIBES OF NORTHWEST INDIANS RESOLUTION" in c["text"]]
+    typed = [("whereas", c) for c in result.whereas_statements] + [("resolved", c) for c in result.resolved_statements]
+    # (type, index) only: no clause text in an assertion message (D-066)
+    assert not [(t, c["index"]) for t, c in typed if "AFFILIATED TRIBES OF NORTHWEST INDIANS RESOLUTION" in c["text"]]
 
 
 @pytest.mark.parametrize("raw, expected", [
     ("RES_11_01", "11-01"), ("Res_08_05", "08-05"), ("Res-18-24.pdf", "18-24"), ("#23-40", "23-40"),
     ("ATNI-RES-2023-41", "23-41"), ("20230921_23-40_Climate.pdf", "23-40"), ("RES_25_100", "25-100"),
     ("Letter", None), ("ATNI-RES-2023", None), ("", None),
+    ("#2023 – 40", "23-40"), ("# 2026 - 034", "26-34"), ("#2021 – 20", "21-20"),
+    ("RES 25—41", "25-41"), ("2026–034", "26-34"),
 ])
 def test_normalize_resolution_number(raw, expected):
     from src.ingestion.parser import normalize_resolution_number
     assert normalize_resolution_number(raw) == expected
+
+
+@pytest.mark.parametrize("header, expected", [
+    ("Resolution #2023 – 40", "23-40"), ("Resolution # 2026 - 034", "26-34"), ("RESOLUTION #18-38", "18-38"),
+    # unnormalizable: the pre-R1.13 capture, never the widened spaced string
+    ("Resolution 2023 - 2024", "2023"), ("Resolution 2023-2024", "2023-2024"), ("Resolution 1838", "1838"),
+])
+def test_resolution_number_falls_back_to_legacy_capture(header, expected):
+    assert parse_resolution(header, "number-only").resolution_number == expected
+
+
+NATIVE =[("Res-23-40.pdf", "23-40"), ("Res-2021-20.pdf", "21-20"), ("Res-26-34.pdf", "26-34")]
+NATIVE_NAMES = [n for n, _ in NATIVE]
+
+
+def page_texts(name: str) -> list:
+    """The page texts extract_text_from_native_pdf joins with "\\n"."""
+    with pymupdf.open(str(ATNI / name)) as doc:
+        return [p.get_text() for p in doc]
+
+
+@pytest.mark.parametrize("name, number", NATIVE)
+def test_own_number_is_normalized(name, number):
+    assert parse_resolution(atni_text(name), name).resolution_number == number
+
+
+@pytest.mark.parametrize("name, whereas, resolved", [("Res-23-40.pdf", 13, 2), ("Res-2021-20.pdf", 12, 2),
+                                                     ("Res-26-34.pdf", 16, 6)])
+def test_no_running_header_in_any_clause(name, whereas, resolved):
+    text = atni_text(name)
+    result = parse_resolution(text, name)
+    header = re.compile(r"AFFILIATED TRIBES OF NORTHWEST|\bPAGE \d+\b")
+    typed = [("whereas", c) for c in result.whereas_statements] + [("resolved", c) for c in result.resolved_statements]
+    assert not [(t, c["index"]) for t, c in typed if header.search(c["text"])]
+    assert len(result.whereas_statements) == len(re.findall(WHEREAS_MARK, text, re.I)) == whereas
+    assert len(result.resolved_statements) == len(re.findall(RESOLVED_MARK, text, re.I)) == resolved
+
+
+@pytest.mark.parametrize("name, blocks", [("Res-23-40.pdf", 2), ("Res-2021-20.pdf", 1), ("Res-26-34.pdf", 3)])
+def test_running_header_blocks_one_per_later_page(name, blocks):
+    text = atni_text(name)
+    assert len(RUNNING_HEADER.findall(text)) == len(page_texts(name)) - 1 == blocks
+    assert len(strip_running_headers(text)) == len(text)
+
+
+@pytest.mark.parametrize("name, counts", [
+    ("Res-26-34.pdf", {1: 4, 2: 6, 3: 8, 4: 4}), ("Res-23-40.pdf", {1: 4, 2: 8, 3: 3}),
+    ("Res-2021-20.pdf", {1: 5, 2: 9}),
+])
+def test_page_number_from_page_texts(name, counts):
+    pages = page_texts(name)
+    result = parse_resolution(atni_text(name), name, pages)
+    numbers = [c["page_number"] for c in result.whereas_statements + result.resolved_statements]
+    assert all(isinstance(n, int) and 1 <= n <= len(pages) for n in numbers)
+    assert numbers == sorted(numbers)
+    assert Counter(numbers) == counts
+
+
+@pytest.mark.parametrize("name", NATIVE_NAMES)
+def test_page_number_none_without_pages(name):
+    result = parse_resolution(atni_text(name), name)
+    assert all(c["page_number"] is None for c in result.whereas_statements + result.resolved_statements)
+
+
+def test_pages_must_join_to_text():
+    text = atni_text("Res-23-40.pdf")
+    with pytest.raises(ValueError, match="pages-do-not-join-to-text"):
+        parse_resolution(text, "res-23-40", [text, ""])
+
+
+@pytest.mark.parametrize("name", NATIVE_NAMES)
+def test_citation_self_filter_keeps_legacy_reading(name):
+    """D3: the self-filter removes the citation extractor's own year-only header reading, as before R1.13."""
+    text = atni_text(name)
+    y = ATNI_RESOLUTION_PATTERN.search(text).group(1)
+    assert f"ATNI-RES-{y}" not in {c["normalized"] for c in parse_resolution(text, name).citations}
 
 
 if __name__ == "__main__":

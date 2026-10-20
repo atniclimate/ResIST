@@ -7,6 +7,7 @@ from fastapi.templating import Jinja2Templates
 from sqlmodel import Session, select
 from sqlalchemy import text
 
+from resist.index import fts_match
 from src.storage.database import get_engine
 from src.storage.repository import search_resolutions, get_resolution, sanitize_snippet
 from src.models.resolution import Resolution, Citation, Sponsor
@@ -35,20 +36,9 @@ def safe_fts_query(user_query: str) -> str:
 
     FTS5 special chars: * - + " ( ) : ^ ~
     By quoting each word, we prevent syntax errors from user input.
+    The query is NFC-normalized first (D-013, R3.2); the rule is shared with resist.index.fts_match.
     """
-    if not user_query or not user_query.strip():
-        return ""
-
-    # Split on whitespace and quote each word
-    words = user_query.strip().split()
-    # Remove any existing quotes and re-wrap
-    quoted_words = []
-    for word in words:
-        clean_word = word.replace('"', '')
-        if clean_word:
-            quoted_words.append(f'"{clean_word}"')
-
-    return " ".join(quoted_words)
+    return fts_match(user_query)
 
 
 def get_available_years(engine) -> List[int]:

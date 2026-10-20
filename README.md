@@ -13,9 +13,12 @@ atnitribes.org. Each record links to its source PDF, which is authoritative.
 
 ## Status
 
-Early prototype (`0.2.0.dev0`) under active rework. `pytest` on a fresh clone gives 155 passed, 5 skipped, 0 failed: 4 tests of known parser defects are quarantined in `tests/quarantine.txt`, and 1 needs the built site database, which a clone does not have.
-The OCR engine class still targets the PaddleOCR 2.x API. Bulk ingest uses the Tesseract command line
-for image-only pages.
+Early prototype (`0.2.0.dev0`) under active rework. A new `resist/` package now holds swappable components
+(PDF extraction, OCR, search index, DOCX intake) selected by name, a source-policy tier gate, a loopback-only
+`/api/v1`, and a socket guard so processing stages make no network calls. External tools such as Tesseract
+run only through one helper that requires a pinned binary and a Windows outbound block rule, so they report
+"unavailable" until those are set up. Skipped tests print the reason. The OCR engine class still targets the
+PaddleOCR 2.x API.
 
 ## What it does
 
@@ -69,6 +72,7 @@ executable for scanned pages.
 ## Layout
 
 ```
+resist/     the core package: models, contracts (ports), registry, adapters, ocr, index, db, services, web
 src/        api/ (FastAPI routes)  ingestion/ (intake, OCR, parser, citations)  storage/ (SQLite, FTS5)
             analysis/ (graph, similarity, keywords)  export/ (DOCX/PDF)  templates/  static/
 pages/      the static in-browser site (index.html)

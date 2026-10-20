@@ -38,6 +38,11 @@ class Statement(SQLModel, table=True):
     text: str
     function: Optional[str] = None  # For whereas: legal_basis, historical_context, etc.
     action_type: Optional[str] = None  # For resolved: directive, request_urge, etc.
+    page_number: Optional[int] = None  # 1-based PDF page where the clause begins; NULL when unknown (R1.21)
+    # Offsets into resolution.full_text and the sha256 of it; NULL when unknown (LR-F)
+    char_start: Optional[int] = None
+    char_end: Optional[int] = None
+    text_sha256: Optional[str] = None
 
     resolution: Resolution = Relationship(back_populates="statements")
 

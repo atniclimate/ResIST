@@ -1,0 +1,29 @@
+# Binary pins for resist/adapters/cli_tool.py (D-060). cli_tool reads ONLY this file; resist.toml may only name a tool.
+# A value starting with "<" is a placeholder: the tool stays unavailable until the owner adopts it.
+# SHA-256 values recorded 2026-10-20 from file bytes; nothing was executed. Versions from file metadata where shown.
+# Every tool also needs an enabled outbound block rule for its path (scripts/firewall/outbound-block-rules.ps1).
+
+[tesseract]
+path = "C:/Program Files/Tesseract-OCR/tesseract.exe"
+sha256 = "babb405f4366b480d02cd8ff2bac8d497170f6c1711ce6f3d5d8bf0fb7fa6ed9"
+version = "<pinned at adoption>"    # unknown without running --version once (owner-authorized)
+
+[soffice]
+path = "C:/Program Files/LibreOffice/program/soffice.exe"
+sha256 = "a2823391857db1dd8ebbd8234267f9ec58ec7e5b5fc434665c0ecec4671cb988"
+version = "26.8.0.3"
+
+[wordcraft]
+path = "C:/Program Files/WordCraft/wordcraft-cli.exe"
+sha256 = "c28bcf13a8960cce781f64fbbaa34233eb356b60f69808e0a265100c15e79e7f"
+version = "0.7.0"
+
+[ocr-cli]
+path = "<pinned at adoption: the ocr-engine-next release ocr-cli.exe>"
+sha256 = "<pinned at adoption>"
+version = "<pinned at adoption>"
+
+[qtqt-python]
+path = "<pinned at adoption: the qtqt venv python.exe>"
+sha256 = "<pinned at adoption>"
+version = "<pinned at adoption>"
