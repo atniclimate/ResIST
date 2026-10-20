@@ -23,14 +23,17 @@ const ISSUE_TYPES = ["consultation_language", "consultation_absent", "tribal_ref
 // ---- Search words for a citation found in a resolution ----
 const FORMS = {
   executive_order: [/\b(?:Executive\s+Order|E\.?\s?O\.?)\s*(?:No\.?\s*)?(\d[\d,]*)/i, m => `Executive Order ${m[1].replace(/,/g, "")}`],
-  public_law: [/\b(?:Public\s+Law|P\.?\s?L\.?)\s*(?:No\.?\s*)?(\d+\s*-\s*\d+)/i, m => `Public Law ${m[1].replace(/\s/g, "")}`],
-  usc: [/\b(\d+)\s*U\.?\s?S\.?\s?C\.?\s*(?:§+\s*)?(\d[\w.()-]*)/i, m => `${m[1]} U.S.C. ${m[2]}`],
-  cfr: [/\b(\d+)\s*C\.?\s?F\.?\s?R\.?\s*(?:Part\s*|§+\s*)?(\d[\w.()-]*)/i, m => `${m[1]} CFR ${m[2]}`],
+  public_law: [/\b(?:Public\s+Law|Pub\.?\s*L\.?|P\.?\s?L\.?)\s*(?:No\.?\s*)?(\d+\s*-\s*\d+)/i, m => `Public Law ${m[1].replace(/\s/g, "")}`],
+  // Title, then "U.S.C.", "USCS" or "U.S. Code", then a section marker (§, sec., secs., section) before the number.
+  usc: [/\b(\d+)\s*U\.?\s?S\.?(?:\s?C(?:S\b)?\.?|\s+Code)\s*,?\s*(?:§+|sec(?:s|tions?)?\.?)?\s*(\d[\w.()-]*)/i, m => `${m[1]} U.S.C. ${m[2]}`],
+  cfr: [/\b(\d+)\s*C\.?\s?F\.?\s?R\.?\s*,?\s*(?:Parts?|§+|sec(?:s|tions?)?\.?)?\s*(\d[\w.()-]*)/i, m => `${m[1]} CFR ${m[2]}`],
 };
+// A federal citation with no recognized form gets "" (no Look up is offered); other kinds fall back to the squashed text.
 export function lookupWords(text, citationType) {
   const t = squash(text).replace(/[‐-―]/g, "-");
   const [re, make] = FORMS[citationType] ?? [];
   const m = re?.exec(t);
+  if (!m && FEDERAL_TYPES.has(citationType)) return "";
   return (m ? make(m) : t).slice(0, 200).replace(/[\s.,;:]+$/, "");
 }
 
@@ -214,6 +217,30 @@ const link = (url, label) => url ? `<a href="${esc(url)}" target="_blank" rel="n
 
 let allowed = false; // fail closed until capabilities.json says sentinel: true (D-059 item 5)
 export function allowLookup(on) { allowed = on === true; }
+export const isLookupLive = () => allowed;
+
+// The local face never contacts Policy Sentinel: it shows the search words to copy and links out. id is made by the
+// caller from [a-z0-9-] only; the words are escaped.
+export function wordsHTML(words, id) {
+  return `<div class="sn-words" id="${id}" hidden>
+    <label for="${id}-q">Search words for Policy Sentinel</label>
+    <div class="sn-wrow"><input type="text" id="${id}-q" readonly value="${esc(words)}">
+      <button type="button" class="btn small" data-copy="${id}-q">Copy</button></div>
+    <p class="meta">${link(SENTINEL_HOME, "Open Policy Sentinel")} and paste them into its search. Nothing is sent from this page.</p>
+  </div>`;
+}
+
+// Copies the field's words to the clipboard (nothing leaves the device). When the clipboard refuses, the words are
+// selected for the person to copy. Never throws.
+export async function copyText(input) {
+  try {
+    await navigator.clipboard.writeText(input.value);
+    return true;
+  } catch {
+    try { input.select(); } catch { /* nothing to select */ }
+    return false;
+  }
+}
 
 export function openLookup({ query = "", onAddNote } = {}) {
   const dlg = document.createElement("dialog");

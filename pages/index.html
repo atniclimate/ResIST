@@ -15,24 +15,29 @@
 <body>
 <a class="skip" href="#main">Skip to content</a>
 <header class="site-header"><div class="wrap wide bar">
-  <a class="brand" href="#/"><img src="atni-seal.png" alt="" width="40" height="40"><span class="brand-words"><b>ResIST</b><span>Resolutions of the Affiliated Tribes of Northwest Indians</span></span></a>
+  <a class="brand" href="#/"><img src="atni-seal.png" alt="" width="32" height="32"><span class="brand-words"><b>ResIST</b><span>Resolutions of the Affiliated Tribes of Northwest Indians</span></span></a>
   <nav class="site-nav" aria-label="Main">
     <a href="#/" data-nav="search">Search</a>
     <a href="#/draft" data-nav="draft">Draft <span class="count" id="draft-count"></span><span class="visually-hidden" id="draft-count-words"></span></a>
     <a href="#/about" data-nav="about">About</a>
-    <button type="button" class="btn quiet small theme-toggle" id="theme-toggle">Light theme</button>
+    <button type="button" class="icon-btn theme-toggle" id="theme-toggle" aria-label="Light theme" title="Light theme"><svg aria-hidden="true" focusable="false" width="20" height="20" viewBox="0 0 20 20"><circle cx="10" cy="10" r="7.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10 2.5a7.5 7.5 0 0 1 0 15z" fill="currentColor"/></svg></button>
   </nav>
 </div></header>
-<main id="main" tabindex="-1">
+<main id="main" tabindex="-1" aria-busy="true">
   <div class="wrap wide loading" id="loading">
     <p id="status">Loading the resolutions</p>
     <div class="loadbar" aria-hidden="true"><span id="loadbar"></span></div>
   </div>
 </main>
-<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<div class="dock" id="dock" hidden>
+  <p class="dock-msg" id="toast" aria-hidden="true"></p>
+  <p class="dock-draft" id="dock-draft" hidden><span id="dock-count"></span> <a class="btn small primary" href="#/draft">Open draft</a></p>
+  <p class="dock-ins" id="dock-ins" hidden>Insert point: <span id="dock-ins-pos"></span> <button type="button" class="btn small quiet" id="dock-ins-clear" aria-label="Clear the insert point">Clear</button></p>
+</div>
+<div id="announce" class="visually-hidden" role="status" aria-live="polite" aria-atomic="true"></div>
 <footer class="site-footer"><div class="wrap wide">
   <p>Verbatim text from resolutions published by the Affiliated Tribes of Northwest Indians. Not an official ATNI record; the source PDF governs.</p>
-  <p class="footer-links"><a href="https://atniclimate.github.io/policy-sentinel/" rel="noopener">Policy Sentinel</a> <a href="https://atniclimate.github.io/TieredSovereignDataFramework/" rel="noopener">TSDF T0: public</a></p>
+  <p class="footer-links"><a href="https://atniclimate.github.io/policy-sentinel/" target="_blank" rel="noopener noreferrer">Policy Sentinel<span class="visually-hidden"> (opens in a new tab)</span></a> <a href="https://atniclimate.github.io/TieredSovereignDataFramework/" target="_blank" rel="noopener noreferrer">TSDF T0: public<span class="visually-hidden"> (opens in a new tab)</span></a></p>
 </div></footer>
 <script type="module" src="app.js"></script>
 </body>

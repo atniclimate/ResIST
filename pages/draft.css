@@ -23,7 +23,7 @@
 @media (min-width: 64rem) {
   .draft-switch { display: none; }
   .bench { grid-template-columns: minmax(0, 1fr) minmax(0, 1.12fr); align-items: start; }
-  .desk { position: sticky; top: 80px; max-height: calc(100vh - 96px); overflow-y: auto; overscroll-behavior: contain; padding: 0 var(--atni-space-step-5) var(--atni-space-step-6); margin: 0 calc(-1 * var(--atni-space-step-5)); scrollbar-width: thin; }
+  .desk { position: sticky; top: calc(var(--hdr, 56px) + 24px); max-height: calc(100vh - var(--hdr, 56px) - 40px); overflow-y: auto; overscroll-behavior: contain; padding: 0 var(--atni-space-step-5) var(--atni-space-step-6); margin: 0 calc(-1 * var(--atni-space-step-5)); scrollbar-width: thin; }
 }
 
 /* Editor */
@@ -49,7 +49,12 @@ details.orig blockquote { margin: var(--atni-space-step-2) 0 0; padding: var(--a
 .crow:first-child { border-top: 0; }
 .crow.carried { border-left-color: var(--atni-non-text-accent); }
 .crow-lead { font-family: var(--atni-type-family-display); font-weight: var(--atni-type-weight-display-medium); font-size: var(--atni-type-label-size); letter-spacing: var(--atni-type-label-tracking); line-height: 1.35; color: var(--atni-text-secondary); padding-top: 12px; cursor: pointer; }
+.crow-lead .lw, .crow-lead .pos { display: block; }
+.crow-lead .pos { margin-top: 2px; color: var(--atni-text-muted); font-family: var(--atni-type-family-body); font-weight: 400; font-size: var(--atni-type-caption-size); letter-spacing: normal; }
 .crow-main { min-width: 0; }
+/* The Undo row left where a removed clause was */
+.crow.gone { display: flex; flex-wrap: wrap; align-items: center; gap: var(--atni-space-step-2) var(--atni-space-step-4); border-left-color: var(--atni-non-text-rule); border-left-style: dashed; }
+.crow.gone p { margin: 0; color: var(--atni-text-secondary); }
 .crow-main textarea { font-size: 0.9375rem; line-height: 1.55; padding: 10px 12px; }
 .crow-joiner { margin: 2px 0 0; text-align: right; color: var(--atni-text-muted); font-size: var(--atni-type-caption-size); min-height: 1.4em; }
 .crow-ph { margin: var(--atni-space-step-2) 0; display: flex; flex-wrap: wrap; align-items: center; gap: var(--atni-space-step-2) var(--atni-space-step-4); }
@@ -57,7 +62,13 @@ details.orig blockquote { margin: var(--atni-space-step-2) 0 0; padding: var(--a
 .crow-ph p { margin: 0; font-size: var(--atni-type-caption-size); }
 .crow-foot { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: var(--atni-space-step-1) var(--atni-space-step-3); }
 .crow-prov { min-width: 0; padding-top: 5px; }
-.crow-prov .chip a { color: inherit; }
+.crow-prov .chip a { color: inherit; display: inline-flex; align-items: center; min-height: 24px; }
+/* Carried citations under a clause (D-077): the words and where they came from */
+.crow-prov .chip + .chip { margin-left: var(--atni-space-step-2); }
+.crow-cites { list-style: none; margin: var(--atni-space-step-2) 0 0; padding: 0 0 0 var(--atni-space-step-3); border-left: 2px solid var(--atni-non-text-accent); color: var(--atni-text-secondary); font-size: var(--atni-type-caption-size); line-height: 1.5; }
+.crow-cites li + li { margin-top: var(--atni-space-step-1); }
+.crow-cites a { display: inline-flex; align-items: center; min-height: 24px; }
+.crow-cites code { overflow-wrap: anywhere; }
 .crow-acts { display: flex; flex-wrap: wrap; margin-left: auto; }
 .crow-acts .btn.small { min-height: 32px; }
 @media (max-width: 40rem) {
@@ -109,12 +120,16 @@ details.orig blockquote { margin: var(--atni-space-step-2) 0 0; padding: var(--a
 .sheet .s-cl { text-indent: calc(36 * var(--pt)); position: relative; cursor: pointer; }
 .sheet .s-cl:hover, .sheet .s-go:hover { background: color-mix(in srgb, var(--atni-color-core-atni-red) 7%, transparent); }
 .sheet .s-go { cursor: pointer; }
+.sheet [tabindex="0"]:focus-visible { outline-offset: 4px; }
 /* The margin mark: a preview annotation for carried clauses, never part of the document */
 .sheet .s-cl:is([data-state="verbatim"], [data-state="cleaned"], [data-state="edited"])::before {
   content: ""; position: absolute; top: 0.15em; bottom: 0.15em; left: calc(-30 * var(--raw)); width: 3px;
   background: var(--atni-non-text-accent); transform-origin: top; animation: sheet-rule 240ms ease-out;
 }
 @keyframes sheet-rule { from { transform: scaleY(0); } }
+/* A carried citation in the preview: a screen tint only, never printed or put into Word */
+.sheet .s-cite { background: color-mix(in srgb, var(--atni-non-text-accent) 14%, transparent); box-shadow: inset 0 -1px 0 var(--atni-non-text-accent); }
+@media print { .sheet .s-cite { background: none; box-shadow: none; } }
 .sheet .s-cert { margin-top: calc(22 * var(--pt)); }
 .sheet .s-certh { text-align: center; font-weight: 700; text-decoration: underline; text-underline-offset: 0.12em; margin-bottom: calc(22 * var(--pt)); }
 .sheet .s-sigs { display: grid; grid-template-columns: calc(252 * var(--raw)) 1fr; gap: calc(12 * var(--pt)); margin-top: calc(52 * var(--pt)); }

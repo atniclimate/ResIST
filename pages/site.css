@@ -1,10 +1,15 @@
 /* ResIST base styles on the ATNI design system (atni.css holds the tokens). View styles extend these; they never
    redefine them. Red means act or carried. Radius is 0 everywhere (design-system token). */
 
+/* Bar heights the sticky parts and scroll padding derive from (UI-1 D10). */
+:root { --hdr: 56px; --jump: 52px; }
 *, *::before, *::after { box-sizing: border-box; }
-html { -webkit-text-size-adjust: 100%; }
+/* Nothing focused or scrolled to lands under the header, the jump bar or the draft bar. */
+html { -webkit-text-size-adjust: 100%; scroll-padding-top: 16px; scroll-padding-bottom: 136px; } /* the draft bar can now hold the insert point too (UI-2 D19) */
+@media (min-width: 40rem) { html { scroll-padding-top: calc(var(--hdr) + 16px); } }
+@media (min-width: 48rem) { html { scroll-padding-top: calc(var(--hdr) + var(--jump) + 16px); } }
 body {
-  margin: 0; background: var(--atni-ground-base); color: var(--atni-text-body);
+  margin: 0; padding-bottom: 136px; /* clears the dock with draft link, insert point and toast (UI-2) */ background: var(--atni-ground-base); color: var(--atni-text-body);
   font: var(--atni-type-body-weight) var(--atni-type-body-size)/var(--atni-type-body-line-height) var(--atni-type-family-body);
   font-kerning: normal; text-rendering: optimizeLegibility;
 }
@@ -35,15 +40,20 @@ ul.squares > li::before { content: ""; position: absolute; left: 0; top: 0.62em;
 .wrap { max-width: var(--atni-space-page-max); margin: 0 auto; padding: 0 var(--atni-space-gutter-mobile); }
 .wrap.wide { max-width: 1360px; }
 @media (min-width: 48rem) { .wrap { padding: 0 var(--atni-space-step-6); } }
-.site-header { background: var(--atni-ground-base); border-bottom: 1px solid var(--atni-non-text-rule); position: sticky; top: 0; z-index: 20; }
-.site-header .bar { display: flex; align-items: center; gap: var(--atni-space-step-4); min-height: 64px; flex-wrap: wrap; }
-.brand { display: flex; align-items: center; gap: var(--atni-space-step-3); text-decoration: none; color: var(--atni-text-heading); }
-.brand img { width: 40px; height: 40px; }
+/* One row, never wrapping. Static on phones (the draft bar is the persistent control there), sticky from 40rem. */
+.site-header { background: var(--atni-ground-base); border-bottom: 1px solid var(--atni-non-text-rule); position: relative; z-index: 20; }
+@media (min-width: 40rem) { .site-header { position: sticky; top: 0; } }
+.site-header .bar { display: flex; align-items: center; gap: var(--atni-space-step-2); height: calc(var(--hdr) - 1px); flex-wrap: nowrap; } /* plus the 1px rule */
+.brand { display: flex; align-items: center; gap: var(--atni-space-step-2); min-width: 0; text-decoration: none; color: var(--atni-text-heading); }
+.brand img { width: 32px; height: 32px; flex: none; }
 [data-theme="light"] .brand img { filter: brightness(0.32); }
 .brand b { font-family: var(--atni-type-family-display); font-weight: var(--atni-type-weight-display-semibold); font-size: 1.3rem; letter-spacing: -0.02em; }
 .brand span { display: block; font-size: var(--atni-type-caption-size); color: var(--atni-text-muted); line-height: 1.2; }
-.site-nav { margin-left: auto; display: flex; align-items: center; gap: var(--atni-space-step-1); flex-wrap: wrap; }
-.site-nav a { font-family: var(--atni-type-family-display); font-weight: var(--atni-type-weight-display-medium); font-size: var(--atni-type-button-size); color: var(--atni-text-secondary); text-decoration: none; padding: 10px 12px; min-height: var(--atni-space-touch-primary); display: inline-flex; align-items: center; gap: var(--atni-space-step-2); }
+.site-nav { margin-left: auto; display: flex; align-items: center; gap: 0; flex-wrap: nowrap; }
+.site-nav a { font-family: var(--atni-type-family-display); font-weight: var(--atni-type-weight-display-medium); font-size: var(--atni-type-button-size); color: var(--atni-text-secondary); text-decoration: none; padding: 0 var(--atni-space-step-2); min-height: var(--atni-space-touch-primary); display: inline-flex; align-items: center; gap: var(--atni-space-step-1); white-space: nowrap; }
+@media (min-width: 40rem) { .site-nav { gap: var(--atni-space-step-1); } .site-nav a { padding: 0 var(--atni-space-step-3); gap: var(--atni-space-step-2); } .site-header .bar { gap: var(--atni-space-step-4); } }
+.icon-btn { display: inline-flex; align-items: center; justify-content: center; flex: none; width: var(--atni-space-touch-primary); height: var(--atni-space-touch-primary); padding: 0; border: 1px solid transparent; border-radius: var(--atni-space-radius); background: transparent; color: var(--atni-text-secondary); cursor: pointer; }
+.icon-btn:hover { color: var(--atni-text-heading); border-color: var(--atni-non-text-rule); }
 .site-nav a:hover { color: var(--atni-text-heading); }
 .site-nav a[aria-current="page"] { color: var(--atni-text-heading); box-shadow: inset 0 -2px 0 var(--atni-non-text-accent); }
 .count { display: inline-block; min-width: 1.5em; padding: 0 0.4em; text-align: center; font-size: 0.75rem; line-height: 1.5; background: var(--atni-non-text-button-fill); color: var(--atni-color-core-white); }
@@ -56,15 +66,15 @@ main { display: block; padding: var(--atni-space-step-6) 0 var(--atni-space-step
 /* Controls */
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: var(--atni-space-step-2);
-  min-height: var(--atni-space-touch-primary); padding: 0 var(--atni-space-step-4); border: 1px solid var(--atni-non-text-rule);
+  min-height: var(--atni-space-touch-primary); padding: 0 var(--atni-space-step-4); border: 1px solid var(--atni-text-muted);
   border-radius: var(--atni-space-radius); background: var(--atni-ground-raised); color: var(--atni-text-heading);
   font: var(--atni-type-weight-display-medium) var(--atni-type-button-size)/var(--atni-type-button-line-height) var(--atni-type-family-display);
   cursor: pointer; text-decoration: none; white-space: nowrap;
 }
-.btn:hover { border-color: var(--atni-text-muted); color: var(--atni-text-heading); }
+.btn:hover { border-color: var(--atni-text-secondary); color: var(--atni-text-heading); }
 .btn.primary { background: var(--atni-non-text-button-fill); border-color: var(--atni-non-text-button-border); color: var(--atni-non-text-button-text); }
 .btn.primary:hover { background: var(--atni-color-core-red-alt-hover); }
-.btn.quiet { background: transparent; border-color: transparent; color: var(--atni-text-secondary); padding: 0 var(--atni-space-step-3); }
+.btn.quiet { background: transparent; border-color: transparent; color: var(--atni-text-secondary); padding: 0 var(--atni-space-step-3); text-decoration: underline; text-underline-offset: 0.18em; text-decoration-thickness: 1px; }
 .btn.quiet:hover { color: var(--atni-text-heading); border-color: var(--atni-non-text-rule); }
 .btn.small { min-height: 32px; padding: 0 var(--atni-space-step-3); font-size: var(--atni-type-label-size); }
 .btn[aria-pressed="true"] { background: var(--atni-non-text-button-fill); border-color: var(--atni-non-text-button-border); color: var(--atni-non-text-button-text); }
@@ -93,10 +103,20 @@ input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px
 .notice p:last-child { margin: 0; }
 mark { background: color-mix(in srgb, var(--atni-color-core-atni-red) 30%, transparent); color: var(--atni-text-heading); padding: 0 1px; }
 
-/* Toast: announces carry and save actions; role="status" lives in index.html */
-.toast { position: fixed; left: 50%; bottom: var(--atni-space-step-5); transform: translateX(-50%); z-index: 50; max-width: min(36rem, calc(100vw - 32px)); background: var(--atni-ground-overlay); color: var(--atni-text-heading); border-left: 3px solid var(--atni-non-text-accent); padding: var(--atni-space-step-3) var(--atni-space-step-4); display: flex; gap: var(--atni-space-step-4); align-items: center; box-shadow: 0 8px 24px rgb(0 0 0 / 0.35); }
-.toast:empty { display: none; }
-.toast a { white-space: nowrap; }
+/* Draft bar (#dock): the latest short message (visual copy; #announce speaks it) and the way to the draft.
+   A full-width bottom bar on phones, a bottom-right card from 40rem. body's bottom padding keeps the page end clear. */
+.dock { position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--atni-space-step-2) var(--atni-space-step-4); background: var(--atni-ground-overlay); color: var(--atni-text-heading); border-top: 2px solid var(--atni-non-text-accent); padding: var(--atni-space-step-2) var(--atni-space-step-3); box-shadow: 0 -4px 16px rgb(0 0 0 / 0.25); }
+.dock[hidden], .dock-draft[hidden], .dock-msg:empty { display: none; }
+.dock p { margin: 0; font-size: 0.875rem; line-height: 1.35; }
+.dock-msg { font-family: var(--atni-type-family-display); font-weight: var(--atni-type-weight-display-medium); }
+.dock-draft { display: flex; align-items: center; gap: var(--atni-space-step-3); color: var(--atni-text-secondary); }
+.dock-draft .btn { min-height: var(--atni-space-touch-primary); }
+.dock-ins { display: flex; align-items: center; gap: var(--atni-space-step-2); color: var(--atni-text-secondary); }
+.dock-ins[hidden] { display: none; }
+.dock-ins .btn { min-height: var(--atni-space-touch-primary); }
+@media (min-width: 40rem) {
+  .dock { left: auto; right: var(--atni-space-step-5); bottom: var(--atni-space-step-4); max-width: min(36rem, calc(100vw - 48px)); border: 1px solid var(--atni-text-muted); border-left: 3px solid var(--atni-non-text-accent); padding: var(--atni-space-step-2) var(--atni-space-step-2) var(--atni-space-step-2) var(--atni-space-step-4); box-shadow: 0 10px 28px rgb(0 0 0 / 0.35); }
+}
 
 /* Dialog (native <dialog>; never window.alert/confirm) */
 dialog { border: 1px solid var(--atni-non-text-rule); border-radius: 0; padding: 0; background: var(--atni-ground-raised); color: var(--atni-text-body); width: min(44rem, calc(100vw - 32px)); max-height: calc(100vh - 64px); }
@@ -106,7 +126,7 @@ dialog .dialog-head h2 { font-size: var(--atni-type-heading-3-size); flex: 1; }
 dialog .dialog-body { padding: var(--atni-space-step-5); }
 
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
-@media print { .site-header, .site-footer, .toast { display: none; } }
+@media print { .site-header, .site-footer, .dock, .jump { display: none; } body { padding-bottom: 0; } }
 
 /* ===== ui-shell views (app.js): header details, loading, search, detail, about. Extends the base above. ===== */
 
@@ -116,10 +136,10 @@ dialog .dialog-body { padding: var(--atni-space-step-5); }
 main:focus, h1[tabindex="-1"]:focus { outline: none; }
 .brand .brand-words { display: block; color: var(--atni-text-heading); font-size: inherit; line-height: 1.15; }
 .brand .brand-words b { display: block; }
-.brand .brand-words span { max-width: 17rem; margin-top: 2px; }
-@media (min-width: 48rem) { .brand .brand-words span { max-width: none; } }
-.theme-toggle { margin-left: var(--atni-space-step-2); }
-@media (max-width: 40rem) { .site-nav { margin-left: -12px; } }
+/* The tagline only where the row has room for it; the brand word stays the link's name when hidden. */
+.brand .brand-words span { display: none; margin-top: 2px; white-space: nowrap; }
+@media (min-width: 64rem) { .brand .brand-words span { display: block; } }
+@media (max-width: 23.99rem) { .brand .brand-words { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; } }
 .site-footer p { margin: 0; }
 .site-footer .footer-links { display: flex; gap: var(--atni-space-step-5); flex-wrap: wrap; }
 .loading { padding-top: var(--atni-space-step-7); padding-bottom: var(--atni-space-step-7); }
@@ -134,15 +154,14 @@ main:focus, h1[tabindex="-1"]:focus { outline: none; }
 .search-row input { flex: 1; min-width: 0; min-height: 56px; font-size: 1.125rem; padding: 12px 16px; }
 .search-row .btn { min-height: 56px; padding: 0 var(--atni-space-step-6); font-size: 1rem; }
 .search-note { margin: var(--atni-space-step-3) 0 var(--atni-space-step-6); }
-.years { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 3px; max-width: 48rem; margin: 0 0 var(--atni-space-step-5); }
-.years a, .years .empty { display: flex; flex-direction: column; text-decoration: none; min-width: 0; }
-.years .col { display: flex; align-items: flex-end; height: 64px; border-bottom: 1px solid var(--atni-non-text-rule); }
-.years .bar { display: block; width: 100%; background: var(--atni-text-muted); }
-.years a:hover .bar { background: var(--atni-text-heading); }
-.years a[aria-current] .bar { background: var(--atni-non-text-accent); }
-.years .tick { display: block; height: 1.4em; margin-top: var(--atni-space-step-1); text-align: center; white-space: nowrap; overflow: visible; font-family: var(--atni-type-family-display); font-weight: var(--atni-type-weight-display-medium); font-size: var(--atni-type-label-size); color: var(--atni-text-muted); }
-.years a[aria-current] .tick { color: var(--atni-text-red); }
-.years .tick.dim { visibility: hidden; }
+/* Year chips (mouse and touch; the Year select is the keyboard path). Hidden on phones, where the select shows counts. */
+.ychips { display: none; flex-wrap: wrap; gap: 6px; max-width: 48rem; margin: 0 0 var(--atni-space-step-5); }
+@media (min-width: 40rem) { .ychips { display: flex; } }
+.ychip { display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 var(--atni-space-step-3); border: 1px solid var(--atni-text-muted); color: var(--atni-text-heading); text-decoration: none; font-family: var(--atni-type-family-display); font-weight: var(--atni-type-weight-display-medium); font-size: 0.875rem; line-height: 1; font-variant-numeric: tabular-nums; }
+.ychip:hover { color: var(--atni-text-heading); border-color: var(--atni-text-heading); }
+.ychip .yn { color: var(--atni-text-muted); }
+.ychip[aria-current] { background: var(--atni-non-text-button-fill); border-color: var(--atni-non-text-button-border); color: var(--atni-non-text-button-text); }
+.ychip[aria-current] .yn { color: var(--atni-non-text-button-text); }
 .filters { display: grid; grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr)); gap: var(--atni-space-step-4); max-width: 48rem; }
 .filters .field { margin: 0; }
 .results-head { display: flex; gap: var(--atni-space-step-4); align-items: baseline; flex-wrap: wrap; margin: var(--atni-space-step-7) 0 0; padding-bottom: var(--atni-space-step-3); border-bottom: 1px solid var(--atni-non-text-rule); }
@@ -173,8 +192,18 @@ main:focus, h1[tabindex="-1"]:focus { outline: none; }
 .detail-grid { display: grid; gap: var(--atni-space-step-7); }
 @media (min-width: 64rem) {
   .detail-grid { grid-template-columns: minmax(0, 1fr) 20rem; gap: var(--atni-space-step-8); align-items: start; }
-  .detail-aside { position: sticky; top: 88px; max-height: calc(100vh - 104px); overflow-y: auto; padding-right: var(--atni-space-step-2); }
+  .detail-aside { position: sticky; top: calc(var(--hdr) + var(--jump) + 16px); max-height: calc(100vh - var(--hdr) - var(--jump) - 32px); overflow-y: auto; padding-right: var(--atni-space-step-2); }
 }
+/* Jump bar: the early path to every part of a long record; sticky under the header from 48rem. */
+.jump { display: flex; flex-wrap: wrap; align-items: center; gap: 0 var(--atni-space-step-1); min-height: var(--jump); margin: 0 0 var(--atni-space-step-5); border-bottom: 1px solid var(--atni-non-text-rule); background: var(--atni-ground-base); }
+.jump a { display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 0 var(--atni-space-step-3); font-family: var(--atni-type-family-display); font-weight: var(--atni-type-weight-display-medium); font-size: 0.875rem; line-height: 1; color: var(--atni-text-secondary); text-decoration: none; }
+.jump a:first-child { padding-left: 0; }
+.jump a:hover { color: var(--atni-text-heading); text-decoration: underline; text-decoration-color: var(--atni-non-text-accent); }
+.jump a b { font-weight: inherit; color: var(--atni-text-muted); font-variant-numeric: tabular-nums; }
+@media (max-width: 40rem) { .jump a { padding: 0 var(--atni-space-step-2); } }
+@media (min-width: 48rem) { .jump { position: sticky; top: var(--hdr); z-index: 15; } }
+h2[tabindex="-1"]:focus { outline: none; }
+h2[tabindex="-1"]:focus-visible { outline: 2px solid var(--atni-non-text-accent); outline-offset: 4px; }
 .section-head { display: flex; gap: var(--atni-space-step-4); align-items: center; justify-content: space-between; flex-wrap: wrap; padding-bottom: var(--atni-space-step-3); border-bottom: 1px solid var(--atni-non-text-rule); }
 .section-head h2 { font-size: 1.5rem; }
 .clauses + .clauses { margin-top: var(--atni-space-step-7); }
@@ -183,14 +212,19 @@ main:focus, h1[tabindex="-1"]:focus { outline: none; }
 .clause::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--atni-non-text-accent); transform: scaleY(0); transform-origin: top; transition: transform 0.22s ease-out; }
 .clause.in-draft::before { transform: scaleY(1); }
 .clause-lead { padding-top: 0.2em; font-family: var(--atni-type-family-display); font-weight: var(--atni-type-weight-display-medium); font-size: var(--atni-type-label-size); letter-spacing: var(--atni-type-label-tracking); line-height: 1.4; color: var(--atni-text-muted); }
-.clause.in-draft .clause-lead { color: var(--atni-text-red); }
+.clause.in-draft .clause-lead, .clause.in-draft .clause-lead b { color: var(--atni-text-red); }
+.clause-lead b { display: block; font-weight: inherit; color: var(--atni-text-secondary); }
+.clause-lead .pg { display: block; margin-top: 2px; color: var(--atni-text-muted); letter-spacing: 0; font-variant-numeric: tabular-nums; }
 .clause-text { min-width: 0; }
 .clause-text p { margin: 0; max-width: 42rem; overflow-wrap: anywhere; }
 .clause-text .chip { margin-top: var(--atni-space-step-2); }
 .clause-text .header-note { margin-top: var(--atni-space-step-2); }
 .clause .carry { align-self: start; }
+/* The label stays "Add to draft" (it is the button's name); aria-pressed carries the state, the mark shows it. */
+.btn.carry[aria-pressed="true"]::before { content: "\2713"; content: "\2713" / ""; }
 @media (max-width: 48rem) {
   .clause { grid-template-columns: minmax(0, 1fr); }
+  .clause-lead b, .clause-lead .pg { display: inline; margin-right: var(--atni-space-step-2); }
   .clause .carry { justify-self: start; min-height: var(--atni-space-touch-primary); }
 }
 .full-text { margin-top: var(--atni-space-step-7); border-top: 1px solid var(--atni-non-text-rule); }
@@ -204,7 +238,26 @@ main:focus, h1[tabindex="-1"]:focus { outline: none; }
 .sha { font-size: 0.75rem; word-break: break-all; color: var(--atni-text-secondary); }
 .cites > li { display: grid; gap: 2px; justify-items: start; margin-bottom: var(--atni-space-step-3); overflow-wrap: anywhere; }
 .cites .lookup { margin-top: var(--atni-space-step-1); }
+.cites .sn-words { justify-self: stretch; }
+.cgroup { margin: 0 0 var(--atni-space-step-5); }
+.cgroup h3 { font-size: 0.9375rem; line-height: 1.3; margin: 0 0 var(--atni-space-step-2); color: var(--atni-text-secondary); }
+.cgroup .cites { margin-bottom: 0; }
 .detail-aside > .meta { margin: 0 0 var(--atni-space-step-3); }
+.cites .acts { margin-top: var(--atni-space-step-1); }
+
+/* Citation marks and their popover (UI-2 D18). A mark is a button that reads as the clause's own words: underlined in
+   the accent and tinted, never a different font. The popover sits in the flow under its clause, not over the text. */
+.cmark { display: inline; margin: 0; padding: 0.05em 0.15em; border: 0; border-bottom: 2px solid var(--atni-non-text-accent); border-radius: 0; background: color-mix(in srgb, var(--atni-non-text-accent) 14%, transparent); color: inherit; font: inherit; text-align: inherit; white-space: normal; cursor: pointer; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+.cmark:hover { background: color-mix(in srgb, var(--atni-non-text-accent) 26%, transparent); color: var(--atni-text-heading); }
+.cmark[aria-expanded="true"] { background: color-mix(in srgb, var(--atni-non-text-accent) 34%, transparent); color: var(--atni-text-heading); }
+.cpop { max-width: 42rem; margin: var(--atni-space-step-3) 0 0; padding: var(--atni-space-step-3) var(--atni-space-step-4); border: 1px solid var(--atni-text-muted); border-left: 3px solid var(--atni-non-text-accent); background: var(--atni-ground-raised); }
+.cpop[hidden] { display: none; }
+.clause-text .cpop p { margin: 0 0 var(--atni-space-step-2); max-width: none; }
+.cpop-h b { font-family: var(--atni-type-family-display); font-weight: var(--atni-type-weight-display-medium); color: var(--atni-text-heading); overflow-wrap: anywhere; }
+.cpop .acts, .cites .acts { display: flex; flex-wrap: wrap; align-items: center; gap: var(--atni-space-step-2); }
+.cpop .sn-words { flex-basis: 100%; }
+.cite-where { overflow-wrap: anywhere; }
+@media print { .cpop { display: none; } .cmark { background: none; border-bottom-width: 1px; } }
 
 /* About */
 .about-view h1 { margin: var(--atni-space-step-4) 0 var(--atni-space-step-4); }

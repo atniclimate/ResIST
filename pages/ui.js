@@ -9,14 +9,36 @@ export const local = {
   remove(key) { try { localStorage.removeItem(key); } catch { /* nothing kept */ } },
 };
 
-let timer;
-// One message at a time in the page's role="status" region (#toast), with an optional link such as "Open draft".
-export function toast(text, link) {
-  const el = document.getElementById("toast");
+const byId = id => globalThis.document?.getElementById(id) ?? null;
+
+let sayTimer;
+// The page's one polite live region (#announce). Clearing first and writing 50 ms later makes a repeated message
+// heard again.
+export function say(text) {
+  const el = byId("announce");
   if (!el) return;
-  clearTimeout(timer);
-  el.innerHTML = `<span>${esc(text)}</span>${link ? `<a href="${esc(link.href)}">${esc(link.label)}</a>` : ""}`;
-  timer = setTimeout(() => { el.textContent = ""; }, 7000);
+  clearTimeout(sayTimer);
+  el.textContent = "";
+  sayTimer = setTimeout(() => { el.textContent = String(text); }, 50);
+}
+
+// The dock shows when it has a message, the draft link or the insert point to show.
+export function refreshDock() {
+  const dock = byId("dock");
+  if (!dock) return;
+  dock.hidden = !byId("toast")?.textContent && (byId("dock-draft")?.hidden ?? true) && (byId("dock-ins")?.hidden ?? true);
+}
+
+let toastTimer;
+// A short message: announced through say(), shown as plain text in the dock (#toast is aria-hidden) for 5 s.
+export function toast(text) {
+  say(text);
+  const el = byId("toast");
+  if (!el) return;
+  clearTimeout(toastTimer);
+  el.textContent = String(text);
+  refreshDock();
+  toastTimer = setTimeout(() => { el.textContent = ""; refreshDock(); }, 5000);
 }
 
 // Saves bytes as a file the person keeps; nothing is uploaded.

@@ -4,14 +4,16 @@
 import {
   STANDARD, COMMITTEES, CONVENTION_FIELDS, newDraft, newClause, compose, body, clauseState, isStandard,
   isNcaiTransmittal, hasPageHeader, removePageHeader, validDraft, safeUrl, usDate, resolvedLead, squash,
+  anchorCites, insertCite, segments, newId, citeFrom,
 } from "./compose.js";
-import { esc, local, toast, download } from "./ui.js";
+import { esc, local, say, toast, download } from "./ui.js";
 import { buildDocx, docxName } from "./docx.js";
-import { openLookup } from "./sentinel.js";
+import { openLookup, isLookupLive } from "./sentinel.js";
 
 const KEY = "resist-draft-v1";
 const DOCX = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
 const carryKey = s => `${s?.documentId}:${s?.statementType}:${s?.index}`;
+const citeKey = s => `${s?.documentId}:${s?.statementType}:${s?.index}:${s?.start}:${s?.end}`;
 // Own toString/valueOf keys in untrusted JSON make String() and template literals throw; JSON cannot carry others.
 const parseDraft = text => validDraft(JSON.parse(text, (k, v) => k === "toString" || k === "valueOf" ? undefined : v));
 
@@ -22,17 +24,38 @@ function loadDraft() {
 }
 // Provenance is the database's, never the draft's: a stored or opened draft is untrusted (D-054). Once the database
 // has loaded, each carried clause's source is replaced by the database's record, and a clause whose source text is
-// not in that ATNI document becomes typed. Returns whether anything changed.
-let sourceOf = null;
-function checkSources(d) {
-  if (!sourceOf) return false;
-  let lost = 0, changed = false;
-  for (const c of [...d.whereas, ...d.resolved]) if (c.origin === "carried") {
-    const real = sourceOf(c.source);
-    if (!real) { c.origin = "typed"; delete c.source; lost++; changed = true; }
-    else if (JSON.stringify(real) !== JSON.stringify(c.source)) { c.source = real; changed = true; }
+// not in that ATNI document becomes typed. Carried citations are checked the same way (D15): a citation the database
+// does not hold at those offsets with those words loses its mark and its words stay as typed text; a lookup answering
+// undefined (an export without the cite table) leaves it unchecked. Returns whether anything changed.
+let sourceOf = null, citeOf = null;
+let checkNote = "";   // what the last checkSources() found; quiet lets the caller fold it into its own single toast
+function checkSources(d, quiet = false) {
+  checkNote = "";
+  if (!sourceOf && !citeOf) return false;
+  let lost = 0, dropped = 0, changed = false;
+  for (const c of [...d.whereas, ...d.resolved]) {
+    if (sourceOf && c.origin === "carried") {
+      const real = sourceOf(c.source);
+      if (!real) { c.origin = "typed"; delete c.source; lost++; changed = true; }
+      else if (JSON.stringify(real) !== JSON.stringify(c.source)) { c.source = real; changed = true; }
+    }
+    if (citeOf && c.cites) {
+      const keep = c.cites.filter(x => {
+        const real = citeOf(x.source);
+        if (real === undefined) return true;
+        if (!real || squash(real.text) !== x.text) { dropped++; return false; }
+        if (JSON.stringify(real) !== JSON.stringify(x.source)) { x.source = real; changed = true; }
+        return true;
+      });
+      if (keep.length !== c.cites.length) { changed = true; if (keep.length) c.cites = keep; else delete c.cites; }
+    }
   }
-  if (lost) toast(`${lost} carried clause${lost === 1 ? " does" : "s do"} not match ATNI's published text and ${lost === 1 ? "is" : "are"} now marked Typed`);
+  const said = [
+    lost && `${lost} carried clause${lost === 1 ? " does" : "s do"} not match ATNI's published text and ${lost === 1 ? "is" : "are"} now marked Typed`,
+    dropped && `${dropped} carried citation${dropped === 1 ? " does" : "s do"} not match ATNI's published text and ${dropped === 1 ? "is" : "are"} now typed text`,
+  ].filter(Boolean);
+  checkNote = said.join(". ");
+  if (checkNote && !quiet) toast(checkNote);
   return changed;
 }
 let draft = loadDraft();
@@ -40,6 +63,12 @@ const subs = new Set();
 let saved = null;   // { ok, at } from the last save attempt
 let pending = 0;    // typing debounce timer
 let view = null;    // the mounted workspace, if any
+// One-level undo for remove(): { kind, index, clause }. Module state only, so it is never saved or exported; any
+// other store change clears it.
+let removed = null;
+// Where "Add to draft" puts a citation: { id, start, end } in a clause, from the last caret or selection in its text
+// box (D12). Module state only: never saved, and setting it never notifies (a repaint would move the caret).
+let insertAt = null;
 
 function save() {
   clearTimeout(pending); pending = 0;
@@ -55,7 +84,23 @@ const isClosing = c => isStandard(c.text) && !isNcaiTransmittal(c.text);
 
 export const store = {
   get draft() { return draft; },
-  update(fn) { fn(draft); save(); notify(); },
+  get removed() { return removed; },
+  update(fn) { removed = null; fn(draft); save(); notify(); },
+  remove(kind, id) {
+    const list = kind === "whereas" || kind === "resolved" ? draft[kind] : [];
+    const index = list.findIndex(c => c.id === id);
+    if (index < 0) return null;
+    removed = { kind, index, clause: list.splice(index, 1)[0] };
+    save(); notify();
+    return removed;
+  },
+  undo() {
+    const r = removed;
+    if (!r) return null;
+    checkSources({ whereas: [r.clause], resolved: [] });   // the database may have loaded since the removal
+    store.update(d => { d[r.kind].splice(Math.min(r.index, d[r.kind].length), 0, r.clause); });
+    return r.clause;
+  },
   subscribe(fn) { subs.add(fn); return () => subs.delete(fn); },
   carriedCount: () => all().filter(c => c.origin === "carried").length,
   isCarried: key => all().some(c => c.origin === "carried" && carryKey(c.source) === key),
@@ -72,20 +117,57 @@ export const store = {
     const keep = c => !(c.origin === "carried" && carryKey(c.source) === key);
     store.update(d => { d.whereas = d.whereas.filter(keep); d.resolved = d.resolved.filter(keep); });
   },
+  // The insert point while its clause exists: { id, kind, index, n, label: "WHEREAS 3 of 6" }, else null.
+  get insertPoint() {
+    if (!insertAt) return null;
+    for (const kind of ["whereas", "resolved"]) {
+      const list = draft[kind], index = list.findIndex(c => c.id === insertAt.id);
+      if (index >= 0) return { id: insertAt.id, kind, index, n: list.length, label: position(kind, index, list.length) };
+    }
+    return null;
+  },
+  setInsertPoint(id, start, end) { insertAt = { id: String(id), start, end }; },
+  clearInsertPoint() { insertAt = null; },
+  citeCount: () => all().reduce((n, c) => n + (c.cites?.length ?? 0), 0),
+  // Carries a citation's verbatim words into a clause (D13): at the insert point when there is one and at is "auto",
+  // else as a new typed WHEREAS. The same citation already in the target clause is refused. The insert point then
+  // sits just after the citation, so the next one lands beside it.
+  carryCite(source, { at = "auto" } = {}) {
+    const text = squash(source?.text);
+    if (!text) return null;
+    const point = at === "auto" ? store.insertPoint : null, target = point && all().find(c => c.id === point.id);
+    if (target?.cites?.some(x => citeKey(x.source) === citeKey(source))) return { label: point.label, created: false, duplicate: true };
+    const cite = { id: newId(), text, source };
+    store.update(d => {
+      let clause = target, range;
+      if (clause) {
+        range = insertCite(clause, insertAt.end, cite);
+        if (clause.origin === "standard" && !isStandard(clause.text)) clause.origin = "typed";
+      } else {
+        clause = { id: newId(), text: "", origin: "typed" };
+        range = insertCite(clause, 0, cite);
+        d.whereas.push(clause);
+      }
+      insertAt = { id: clause.id, start: range.end, end: range.end };
+    });
+    return { label: store.insertPoint.label, created: !target, duplicate: false };
+  },
   addNote(note) { if (note && typeof note === "object") store.update(d => { d.notes.push(note); }); },
-  replace(next) {
+  get checkNote() { return checkNote; },
+  replace(next, { quiet = false } = {}) {
     const v = validDraft(next);
     if (!v) return false;
-    checkSources(v);
-    draft = v; save(); notify();
+    checkSources(v, quiet);
+    draft = v; removed = null; insertAt = null; save(); notify();
     return true;
   },
-  // Called once the database has loaded, with a lookup from a claimed source to the database's, or null.
-  verifyWith(lookup) {
-    sourceOf = lookup;
+  // Called once the database has loaded, with a lookup from a claimed source to the database's, or null, and one
+  // for carried citations (optional; undefined from it means the export cannot check them).
+  verifyWith(lookup, citeLookup) {
+    sourceOf = lookup; citeOf = citeLookup ?? null;
     if (checkSources(draft)) { save(); notify(); }
   },
-  reset() { draft = newDraft(); save(); notify(); },
+  reset() { draft = newDraft(); removed = null; insertAt = null; save(); notify(); },
 };
 
 // Typing changes the draft at once and repaints the sheet, but saves and tells other views about 300ms later.
@@ -101,7 +183,7 @@ globalThis.addEventListener?.("pagehide", () => { if (pending) save(); });
 globalThis.addEventListener?.("storage", e => {
   if (e.key !== KEY) return;
   clearTimeout(pending); pending = 0;
-  draft = loadDraft(); checkSources(draft); notify();
+  draft = loadDraft(); removed = null; insertAt = null; checkSources(draft); notify();
 });
 
 // ---- Small renderers ----------------------------------------------------------------------------------------------
@@ -118,6 +200,7 @@ const resLink = src => {
 const outLink = (u, text) => safeUrl(u) ? `<a href="${esc(safeUrl(u))}" target="_blank" rel="noopener">${text}</a>` : "";
 const plural = (n, one, many = one + "s") => `${n} ${n === 1 ? one : many}`;
 const kindWord = kind => kind === "whereas" ? "WHEREAS" : "RESOLVED";
+const position = (kind, i, n) => `${kindWord(kind)} ${i + 1} of ${n}`;
 const hasWork = d => [...d.whereas, ...d.resolved].some(c => c.origin !== "standard") || Boolean(s(d.title)) ||
   d.notes.length > 0;
 // Anything entered or chosen, for the prompts that would discard it; hasWork alone drives the empty-draft notice.
@@ -150,19 +233,31 @@ function prov(c) {
     `<details class="orig"><summary>Show original</summary><blockquote>${esc(s(c.source?.text))}</blockquote></details>`;
 }
 
+// A clause's carried citations, each with where it came from (D-077).
+function citesHTML(c) {
+  const n = c.cites?.length ?? 0;
+  if (!n) return "";
+  return `<span class="chip carried">${plural(n, "carried citation")}</span><ul class="crow-cites" id="ci-${esc(c.id)}">${c.cites.map(x => {
+    const src = x.source ?? {}, page = Number.isInteger(src.page) ? `page ${src.page}` : "page unknown";
+    return `<li>Carried citation “${esc(x.text)}” from ${resLink(src)}, ${kindWord(src.statementType)} ${esc(s(src.position))}, ${page}, SHA-256 <code>${esc(s(src.documentId).slice(0, 16))}</code></li>`;
+  }).join("")}</ul>`;
+}
+const provHTML = c => prov(c) + citesHTML(c);
+const describedBy = c => `j-${c.id}${c.cites?.length ? ` ci-${c.id}` : ""}`;
+
 function clauseRow(kind, c, i, n, mk) {
-  const id = esc(c.id), pos = `${kindWord(kind)} clause ${i + 1}`, m = mk.get(c.id);
-  return `<li class="crow${c.origin === "carried" ? " carried" : ""}" data-id="${id}" data-kind="${kind}" data-state="${clauseState(c)}">
-    <label class="crow-lead" for="t-${id}">${esc(m.lead)}</label>
+  const id = esc(c.id), pos = position(kind, i, n), m = mk.get(c.id);
+  return `<li class="crow${c.origin === "carried" ? " carried" : ""}" data-id="${id}" data-kind="${kind}" data-state="${clauseState(c)}" data-cites="${c.cites?.length ?? 0}">
+    <label class="crow-lead" for="t-${id}"><span class="lw">${esc(m.lead)}</span> <span class="pos">${pos}</span></label>
     <div class="crow-main">
-      <textarea id="t-${id}" data-clause="${id}" rows="2" aria-describedby="j-${id}">${esc(c.text)}</textarea>
+      <textarea id="t-${id}" data-clause="${id}" rows="2" aria-describedby="${esc(describedBy(c))}">${esc(c.text)}</textarea>
       <p class="crow-joiner" id="j-${id}"><span class="visually-hidden">Ends with </span><span class="jtext">${esc(m.joiner)}</span></p>
       <div class="crow-ph notice"${hasPageHeader(c.text) ? "" : " hidden"}>
         <p>This clause includes page-header text from the PDF.</p>
         <button type="button" class="btn small" data-act="strip" id="ph-${id}">Remove page-header text</button>
       </div>
       <div class="crow-foot">
-        <div class="crow-prov">${prov(c)}</div>
+        <div class="crow-prov">${provHTML(c)}</div>
         <div class="crow-acts">
           <button type="button" class="btn quiet small" data-act="up" id="up-${id}" aria-label="Move up, ${pos}"${i === 0 ? " disabled" : ""}>Move up</button>
           <button type="button" class="btn quiet small" data-act="down" id="dn-${id}" aria-label="Move down, ${pos}"${i === n - 1 ? " disabled" : ""}>Move down</button>
@@ -214,7 +309,13 @@ function noteRow(n, i) {
 
 function editorHTML() {
   const d = draft, h = d.header, m = d.meta, model = compose(d), mk = marks(model);
-  const rows = kind => d[kind].map((c, i) => clauseRow(kind, c, i, d[kind].length, mk)).join("");
+  const rows = kind => {
+    const out = d[kind].map((c, i) => clauseRow(kind, c, i, d[kind].length, mk));
+    const r = store.removed;
+    if (r?.kind === kind) out.splice(Math.min(r.index, out.length), 0, `<li class="crow gone"><p>Removed ${kindWord(kind)} ${r.index + 1}.</p>` +
+      `<button type="button" class="btn small" data-act="undo" id="undo-rm">Undo</button></li>`);
+    return out.join("");
+  };
   const closing = d.resolved.some(isClosing);
   const transmittal = d.resolved.some(c => isNcaiTransmittal(c.text));
   return `
@@ -298,13 +399,22 @@ function editorHTML() {
   <section class="dsec" aria-labelledby="h-notes">
     <h2 id="h-notes">Policy Notes</h2>
     ${d.notes.length ? `<ol class="pnotes">${d.notes.map(noteRow).join("")}</ol>` : `<p class="meta">No policy notes yet. A note records what Policy Sentinel found in a federal policy; it goes in the Drafting Notes section of the Word file.</p>`}
-    <button type="button" class="btn" data-act="lookup" id="b-lookup">Look up a policy</button>
+    <button type="button" class="btn" data-act="lookup" id="b-lookup">${lookupLabel()}</button>
   </section>
 
   <section class="dsec" aria-labelledby="h-check">
     <h2 id="h-check">Before You Download</h2>
     <div class="problems">${problemsHTML(model)}</div>
   </section>`;
+}
+
+const lookupLabel = () => isLookupLive() ? "Look up a policy"
+  : `Open Policy Sentinel<span class="visually-hidden"> (opens in a new tab)</span>`;
+// The label is chosen at render; a draft opened before the database loads renders before allowLookup(), and the open
+// editor is never re-rendered (it would take focus), so the caller fixes the one button in place (design D12).
+export function refreshLookupLabel(root = globalThis.document) {
+  const b = root?.getElementById?.("b-lookup");
+  if (b) b.innerHTML = lookupLabel();
 }
 
 const problemsHTML = model => model.problems.length
@@ -316,7 +426,10 @@ const problemsHTML = model => model.problems.length
 const STATE_TEXT = { verbatim: "Verbatim", cleaned: "Verbatim, page header removed", edited: "Edited by the drafter" };
 
 function sheetHTML(m) {
-  const clause = x => `<p class="s-cl" data-cid="${esc(x.id)}" data-state="${x.state}"><b>${esc(x.lead)}</b> ${esc(x.text)}</p>`;
+  // A carried citation is tinted in the preview only; the Word body carries the same words as plain text.
+  const words = x => x.marks?.length
+    ? segments(x.text, x.marks).map(p => p.span ? `<span class="s-cite">${esc(p.text)}</span>` : esc(p.text)).join("") : esc(x.text);
+  const clause = x => `<p class="s-cl" data-cid="${esc(x.id)}" data-state="${x.state}" tabindex="0"><b>${esc(x.lead)}</b> ${words(x)}</p>`;
   const f = m.form;
   const grid = f.committees.map(row => `<tr>${row.map(c => `<td>${c ? `${box(c.checked)} ${esc(c.name)}${c.name === "Other" && f.otherCommittee ? `: ${esc(f.otherCommittee)}` : ""}` : ""}</td>`).join("")}</tr>`).join("");
   let h = `<div class="pg">
@@ -325,7 +438,7 @@ function sheetHTML(m) {
     <p class="s-14 s-after">${esc(m.number).replace("[Year]", `<span class="fill">[Year]</span>`)}</p>
     <p class="s-14">${line(m.deadlines[0])}</p>
     <p class="s-14 s-after">${line(m.deadlines[1])}</p>
-    <p class="s-14 s-after s-go" data-goto="f-title">${line(m.title)}</p>
+    <p class="s-14 s-after s-go" data-goto="f-title" tabindex="0">${line(m.title)}</p>
     ${m.preamble ? `<p class="s-14 s-after">PREAMBLE</p><p class="s-pre s-after">${esc(m.preamble)}</p>` : ""}
     ${m.whereas.map(clause).join("")}${m.resolved.map(clause).join("")}
     <div class="s-cert">
@@ -347,13 +460,16 @@ function sheetHTML(m) {
     ${f.ncai ? `<p><b>NCAI Form</b> follows on its own page.${f.ncai.emergency ? ` Emergency in nature: ${esc(f.ncai.emergency)}` : ""}</p>` : ""}
     ${f.formCode ? `<p class="s-code">${esc(f.formCode)}</p>` : ""}
   </div>`;
-  if (m.sources.length || m.notes.length) h += `<p class="pg-break"><span>Page break</span></p>
+  if (m.sources.length || m.citations.length || m.notes.length) h += `<p class="pg-break"><span>Page break</span></p>
   <div class="pg s-notes">
     <p class="s-nh">DRAFTING NOTES, NOT PART OF THE RESOLUTION</p>
-    <p><i>Prepared with ResIST. These notes record where carried clauses came from and what Policy Sentinel found. Delete this section before submitting if it is not wanted.</i></p>
+    <p><i>Prepared with ResIST. These notes record where carried clauses and citations came from and what Policy Sentinel found. Delete this section before submitting if it is not wanted.</i></p>
     ${m.sources.length ? `<table class="s-src"><thead><tr><th>Position</th><th>ATNI resolution</th><th>Text</th><th>Source</th></tr></thead><tbody>${m.sources.map(x => `<tr>
       <td>${esc(x.position)}</td><td>${esc([x.number, x.title, x.year].map(s).filter(Boolean).join(", "))}</td>
       <td>${STATE_TEXT[x.state] ?? ""}</td><td>${outLink(x.url, "Source PDF")}<br>${esc(s(x.documentId).slice(0, 16))}</td></tr>`).join("")}</tbody></table>` : ""}
+    ${m.citations.length ? `<p><b>Carried Citations</b></p><table class="s-src"><thead><tr><th>Position</th><th>Citation</th><th>From</th><th>Source</th></tr></thead><tbody>${m.citations.map(x => `<tr>
+      <td>${esc(x.position)}</td><td>${esc(s(x.text))}</td><td>${esc(citeFrom(x))}</td>
+      <td>${outLink(x.url, "Source PDF")}<br>SHA-256 ${esc(s(x.documentId).slice(0, 16))}</td></tr>`).join("")}</tbody></table>` : ""}
     ${m.notes.map(n => `<div class="s-note">
       <p><b>${esc(s(n.title))}</b></p>
       <p>${[n.issuingBody, n.kind, usDate(s(n.date))].map(s).filter(Boolean).map(esc).join(", ")}${outLink(n.officialUrl, "Official source") ? `, ${outLink(n.officialUrl, "Official source")}` : ""}</p>
@@ -442,7 +558,7 @@ export function renderDraft(main) {
       for (const li of editor.querySelectorAll(".crow")) {
         const m = mk.get(li.dataset.id);
         if (!m) continue;
-        li.querySelector(".crow-lead").textContent = m.lead;
+        li.querySelector(".crow-lead .lw").textContent = m.lead;
         li.querySelector(".jtext").textContent = m.joiner;
       }
       const p = editor.querySelector(".problems");
@@ -462,12 +578,17 @@ export function renderDraft(main) {
         : "Saved in this browser as you work. Nothing is sent anywhere.";
     }
   }
-  // A row's provenance chip and page-header notice follow the text as it is typed.
+  // A row's provenance chip, carried citations and page-header notice follow the text as it is typed.
   function paintRow(li, c) {
-    const state = clauseState(c);
-    if (li.dataset.state !== state) { li.dataset.state = state; li.querySelector(".crow-prov").innerHTML = prov(c); }
+    const state = clauseState(c), cites = String(c.cites?.length ?? 0);
+    if (li.dataset.state !== state || li.dataset.cites !== cites) {
+      li.dataset.state = state; li.dataset.cites = cites;
+      li.querySelector(".crow-prov").innerHTML = provHTML(c);
+      li.querySelector("textarea")?.setAttribute("aria-describedby", describedBy(c));
+    }
     li.querySelector(".crow-ph").hidden = !hasPageHeader(c.text);
   }
+  const citeEdited = n => { if (n) say(`A carried citation was edited and is now typed text`); };
   function setMode(mode) {
     root.dataset.show = mode;
     for (const b of root.querySelectorAll(".draft-switch [data-mode]")) b.setAttribute("aria-pressed", String(b.dataset.mode === mode));
@@ -483,6 +604,9 @@ export function renderDraft(main) {
     confirmEl.querySelector('[data-confirm="cancel"]').focus();
   }
   const closeAsk = () => { confirmEl.hidden = true; confirmEl.innerHTML = ""; confirmEl._ok = confirmEl._from = null; };
+  // "Keep this draft": close and give focus back to the tool that asked.
+  const cancelAsk = () => { const from = confirmEl._from; closeAsk(); root.querySelector(`[data-tool="${from || "new"}"]`)?.focus(); };
+  confirmEl.addEventListener("keydown", e => { if (e.key === "Escape" && !confirmEl.hidden) { e.preventDefault(); cancelAsk(); } });
 
   function lostText() {
     const kept = all().filter(c => c.origin !== "standard").length;
@@ -514,7 +638,11 @@ export function renderDraft(main) {
     if (file.size <= 5e6) try { v = parseDraft(await file.text()); } catch { v = null; }
     fileEl.value = "";
     if (!v) { errEl.textContent = "This file is not a ResIST draft."; errEl.hidden = false; return; }
-    const open = () => { store.replace(v); toast("Draft file opened"); $("h1").focus(); };
+    const open = () => {
+      store.replace(v, { quiet: true });
+      toast(["Draft file opened", store.checkNote].filter(Boolean).join(". "));   // one toast (D15), warning included
+      $("h1").focus();
+    };
     if (changed(draft)) ask(`Opening ${file.name} replaces the draft in this browser: ${lostText()}. Save a draft file first if you want to keep it.`, "Open this draft file", open, "open");
     else open();
   }
@@ -533,17 +661,27 @@ export function renderDraft(main) {
           "Clear and start a new draft", () => { store.reset(); toast("New draft started"); $("h1").focus(); }, "new");
       }
     } else if (t.dataset.confirm) {
-      const ok = confirmEl._ok, from = confirmEl._from;
-      closeAsk();
-      if (t.dataset.confirm === "ok") ok?.(); else root.querySelector(`[data-tool="${from || "new"}"]`)?.focus();
+      if (t.dataset.confirm !== "ok") { cancelAsk(); return; }
+      const ok = confirmEl._ok;
+      closeAsk(); ok?.();
     } else if (t.dataset.mode && t.matches("button")) setMode(t.dataset.mode);
-    else if (t.dataset.cid || t.dataset.goto) {
-      const target = document.getElementById(t.dataset.goto || `t-${t.dataset.cid}`);
-      if (!target) return;
-      setMode("edit");
-      target.scrollIntoView({ block: "center" });
-      target.focus({ preventScroll: true });
-    } else act(t);
+    else if (t.dataset.cid || t.dataset.goto) goTo(t);
+    else act(t);
+  });
+  // A preview paragraph takes the person to the field it came from.
+  function goTo(t) {
+    const target = document.getElementById(t.dataset.goto || `t-${t.dataset.cid}`);
+    if (!target) return;
+    setMode("edit");
+    target.scrollIntoView({ block: "center" });
+    target.focus({ preventScroll: true });
+  }
+  sheet.addEventListener("keydown", e => {
+    if (e.key !== "Enter" && e.key !== " ") return;
+    const t = e.target;
+    if (!t.matches?.("[data-cid], [data-goto]") || !root.contains(t)) return;
+    e.preventDefault();
+    goTo(t);
   });
 
   function act(b) {
@@ -556,13 +694,23 @@ export function renderDraft(main) {
       const edge = j === 0 || j === list.length - 1;
       nextFocus = edge ? `t-${id}` : b.id;
       store.update(d => { [d[kind][i], d[kind][j]] = [d[kind][j], d[kind][i]]; });
+      say(`Moved to ${position(kind, j, list.length)}`);
     } else if (a === "rm" && i >= 0) {
-      nextFocus = list[i + 1] ? `t-${list[i + 1].id}` : list[i - 1] ? `t-${list[i - 1].id}` : `add-${kind}`;
-      store.update(d => { d[kind].splice(i, 1); });
+      const n = list.length;
+      nextFocus = "undo-rm";
+      store.remove(kind, id);
+      say(`Removed ${position(kind, i, n)}. Undo restores it.`);
+    } else if (a === "undo" && store.removed) {
+      const r = store.removed;
+      nextFocus = `t-${r.clause.id}`;
+      store.undo();
+      const at = draft[r.kind].indexOf(r.clause);
+      say(`Restored ${position(r.kind, at, draft[r.kind].length)}`);
     } else if (a === "strip" && i >= 0) {
       nextFocus = `t-${id}`;
-      store.update(() => { list[i].text = body(removePageHeader(list[i].text)); });
-      toast("Page-header text removed");
+      let lost = 0;
+      store.update(() => { list[i].text = body(removePageHeader(list[i].text)); lost = anchorCites(list[i]); });
+      toast(lost ? "Page-header text removed. A carried citation was edited and is now typed text" : "Page-header text removed");
     } else if (a === "add-whereas" || a === "add-resolved") {
       const c = newClause("", "typed");
       nextFocus = `t-${c.id}`;
@@ -603,8 +751,10 @@ export function renderDraft(main) {
     if (t.dataset.clause) {
       const c = find(t.dataset.clause);
       if (!c) return;
-      typed(() => { c.text = t.value; if (c.origin === "standard" && !isStandard(c.text)) c.origin = "typed"; });
+      let lost = 0;
+      typed(() => { c.text = t.value; if (c.origin === "standard" && !isStandard(c.text)) c.origin = "typed"; lost = anchorCites(c); });
       paintRow(t.closest(".crow"), c);
+      citeEdited(lost);
     } else if (t.dataset.bind) typed(() => setPath(draft, t.dataset.bind, t.value));
     else if (t.dataset.note) { const n = draft.notes[Number(t.dataset.note)]; if (n) typed(() => { n.comment = t.value; }); }
     if (t.matches("textarea")) grow(t);
@@ -615,9 +765,20 @@ export function renderDraft(main) {
     else if (t.dataset.clause) {
       // Lead words and joiners belong to the position; the stored text is the clause body only.
       const c = find(t.dataset.clause), b = body(t.value);
-      if (c && b !== t.value) { t.value = b; typed(() => { c.text = b; }); grow(t); }
+      if (c && b !== t.value) {
+        let lost = 0;
+        t.value = b; typed(() => { c.text = b; lost = anchorCites(c); }); grow(t);
+        paintRow(t.closest(".crow"), c);
+        citeEdited(lost);
+      }
     }
   });
+  // The caret or selection in a clause's text box is where the next citation goes (D12); nothing is saved or repainted.
+  const caret = e => {
+    const t = e.target;
+    if (t?.dataset?.clause && t.matches("textarea")) store.setInsertPoint(t.dataset.clause, t.selectionStart, t.selectionEnd);
+  };
+  for (const ev of ["focusin", "click", "keyup", "select", "input"]) editor.addEventListener(ev, caret);
   fileEl.addEventListener("change", () => { if (fileEl.files?.[0]) openFile(fileEl.files[0]); });
 
   const sub = () => {

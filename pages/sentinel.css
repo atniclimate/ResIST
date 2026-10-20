@@ -26,3 +26,12 @@ dialog.sentinel .sn-flag .meta { display: inline-block; }
 dialog.sentinel .sn-flag code { font-size: 0.85em; }
 dialog.sentinel .sn-links { margin: var(--atni-space-step-5) 0 0; padding-top: var(--atni-space-step-4); border-top: 1px solid var(--atni-non-text-rule); }
 dialog.sentinel .sn-links:empty { display: none; }
+
+/* Local face: the search words to copy, revealed under an "Open Policy Sentinel" button (no request is made). */
+.sn-words { margin: var(--atni-space-step-2) 0 var(--atni-space-step-4); padding: var(--atni-space-step-3); border-left: 3px solid var(--atni-non-text-rule); background: var(--atni-ground-overlay); }
+.sn-words[hidden] { display: none; }
+.sn-words label { display: block; margin-bottom: var(--atni-space-step-1); font-size: var(--atni-type-caption-size); color: var(--atni-text-secondary); }
+.sn-wrow { display: flex; flex-wrap: wrap; gap: var(--atni-space-step-2); align-items: center; }
+.sn-wrow input { flex: 1 1 12rem; min-width: 0; }
+.sn-words .meta { margin: var(--atni-space-step-2) 0 0; }
+@media (min-width: 40rem) { .sn-wrow { flex-wrap: nowrap; } }

@@ -5,7 +5,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import {
   ApiFailure, FEDERAL_TYPES, MAX_BYTES, SENTINEL_HOME, SOURCES, citationValue, lookupWords, noteFromPolicy,
-  officialUrl, policyId, policyValue, readPolicy, searchPolicies, searchValue,
+  copyText, officialUrl, policyId, policyValue, readPolicy, searchPolicies, searchValue, wordsHTML,
 } from "../../pages/sentinel.js";
 
 const fixture = name => JSON.parse(readFileSync(new URL(`../fixtures/sentinel/${name}`, import.meta.url), "utf8"));
@@ -26,11 +26,30 @@ test("lookupWords normalizes the four federal citation types", () => {
 
 test("lookupWords falls back to the squashed text and never exceeds 200 characters", () => {
   assert.equal(lookupWords("  the   Indian\nSelf-Determination Act. ", "other"), "the Indian Self-Determination Act");
-  assert.equal(lookupWords("no number here", "executive_order"), "no number here");
   assert.equal(lookupWords(null, "usc"), "");
   const long = lookupWords("word ".repeat(100), "other");
   assert.ok(long.length <= 200);
   assert.ok(FEDERAL_TYPES.has("cfr") && !FEDERAL_TYPES.has("treaty"));
+});
+
+// Review finding 5: sec./section/U.S. Code forms give canonical words; a federal citation no form reads gets none.
+test("lookupWords reads section markers and offers nothing for an unreadable federal citation", () => {
+  assert.equal(lookupWords("25 U.S.C. sec. 5301(d)", "usc"), "25 U.S.C. 5301(d)");
+  assert.equal(lookupWords("25 U.S.C. secs. 5301", "usc"), "25 U.S.C. 5301");
+  assert.equal(lookupWords("25 U.S. Code, section 5301", "usc"), "25 U.S.C. 5301");
+  assert.equal(lookupWords("42 USCS § 1983b", "usc"), "42 U.S.C. 1983b");
+  assert.equal(lookupWords("25 CFR Section 900.1", "cfr"), "25 CFR 900.1");
+  assert.equal(lookupWords("25 CFR, 900.1", "cfr"), "25 CFR 900.1");
+  assert.equal(lookupWords("Section 5301", "usc"), "");
+  assert.equal(lookupWords("§§ 900.1", "cfr"), "");
+  assert.equal(lookupWords("no number here", "executive_order"), "");
+});
+
+// UI-2 D20: eyecite and ATNI's text print "Pub. L. No.", citeurl prints "Public Law No." with an en dash.
+test("lookupWords reads the Pub. L. form; Federal Register has no lookup", () => {
+  assert.equal(lookupWords("Pub. L. No. 93-638", "public_law"), "Public Law 93-638");
+  assert.equal(lookupWords("Public Law No. 93–638", "public_law"), "Public Law 93-638");
+  assert.equal(FEDERAL_TYPES.has("federal_register"), false);
 });
 
 test("policyId reads the Federal Register document number", () => {
@@ -247,4 +266,42 @@ test("an aborted request surfaces as a service failure", async () => {
 
 test("the Policy Sentinel home is an https address", () => {
   assert.match(SENTINEL_HOME, /^https:\/\//);
+});
+
+// ---- Local face: the words block and the copy helper ----
+test("wordsHTML escapes the words and links out with the new-tab notice", () => {
+  const h = wordsHTML('E.O. "13175" <b>', "sw-0");
+  for (const part of ['value="E.O. &quot;13175&quot; &lt;b&gt;"', 'id="sw-0-q"', "readonly", 'data-copy="sw-0-q"',
+    `href="${SENTINEL_HOME}"`, 'target="_blank"', 'rel="noopener noreferrer"', "(opens in a new tab)", "hidden"]) {
+    assert.ok(h.includes(part), part);
+  }
+  assert.ok(!h.includes("<b>"));
+  assert.deepEqual(h.match(/https?:\/\/[^"\s<]+/g), [SENTINEL_HOME]);
+});
+
+test("copyText copies, or selects when the clipboard refuses", async () => {
+  const real = Object.getOwnPropertyDescriptor(globalThis, "navigator");
+  const field = () => { const f = { value: "Executive Order 13175", selects: 0, select() { f.selects++; } }; return f; };
+  const useNavigator = v => Object.defineProperty(globalThis, "navigator", { value: v, configurable: true, writable: true });
+  try {
+    const written = [];
+    useNavigator({ clipboard: { writeText: async s => { written.push(s); } } });
+    let f = field();
+    assert.equal(await copyText(f), true);
+    assert.deepEqual(written, ["Executive Order 13175"]);
+    assert.equal(f.selects, 0);
+
+    useNavigator({ clipboard: { writeText: async () => { throw new Error("denied"); } } });
+    f = field();
+    assert.equal(await copyText(f), false);
+    assert.equal(f.selects, 1);
+
+    useNavigator({});
+    f = field();
+    assert.equal(await copyText(f), false);
+    assert.equal(f.selects, 1);
+  } finally {
+    if (real) Object.defineProperty(globalThis, "navigator", real);
+    else delete globalThis.navigator;
+  }
 });

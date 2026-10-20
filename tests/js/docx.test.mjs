@@ -5,7 +5,7 @@ import assert from "node:assert/strict";
 import { crc32 as zlibCrc32 } from "node:zlib";
 import { compose, newDraft } from "../../pages/compose.js";
 import { buildDocx, docxName, crc32, zip } from "../../pages/docx.js";
-import { emptyDraft, fullDraft, seal, CREATED } from "./docx-fixtures.mjs";
+import { emptyDraft, fullDraft, seal, CREATED, CITE } from "./docx-fixtures.mjs";
 
 // Reads a STORE zip through its central directory and checks every local header against it.
 function unzip(bytes) {
@@ -99,6 +99,22 @@ test("the full draft carries known details, verbatim clauses, checkboxes, the NC
   assert.match(rels, /Target="https:\/\/atnitribes\.org\/wp-content\/uploads\/2026\/09\/20260917_26-51_[^"]+" TargetMode="External"/);
   assert.match(rels, /Target="https:\/\/www\.federalregister\.gov\/d\/2025-23880" TargetMode="External"/);
   assert.ok(doc.includes("SHA-256 5b62a9708e4081fd"));
+  // Carried Citations (D-077): one row after the clause sources; the body holds the words as an ordinary clause.
+  const at = doc.indexOf(">Carried Citations<");
+  assert.ok(at > doc.indexOf(">Sources of Carried Clauses<"), "Carried Citations follows the clause sources");
+  assert.ok(at < doc.indexOf("Read by Policy Sentinel"), "and comes before the policy notes");
+  const table = doc.slice(at, doc.indexOf("</w:tbl>", at));
+  assert.equal(table.match(/<w:tr>/g).length, 2, "a header row and one citation row");
+  assert.deepEqual([...table.matchAll(/<w:gridCol w:w="(\d+)"\/>/g)].map(x => Number(x[1])), [1500, 3100, 2300, 2460]);
+  for (const head of ["Position", "Citation", "From", "Source"]) assert.ok(table.includes(`>${head}<`), `header ${head}`);
+  assert.ok(table.includes(">WHEREAS 5<"), "the draft position of the clause holding it");
+  assert.ok(table.includes(`>ATNI ${CITE.number}, WHEREAS ${CITE.position}, page ${CITE.page}<`), "From names the number, clause and page");
+  assert.ok(table.includes(`>SHA-256 ${CITE.documentId.slice(0, 16)}<`), "the source document's SHA-256 prefix");
+  assert.ok(table.includes(`>${CITE.text}<`), "the citation words");
+  assert.match(rels, /Target="https:\/\/atnitribes\.org\/wp-content\/uploads\/2021\/10\/[^"]+" TargetMode="External"/);
+  assert.ok(doc.includes(`<w:r><w:rPr><w:b/><w:bCs/></w:rPr><w:t xml:space="preserve">WHEREAS,</w:t></w:r><w:r><w:t xml:space="preserve"> ${CITE.text}; now</w:t></w:r>`),
+    "the clause holding the citation is plain text in the body");
+  assert.equal(model.citations.length, 1);
   assert.ok(doc.includes("Read by Policy Sentinel on 10/19/2026; text SHA-256 b3ee0b8f7d68c588"));
   assert.ok(doc.includes("Drafter's note: Check the consultation section"));
   assert.ok(text(files, "word/_rels/header3.xml.rels").includes("media/seal.jpg"));
