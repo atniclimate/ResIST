@@ -1,11 +1,13 @@
 // ResIST public site: header, router and the search, detail and about views (SPEC 6.1). The draft workspace is
-// draft.js; Policy Sentinel lookups are sentinel.js. Every string from the database passes through esc(); user
-// search text reaches SQL only through ftsQuery() or as a bound parameter.
-import { load, rows, ftsQuery, build } from "./db.js";
+// draft.js; Policy Sentinel lookups are sentinel.js; every database query is a named export of query.js. Every
+// string from the database passes through esc(); user search text reaches a query only through Q.ftsMatch() or as
+// a bound parameter.
+import { load, build, caps } from "./db.js";
+import * as Q from "./query.js";
 import { esc, local, toast } from "./ui.js";
 import { isStandard, hasPageHeader, resolvedLead, usDate, squash } from "./compose.js";
 import { store, renderDraft } from "./draft.js";
-import { openLookup, lookupWords, FEDERAL_TYPES, SENTINEL_HOME } from "./sentinel.js";
+import { openLookup, allowLookup, lookupWords, FEDERAL_TYPES, SENTINEL_HOME } from "./sentinel.js";
 
 const PAGE = 25;
 const main = document.getElementById("main");
@@ -85,9 +87,7 @@ function route() {
 /* Search */
 let topCommittees;
 function committees() {
-  // Committee names are noisy (93 distinct); the ones used on 15 or more resolutions make a usable filter.
-  topCommittees ??= rows(`select name from sponsor where sponsor_type = 'committee' group by name
-    having count(*) >= 15 order by name`).map(r => r.name);
+  topCommittees ??= Q.committees();
   return topCommittees;
 }
 
@@ -96,33 +96,15 @@ function searchView(q) {
   const year = /^\d{4}$/.test(q.get("year") || "") ? q.get("year") : "";
   const conv = CONVENTIONS.find(c => c[0] === q.get("convention")) || null;
   const committee = committees().includes(q.get("committee")) ? q.get("committee") : "";
-  const match = ftsQuery(text);
+  const match = Q.ftsMatch(text);
   const sort = ["new", "old"].includes(q.get("sort")) ? q.get("sort") : match ? "best" : "new";
   const page = Math.max(1, Math.floor(Number(q.get("page"))) || 1);
 
-  const where = [], bind = [];
-  if (match) { where.push("resolution_fts match ?"); bind.push(match); }
-  if (conv) { where.push("r.convention_name = ?"); bind.push(conv[2]); }
-  if (committee) {
-    where.push("exists (select 1 from sponsor s where s.resolution_id = r.id and s.sponsor_type = 'committee' and s.name = ?)");
-    bind.push(committee);
-  }
-  const from = match ? "resolution_fts join resolution r on r.id = resolution_fts.rowid" : "resolution r";
-  const cond = list => list.length ? "where " + list.join(" and ") : "";
-  // The year strip counts everything the other filters match, so it shows when ATNI resolved on these words.
-  const byYear = new Map(rows(`select r.convention_year y, count(*) n from ${from} ${cond(where)}
-    group by y`, bind).map(r => [r.y, r.n]));
-  const yWhere = year ? [...where, "r.convention_year = ?"] : where, yBind = year ? [...bind, Number(year)] : bind;
-  const total = rows(`select count(*) n from ${from} ${cond(yWhere)}`, yBind)[0].n;
+  const f = { match, convention: conv?.[2] || "", committee, year: year ? Number(year) : "" };
+  const byYear = Q.yearCounts(f);
+  const total = Q.searchTotal(f);
   const pages = Math.max(1, Math.ceil(total / PAGE)), at = Math.min(page, pages);
-  const order = { best: "bm25(resolution_fts)",
-    new: "r.convention_year is null, r.convention_year desc, r.resolution_number desc",
-    old: "r.convention_year is null, r.convention_year, r.resolution_number" }[sort];
-  const snip = match ? "snippet(resolution_fts, 2, char(2), char(3), ' ... ', 24)" : "null";
-  const hits = rows(`select r.id, r.resolution_number, r.title, r.convention_name, r.convention_year,
-      r.convention_location, r.needs_review, ${snip} snip,
-      (select group_concat(name, ', ') from sponsor s where s.resolution_id = r.id and s.sponsor_type = 'committee') committee
-      from ${from} ${cond(yWhere)} order by ${order} limit ${PAGE} offset ${(at - 1) * PAGE}`, yBind);
+  const hits = Q.search(f, { sort, limit: PAGE, offset: (at - 1) * PAGE });
 
   const state = { q: text, year, convention: conv?.[0] || "", committee, sort: sort === "best" || sort === (match ? "" : "new") ? "" : sort, page: "" };
   const href = changes => {
@@ -216,17 +198,15 @@ const sourceFrom = (r, s, url) => ({
 });
 // The database's record for a claimed source: the same statement text in the same ATNI document, or null.
 function storedSource(claim) {
-  const s = rows(`select resolution_id, statement_type t, "index" i, text from statement where statement_type = ?
-    and text = ? and resolution_id in (select id from resolution where document_id = ?) order by "index"`,
-  [String(claim?.statementType ?? ""), String(claim?.text ?? ""), String(claim?.documentId ?? "")]);
+  const s = Q.storedStatements(String(claim?.statementType ?? ""), String(claim?.text ?? ""), String(claim?.documentId ?? ""));
   const hit = s.find(x => x.i === claim?.index) ?? s[0];
   if (!hit) return null;
-  const r = rows("select * from resolution where id = ?", [hit.resolution_id])[0];
-  return sourceFrom(r, hit, rows("select url from source where document_id = ?", [r.document_id])[0]?.url);
+  const r = Q.resolution(hit.resolution_id);
+  return sourceFrom(r, hit, Q.sourceUrls(r.document_id)[0]);
 }
 
 function detailView(id) {
-  const r = Number.isInteger(id) ? rows("select * from resolution where id = ?", [id])[0] : null;
+  const r = Number.isInteger(id) ? Q.resolution(id) : null;
   if (!r) {
     document.title = "Resolution not found, ResIST";
     main.innerHTML = `<div class="wrap wide"><h1 tabindex="-1">Resolution Not Found</h1>
@@ -234,15 +214,11 @@ function detailView(id) {
       <p><a class="btn" href="${esc(lastSearch)}">Back to search</a></p></div>`;
     return;
   }
-  const statements = rows(`select statement_type t, "index" i, text from statement where resolution_id = ?
-    order by "index"`, [id]);
-  const cites = rows(`select c.text, c.citation_type, c.linked_resolution_id l, t.resolution_number n, t.title tt
-    from citation c left join resolution t on t.id = c.linked_resolution_id where c.resolution_id = ?`, [id]);
-  const citedBy = rows(`select distinct r.id, r.resolution_number, r.title, r.convention_year from citation c
-    join resolution r on r.id = c.resolution_id where c.linked_resolution_id = ? and r.id != ?
-    order by r.convention_year desc, r.resolution_number desc`, [id, id]);
-  const committee = rows("select name from sponsor where resolution_id = ? and sponsor_type = 'committee'", [id]).map(s => s.name);
-  const urls = rows("select url from source where document_id = ?", [r.document_id]).map(s => s.url);
+  const statements = Q.statements(id);
+  const cites = Q.citations(id);
+  const citedBy = Q.citedBy(id);
+  const committee = Q.committeesOf(id);
+  const urls = Q.sourceUrls(r.document_id);
   const where = [r.convention_name, r.convention_year, r.convention_location].filter(Boolean);
 
   const source = s => sourceFrom(r, s, urls[0]);
@@ -337,7 +313,7 @@ function detailView(id) {
 
 /* About */
 function aboutView() {
-  const dated = rows("select count(date_adopted) n from resolution")[0].n;
+  const dated = Q.datedCount();
   document.title = "About ResIST";
   main.innerHTML = `<div class="wrap wide about-view">
     <h1 tabindex="-1">About ResIST</h1>
@@ -347,7 +323,7 @@ function aboutView() {
         <p>Every word shown is ATNI's published text, quoted verbatim. Clauses are separated by fixed rules from the PDFs ATNI publishes at <a href="https://atnitribes.org/resolutions/" rel="noopener">atnitribes.org</a>. Each record links its PDF and shows the file's SHA-256. The PDF is authoritative.</p>
         <p>Nothing on this site is generated, summarized or paraphrased by AI.</p></section>
       <section><h2>Search in This Browser</h2>
-        <p>The whole collection (${num(build.resolutions)} documents, ${build.year_min} to ${build.year_max}) downloads once and is searched here with SQLite full-text search and BM25 ranking. Nothing you type is sent anywhere.</p></section>
+        <p>The whole collection (${num(build.resolutions)} documents, ${build.year_min} to ${build.year_max}) downloads once and is searched here with SQLite full-text search, best matches first. Nothing you type is sent anywhere.</p></section>
       <section><h2>The Draft Tool</h2>
         <ul class="squares">
           <li>On any resolution, “Add to draft” carries a WHEREAS or RESOLVED clause into your draft, word for word, with a record of where it came from.</li>
@@ -384,6 +360,7 @@ try {
     if (status) status.textContent = `Loading ${build ? num(build.resolutions) + " resolutions" : "the resolutions"}, ${pct}%`;
     if (bar) bar.style.width = pct + "%";
   });
+  allowLookup(caps?.sentinel === true); // the local face links out instead (D-059 item 5)
   ready = true;
   store.verifyWith(storedSource);
 } catch (e) {

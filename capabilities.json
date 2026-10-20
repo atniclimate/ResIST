@@ -1,0 +1,19 @@
+{
+ "schema": "resist-capabilities/1",
+ "face": "static",
+ "tier_max": "T0",
+ "api": null,
+ "export": {
+  "docx": "client",
+  "pdf": null
+ },
+ "sentinel": true,
+ "annotate": false,
+ "analytics": false,
+ "index": {
+  "adapter": "fts5",
+  "version": "1",
+  "tokenizer": "unicode61 remove_diacritics 0 categories 'L* N* Co Mn Mc' tokenchars '''’'"
+ },
+ "components": []
+}
