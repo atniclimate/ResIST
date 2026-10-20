@@ -6,6 +6,13 @@ from datetime import date
 from src.analysis.graph import ResolutionGraph, build_graph_from_resolutions
 from src.analysis.linker import link_atni_references
 from src.analysis.summarizer import generate_summary, _extract_first_resolved
+from src.ingestion.intake import extract_text_from_native_pdf
+
+ATNI = Path(__file__).parent / "fixtures" / "atni"
+
+
+def _fixture_text(name: str) -> str:
+    return extract_text_from_native_pdf(ATNI / name)
 
 
 class TestResolutionGraph:
@@ -14,38 +21,41 @@ class TestResolutionGraph:
     def test_add_resolution(self, tmp_path):
         """Test adding resolution node."""
         graph = ResolutionGraph(tmp_path / "test_graph.json")
-        graph.add_resolution("doc-001", {"resolution_number": "24-01", "convention_year": 2024})
+        # Res-23-40.pdf: own number 23-40, adopted at the 2023 Annual Convention
+        graph.add_resolution("doc-001", {"resolution_number": "23-40", "convention_year": 2023})
 
         assert graph.G.has_node("doc-001")
         assert graph.G.nodes["doc-001"]["node_type"] == "resolution"
-        assert graph.G.nodes["doc-001"]["resolution_number"] == "24-01"
+        assert graph.G.nodes["doc-001"]["resolution_number"] == "23-40"
 
     def test_add_sponsor_edge(self, tmp_path):
-        """Test sponsor relationship edge."""
+        """Test sponsor relationship edge (graph mechanics; no fixture names a sponsor)."""
         graph = ResolutionGraph(tmp_path / "test_graph.json")
         graph.add_resolution("doc-001", {})
-        graph.add_sponsor_edge("doc-001", "Tulalip Tribes", "primary")
+        graph.add_sponsor_edge("doc-001", "tribe-a", "primary")
 
-        assert graph.G.has_node("Tulalip Tribes")
-        assert graph.G.nodes["Tulalip Tribes"]["node_type"] == "tribe"
-        assert graph.G.has_edge("doc-001", "Tulalip Tribes")
+        assert graph.G.has_node("tribe-a")
+        assert graph.G.nodes["tribe-a"]["node_type"] == "tribe"
+        assert graph.G.has_edge("doc-001", "tribe-a")
 
     def test_add_cites_edge(self, tmp_path):
         """Test citation edge between resolutions."""
         graph = ResolutionGraph(tmp_path / "test_graph.json")
-        graph.add_resolution("doc-001", {})
-        graph.add_resolution("doc-002", {})
-        graph.add_cites_edge("doc-001", "doc-002", "Resolution No. 23-15")
+        graph.add_resolution("Res-26-34", {})
+        graph.add_resolution("Res-25-41", {})
+        # verbatim from Res-26-34.pdf, WHEREAS 4
+        graph.add_cites_edge("Res-26-34", "Res-25-41", "Resolution #25-41")
 
-        assert graph.G.has_edge("doc-001", "doc-002")
-        assert graph.G.edges["doc-001", "doc-002"]["edge_type"] == "cites"
+        assert graph.G.has_edge("Res-26-34", "Res-25-41")
+        assert graph.G.edges["Res-26-34", "Res-25-41"]["edge_type"] == "cites"
+        assert graph.G.edges["Res-26-34", "Res-25-41"]["citation"] == "Resolution #25-41"
 
     def test_save_and_load(self, tmp_path):
         """Test JSON persistence."""
         graph_path = tmp_path / "test_graph.json"
         graph = ResolutionGraph(graph_path)
-        graph.add_resolution("doc-001", {"resolution_number": "24-01"})
-        graph.add_sponsor_edge("doc-001", "Yakama Nation", "primary")
+        graph.add_resolution("doc-001", {"resolution_number": "23-40"})  # Res-23-40.pdf
+        graph.add_sponsor_edge("doc-001", "tribe-a", "primary")
         graph.save()
 
         # Load into new instance
@@ -53,8 +63,9 @@ class TestResolutionGraph:
         graph2.load()
 
         assert graph2.G.has_node("doc-001")
-        assert graph2.G.has_node("Yakama Nation")
-        assert graph2.G.has_edge("doc-001", "Yakama Nation")
+        assert graph2.G.nodes["doc-001"]["resolution_number"] == "23-40"
+        assert graph2.G.has_node("tribe-a")
+        assert graph2.G.has_edge("doc-001", "tribe-a")
 
     def test_get_stats(self, tmp_path):
         """Test graph statistics."""
@@ -62,7 +73,7 @@ class TestResolutionGraph:
         graph.add_resolution("doc-001", {})
         graph.add_resolution("doc-002", {})
         graph.add_cites_edge("doc-001", "doc-002", "ref")
-        graph.add_sponsor_edge("doc-001", "Tribe A", "primary")
+        graph.add_sponsor_edge("doc-001", "tribe-a", "primary")
 
         stats = graph.get_stats()
         assert stats["resolutions"] == 2
@@ -85,36 +96,45 @@ class TestResolutionGraph:
 class TestSummarizer:
     """Test summarization functions."""
 
-    def test_generate_summary_with_resolved(self):
-        """Test summary extracts RESOLVED statement."""
-        text = """
-        WHEREAS, tribal sovereignty is fundamental;
-        WHEREAS, climate change threatens tribal lands;
-        NOW, THEREFORE BE IT RESOLVED that ATNI calls upon Congress to
-        increase funding for tribal climate adaptation programs;
-        BE IT FURTHER RESOLVED that the Executive Director transmit this resolution.
-        """
+    def test_generate_summary_with_resolved(self, monkeypatch):
+        """Test summary falls back to the first RESOLVED statement of a real resolution."""
+        # Force the fallback: LSA output depends on whether NLTK punkt_tab is staged (DG-9).
+        monkeypatch.setattr("src.analysis.summarizer._sumy_summarize", lambda *a, **k: "")
+        text = _fixture_text("Res-26-34.pdf")
         summary = generate_summary(text)
-        assert "RESOLVED" in summary or "funding" in summary.lower() or "climate" in summary.lower()
+
+        assert summary.startswith(
+            "RESOLVED: ATNI formally endorses and recognizes the Tiered Sovereign Data Framework (TSDF)"
+        )
+        # extractive: the clause body is verbatim from the document
+        assert summary[len("RESOLVED: "):] in " ".join(text.split())
 
     def test_extract_first_resolved(self):
         """Test fallback extraction."""
-        text = "BE IT RESOLVED that ATNI supports tribal sovereignty."
+        # verbatim from Res-26-34.pdf, BE IT FINALLY RESOLVED clause
+        text = (
+            "BE IT FINALLY RESOLVED, that this will be the policy of ATNI until it is "
+            "withdrawn or modified by subsequent resolution(s)."
+        )
         result = _extract_first_resolved(text)
-        assert "RESOLVED" in result
-        assert "sovereignty" in result
+        assert result == (
+            "RESOLVED: this will be the policy of ATNI until it is withdrawn or "
+            "modified by subsequent resolution(s)."
+        )
 
     def test_extract_first_resolved_truncation(self):
-        """Test long summaries are truncated."""
-        text = "BE IT RESOLVED that " + "word " * 100 + "end."
+        """Test long summaries are truncated (Res-23-40's first RESOLVED clause exceeds 200 chars)."""
+        text = _fixture_text("Res-23-40.pdf")
         result = _extract_first_resolved(text)
         assert len(result) <= 210  # 200 + "RESOLVED: " prefix
+        assert result.endswith("...")
+        assert result[len("RESOLVED: "):-3] in " ".join(text.split())
 
     def test_generate_summary_short_text(self):
         """Test handling of very short text."""
-        text = "Short resolution."
+        text = "CERTIFICATION"  # verbatim section heading from Res-26-34.pdf
         summary = generate_summary(text)
-        assert summary == "Short resolution."
+        assert summary == "CERTIFICATION"
 
 
 class TestLinker:
@@ -125,11 +145,12 @@ class TestLinker:
         import re
         pattern = r'ATNI-RES-(\d{2,4})[-/]?(\d{0,4})'
 
-        # Test various normalized formats
-        assert re.search(pattern, "ATNI-RES-23-15")
-        assert re.search(pattern, "ATNI-RES-2023-15")
-        assert re.search(pattern, "ATNI-RES-24-01")
+        # Normalized forms of real numbers: 25-41 (cited by Res-26-34.pdf),
+        # 2021-20 (Res-2021-20.pdf file name), 23-40 (Res-23-40.pdf)
+        assert re.search(pattern, "ATNI-RES-25-41")
+        assert re.search(pattern, "ATNI-RES-2021-20")
+        assert re.search(pattern, "ATNI-RES-23-40")
 
-        match = re.search(pattern, "ATNI-RES-23-15")
-        assert match.group(1) == "23"
-        assert match.group(2) == "15"
+        match = re.search(pattern, "ATNI-RES-25-41")
+        assert match.group(1) == "25"
+        assert match.group(2) == "41"

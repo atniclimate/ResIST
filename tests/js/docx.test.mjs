@@ -118,6 +118,16 @@ test("text is escaped and XML-invalid characters are dropped", () => {
   assert.ok(!/[\uD800-\uDBFF](?![\uDC00-\uDFFF])/.test(doc), "no lone high surrogate");
 });
 
+test("a metadata-only note claims no reading, and a null flag does not stop the export", () => {
+  const d = fullDraft();
+  d.notes[0].receiptSha256 = "";
+  d.notes[0].issues.push(null);
+  const doc = text(unzip(build(d)), "word/document.xml");
+  assert.ok(doc.includes("Details from Policy Sentinel on 10/19/2026; no policy text was read."));
+  assert.ok(!doc.includes("text SHA-256"));
+  assert.ok(doc.includes("Sources of Carried Clauses"));
+});
+
 test("an unsafe link is shown as text, never linked", () => {
   const d = fullDraft();
   d.notes[0].officialUrl = "javascript:alert(1)";

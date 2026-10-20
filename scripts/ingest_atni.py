@@ -121,7 +121,9 @@ def main(res_dir: Path) -> int:
                     number = normalize_resolution_number(trow["number"]) or trow["number"] or None
                     title, committee, conv_raw = trow["title"], trow["committee"], trow["convention"]
                 else:
-                    number = next(filter(None, (normalize_resolution_number(r["local_path"]) for r in rows)), None)
+                    # The file name only: folders such as "2021/03/" or "Meetings 2018/" read as a number.
+                    number = next(filter(None, (normalize_resolution_number(Path(r["local_path"]).name)
+                                                for r in rows)), None)
                     m = next((media[r["url"]] for r in rows if r["url"] in media), None)
                     title, committee, conv_raw = (m["title"] if m else Path(path).stem), "", ""
                 number = number or pr.resolution_number

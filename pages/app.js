@@ -208,6 +208,23 @@ function searchView(q) {
 }
 
 /* Detail */
+// A carried clause's provenance, exactly as the draft stores it.
+const sourceFrom = (r, s, url) => ({
+  resolutionId: r.id, number: r.resolution_number, title: r.title, year: r.convention_year,
+  convention: r.convention_name, documentId: r.document_id, statementType: s.t, index: s.i, text: s.text,
+  url: url || "",
+});
+// The database's record for a claimed source: the same statement text in the same ATNI document, or null.
+function storedSource(claim) {
+  const s = rows(`select resolution_id, statement_type t, "index" i, text from statement where statement_type = ?
+    and text = ? and resolution_id in (select id from resolution where document_id = ?) order by "index"`,
+  [String(claim?.statementType ?? ""), String(claim?.text ?? ""), String(claim?.documentId ?? "")]);
+  const hit = s.find(x => x.i === claim?.index) ?? s[0];
+  if (!hit) return null;
+  const r = rows("select * from resolution where id = ?", [hit.resolution_id])[0];
+  return sourceFrom(r, hit, rows("select url from source where document_id = ?", [r.document_id])[0]?.url);
+}
+
 function detailView(id) {
   const r = Number.isInteger(id) ? rows("select * from resolution where id = ?", [id])[0] : null;
   if (!r) {
@@ -228,11 +245,7 @@ function detailView(id) {
   const urls = rows("select url from source where document_id = ?", [r.document_id]).map(s => s.url);
   const where = [r.convention_name, r.convention_year, r.convention_location].filter(Boolean);
 
-  const source = s => ({
-    resolutionId: r.id, number: r.resolution_number, title: r.title, year: r.convention_year,
-    convention: r.convention_name, documentId: r.document_id, statementType: s.t, index: s.i, text: s.text,
-    url: urls[0] || "",
-  });
+  const source = s => sourceFrom(r, s, urls[0]);
   const sections = ["resolved", "whereas"].map(type => {
     const list = statements.filter(s => s.t === type);
     const word = type === "resolved" ? "RESOLVED" : "WHEREAS";
@@ -361,6 +374,8 @@ function aboutView() {
 }
 
 /* Start */
+// "#main" is not a route: the skip link moves focus itself, so the router never sees it.
+document.querySelector(".skip")?.addEventListener("click", e => { e.preventDefault(); main.focus(); });
 addEventListener("hashchange", route);
 route();
 try {
@@ -370,6 +385,7 @@ try {
     if (bar) bar.style.width = pct + "%";
   });
   ready = true;
+  store.verifyWith(storedSource);
 } catch (e) {
   loadError = `The resolution database did not load (${e.message}). Reload the page to try again.`;
 }

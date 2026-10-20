@@ -249,7 +249,7 @@ function notes(m, w) {
     const cell = (content, width) => `<w:tc><w:tcPr><w:tcW w:w="${width}" w:type="dxa"/></w:tcPr>${para(content, { after: 40 })}</w:tc>`;
     const row = (cells, head) => `<w:tr>${head ? "<w:trPr><w:tblHeader/></w:trPr>" : ""}${cells.map((c, i) => cell(c, cols[i])).join("")}</w:tr>`;
     const H = { b: true, sz: 20 };
-    out.push(para(run("Sources of carried clauses", { b: true }), { keep: true, after: 80 }),
+    out.push(para(run("Sources of Carried Clauses", { b: true }), { keep: true, after: 80 }),
       `<w:tbl><w:tblPr><w:tblStyle w:val="NotesTable"/><w:tblW w:w="9360" w:type="dxa"/><w:tblLayout w:type="fixed"/>` +
       '<w:tblLook w:val="0000" w:firstRow="0" w:lastRow="0" w:firstColumn="0" w:lastColumn="0" w:noHBand="1" w:noVBand="1"/></w:tblPr>' +
       `<w:tblGrid>${cols.map(c => `<w:gridCol w:w="${c}"/>`).join("")}</w:tblGrid>` +
@@ -266,8 +266,10 @@ function notes(m, w) {
     out.push(para(run(String(n.title ?? ""), { b: true }), { keep: true, after: 40 }));
     if (meta) out.push(para(run(meta), { after: 40 }));
     if (n.officialUrl) out.push(para(w.link(n.officialUrl), { after: 40 }));
-    out.push(para(run(`Read by Policy Sentinel on ${usDate(n.retrievedAt) || "an unrecorded date"}; text SHA-256 ${sha16(n.receiptSha256)}`), { after: 120 }));
-    for (const i of Array.isArray(n.issues) ? n.issues : []) {
+    const on = usDate(n.retrievedAt) || "an unrecorded date";
+    out.push(para(run(n.receiptSha256 ? `Read by Policy Sentinel on ${on}; text SHA-256 ${sha16(n.receiptSha256)}`
+      : `Details from Policy Sentinel on ${on}; no policy text was read.`), { after: 120 }));
+    for (const i of (Array.isArray(n.issues) ? n.issues : []).filter(x => x && typeof x === "object")) {
       out.push(para(run(`${String(i.label ?? "")}: “${String(i.quote ?? "")}”`) + (i.locator ? run(` (${String(i.locator)})`) : ""), { after: 0, ind: 360, keep: true }));
       if (i.rule) out.push(para(run(`Rule: ${String(i.rule)}`, grey), { after: 120, ind: 360 }));
     }

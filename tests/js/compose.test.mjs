@@ -23,6 +23,9 @@ test("body strips lead words and joiners but keeps abbreviations", () => {
   assert.equal(body("BE IT FINALLY RESOLVED, " + STANDARD.closing + "."), STANDARD.closing);
   assert.equal(body("future generations; now"), "future generations");
   assert.equal(body("as provided in 25 U.S.C."), "as provided in 25 U.S.C.");
+  // Verbatim from 24-01 RESOLVED 1 as stored: the next clause's lead word leaked into this one.
+  assert.equal(body("that ATNI condemns the Western Oregon Termination Act of 1954; and THEREFORE"),
+    "that ATNI condemns the Western Oregon Termination Act of 1954");
 });
 
 test("resolved lead words follow position", () => {

@@ -12,11 +12,28 @@ import { openLookup } from "./sentinel.js";
 const KEY = "resist-draft-v1";
 const DOCX = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
 const carryKey = s => `${s?.documentId}:${s?.statementType}:${s?.index}`;
+// Own toString/valueOf keys in untrusted JSON make String() and template literals throw; JSON cannot carry others.
+const parseDraft = text => validDraft(JSON.parse(text, (k, v) => k === "toString" || k === "valueOf" ? undefined : v));
 
 // ---- Store -------------------------------------------------------------------------------------------------------
 
 function loadDraft() {
-  try { return validDraft(JSON.parse(local.get(KEY))) || newDraft(); } catch { return newDraft(); }
+  try { return parseDraft(local.get(KEY)) || newDraft(); } catch { return newDraft(); }
+}
+// Provenance is the database's, never the draft's: a stored or opened draft is untrusted (D-054). Once the database
+// has loaded, each carried clause's source is replaced by the database's record, and a clause whose source text is
+// not in that ATNI document becomes typed. Returns whether anything changed.
+let sourceOf = null;
+function checkSources(d) {
+  if (!sourceOf) return false;
+  let lost = 0, changed = false;
+  for (const c of [...d.whereas, ...d.resolved]) if (c.origin === "carried") {
+    const real = sourceOf(c.source);
+    if (!real) { c.origin = "typed"; delete c.source; lost++; changed = true; }
+    else if (JSON.stringify(real) !== JSON.stringify(c.source)) { c.source = real; changed = true; }
+  }
+  if (lost) toast(`${lost} carried clause${lost === 1 ? " does" : "s do"} not match ATNI's published text and ${lost === 1 ? "is" : "are"} now marked Typed`);
+  return changed;
 }
 let draft = loadDraft();
 const subs = new Set();
@@ -59,8 +76,14 @@ export const store = {
   replace(next) {
     const v = validDraft(next);
     if (!v) return false;
+    checkSources(v);
     draft = v; save(); notify();
     return true;
+  },
+  // Called once the database has loaded, with a lookup from a claimed source to the database's, or null.
+  verifyWith(lookup) {
+    sourceOf = lookup;
+    if (checkSources(draft)) { save(); notify(); }
   },
   reset() { draft = newDraft(); save(); notify(); },
 };
@@ -74,6 +97,12 @@ function typed(fn) {
 }
 const flush = () => { if (pending) { save(); notify(view?.sub); } };
 globalThis.addEventListener?.("pagehide", () => { if (pending) save(); });
+// Another tab saved the draft: take its copy, so this tab's next save cannot overwrite it with a stale one.
+globalThis.addEventListener?.("storage", e => {
+  if (e.key !== KEY) return;
+  clearTimeout(pending); pending = 0;
+  draft = loadDraft(); checkSources(draft); notify();
+});
 
 // ---- Small renderers ----------------------------------------------------------------------------------------------
 
@@ -91,6 +120,10 @@ const plural = (n, one, many = one + "s") => `${n} ${n === 1 ? one : many}`;
 const kindWord = kind => kind === "whereas" ? "WHEREAS" : "RESOLVED";
 const hasWork = d => [...d.whereas, ...d.resolved].some(c => c.origin !== "standard") || Boolean(s(d.title)) ||
   d.notes.length > 0;
+// Anything entered or chosen, for the prompts that would discard it; hasWork alone drives the empty-draft notice.
+const plainDraft = d => JSON.stringify({ ...d, whereas: d.whereas.map(c => [c.origin, c.text]),
+  resolved: d.resolved.map(c => [c.origin, c.text]) });
+const changed = d => hasWork(d) || plainDraft(d) !== plainDraft(newDraft(d.header.year));
 
 // Lead words and joiners from compose(); an empty clause (left out of the document) gets its position's lead only.
 function marks(model) {
@@ -324,7 +357,8 @@ function sheetHTML(m) {
     ${m.notes.map(n => `<div class="s-note">
       <p><b>${esc(s(n.title))}</b></p>
       <p>${[n.issuingBody, n.kind, usDate(s(n.date))].map(s).filter(Boolean).map(esc).join(", ")}${outLink(n.officialUrl, "Official source") ? `, ${outLink(n.officialUrl, "Official source")}` : ""}</p>
-      ${s(n.retrievedAt) ? `<p>Read by Policy Sentinel on ${esc(usDate(s(n.retrievedAt)))}; text SHA-256 ${esc(s(n.receiptSha256).slice(0, 16))}</p>` : ""}
+      ${s(n.receiptSha256) ? `<p>Read by Policy Sentinel on ${esc(usDate(s(n.retrievedAt)) || "an unrecorded date")}; text SHA-256 ${esc(s(n.receiptSha256).slice(0, 16))}</p>`
+        : s(n.retrievedAt) ? `<p>Details from Policy Sentinel on ${esc(usDate(s(n.retrievedAt)))}; no policy text was read.</p>` : ""}
       ${(Array.isArray(n.issues) ? n.issues : []).filter(x => x && typeof x === "object").map(x => `<p class="s-flag">${esc(s(x.label))}: “${esc(s(x.quote))}”${s(x.locator) ? ` (${esc(s(x.locator))})` : ""}<br><span class="s-rulet">Rule: ${esc(s(x.rule))}</span></p>`).join("")}
       ${s(n.comment) ? `<p>Drafter's note: ${esc(s(n.comment))}</p>` : ""}
     </div>`).join("")}
@@ -439,15 +473,16 @@ export function renderDraft(main) {
     for (const b of root.querySelectorAll(".draft-switch [data-mode]")) b.setAttribute("aria-pressed", String(b.dataset.mode === mode));
     if (mode === "edit") grow(editor);
   }
-  function ask(message, okLabel, onOk) {
-    confirmEl.innerHTML = `<p>${esc(message)}</p><div class="draft-tools">
-      <button type="button" class="btn primary" data-confirm="ok">${esc(okLabel)}</button>
-      <button type="button" class="btn" data-confirm="cancel">Keep this draft</button></div>`;
+  // from: the toolbar tool that raised the prompt, which takes focus back on cancel.
+  function ask(message, okLabel, onOk, from) {
+    confirmEl.innerHTML = `<p id="draft-confirm-msg">${esc(message)}</p><div class="draft-tools">
+      <button type="button" class="btn primary" data-confirm="ok" aria-describedby="draft-confirm-msg">${esc(okLabel)}</button>
+      <button type="button" class="btn" data-confirm="cancel" aria-describedby="draft-confirm-msg">Keep this draft</button></div>`;
     confirmEl.hidden = false;
-    confirmEl._ok = onOk;
+    confirmEl._ok = onOk; confirmEl._from = from;
     confirmEl.querySelector('[data-confirm="cancel"]').focus();
   }
-  const closeAsk = () => { confirmEl.hidden = true; confirmEl.innerHTML = ""; confirmEl._ok = null; };
+  const closeAsk = () => { confirmEl.hidden = true; confirmEl.innerHTML = ""; confirmEl._ok = confirmEl._from = null; };
 
   function lostText() {
     const kept = all().filter(c => c.origin !== "standard").length;
@@ -476,11 +511,11 @@ export function renderDraft(main) {
   async function openFile(file) {
     errEl.hidden = true; closeAsk();
     let v = null;
-    if (file.size <= 5e6) try { v = validDraft(JSON.parse(await file.text())); } catch { v = null; }
+    if (file.size <= 5e6) try { v = parseDraft(await file.text()); } catch { v = null; }
     fileEl.value = "";
     if (!v) { errEl.textContent = "This file is not a ResIST draft."; errEl.hidden = false; return; }
     const open = () => { store.replace(v); toast("Draft file opened"); $("h1").focus(); };
-    if (hasWork(draft)) ask(`Opening ${file.name} replaces the draft in this browser: ${lostText()}. Save a draft file first if you want to keep it.`, "Open this draft file", open);
+    if (changed(draft)) ask(`Opening ${file.name} replaces the draft in this browser: ${lostText()}. Save a draft file first if you want to keep it.`, "Open this draft file", open, "open");
     else open();
   }
 
@@ -493,14 +528,14 @@ export function renderDraft(main) {
       else if (t.dataset.tool === "save") saveFile();
       else if (t.dataset.tool === "open") fileEl.click();
       else if (t.dataset.tool === "new") {
-        if (!hasWork(draft)) { store.reset(); toast("New draft started"); return; }
+        if (!changed(draft)) { store.reset(); toast("New draft started"); return; }
         ask(`Starting a new draft clears this one from this browser: ${lostText()}. Save a draft file first if you want to keep it.`,
-          "Clear and start a new draft", () => { store.reset(); toast("New draft started"); $("h1").focus(); });
+          "Clear and start a new draft", () => { store.reset(); toast("New draft started"); $("h1").focus(); }, "new");
       }
     } else if (t.dataset.confirm) {
-      const ok = confirmEl._ok;
+      const ok = confirmEl._ok, from = confirmEl._from;
       closeAsk();
-      if (t.dataset.confirm === "ok") ok?.(); else root.querySelector('[data-tool="new"]').focus();
+      if (t.dataset.confirm === "ok") ok?.(); else root.querySelector(`[data-tool="${from || "new"}"]`)?.focus();
     } else if (t.dataset.mode && t.matches("button")) setMode(t.dataset.mode);
     else if (t.dataset.cid || t.dataset.goto) {
       const target = document.getElementById(t.dataset.goto || `t-${t.dataset.cid}`);

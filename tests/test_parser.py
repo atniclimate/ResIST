@@ -1,95 +1,75 @@
 """
 Tests for resolution parser, citation extraction, and statement classification.
+
+Every resolution text here is real, published ATNI text (T0, D-052): whole documents extracted at test
+time from tests/fixtures/atni/, or short verbatim excerpts whose source is named in a comment.
 """
+import re
+from functools import lru_cache
+from pathlib import Path
+
 import pytest
 from src.ingestion.parser import parse_resolution
 from src.ingestion.citations import extract_citations, normalize_citation, classify_citation_type
 from src.ingestion.classifier import classify_whereas_function, classify_resolved_action
+from src.ingestion.intake import detect_pdf_type, extract_text_from_native_pdf
 
-# Sample resolution text for testing
-SAMPLE_RESOLUTION = """
-RESOLUTION NO. 23-15
+ATNI = Path(__file__).parent / "fixtures" / "atni"
+WHEREAS_MARK = r"\bWHEREAS\b"
+RESOLVED_MARK = r"\bBE\s+IT\s+(?:FURTHER\s+|FINALLY\s+)?RESOLVED\b"
 
-OF THE AFFILIATED TRIBES OF NORTHWEST INDIANS
-2023 Annual Convention, Grand Mound, Washington
-September 18-21, 2023
 
-TITLE: Support for Tribal Climate Resilience Programs
-
-WHEREAS, the Affiliated Tribes of Northwest Indians (ATNI) has historically supported
-tribal sovereignty and self-determination; and
-
-WHEREAS, pursuant to P.L. 93-638, the Indian Self-Determination and Education Assistance
-Act, tribes have the authority to manage their own programs; and
-
-WHEREAS, studies show that tribal lands are disproportionately affected by climate change,
-with temperatures rising 1.5 degrees faster than surrounding areas; and
-
-WHEREAS, this represents an urgent crisis requiring immediate federal action; and
-
-NOW, THEREFORE BE IT RESOLVED, that ATNI urges Congress to increase funding for
-tribal climate adaptation programs; and
-
-BE IT FURTHER RESOLVED, that ATNI supports the establishment of regional tribal
-climate centers as authorized under 25 U.S.C. 5301; and
-
-BE IT FURTHER RESOLVED, that ATNI directs its Executive Board to work with member
-tribes to develop comprehensive climate action plans.
-
-CERTIFICATION
-I, the undersigned Secretary of ATNI, do hereby certify that this resolution was duly adopted
-at the 2023 Annual Convention.
-
-Leonard Forsman, President
-Norma Jean Louie, Secretary
-
-Sponsored by: Tulalip Tribes
-Co-Sponsored by: Lummi Nation
-Committee: Natural Resources
-"""
+@lru_cache(maxsize=None)
+def atni_text(name: str) -> str:
+    return extract_text_from_native_pdf(ATNI / name)
 
 
 class TestParser:
     def test_extract_resolution_number(self):
-        result = parse_resolution(SAMPLE_RESOLUTION, "test-001")
-        assert result.resolution_number == "23-15"
+        # verbatim header from the published database, resolution 18-38
+        assert parse_resolution("RESOLUTION #18-38", "res-18-38").resolution_number == "18-38"
 
     def test_extract_convention(self):
-        result = parse_resolution(SAMPLE_RESOLUTION, "test-001")
+        result = parse_resolution(atni_text("Res-23-40.pdf"), "res-23-40")
         assert result.convention is not None
         assert result.convention["year"] == "2023"
         assert "Grand Mound" in result.convention["location"]
 
     def test_extract_whereas_statements(self):
-        result = parse_resolution(SAMPLE_RESOLUTION, "test-001")
-        assert len(result.whereas_statements) >= 4
+        text = atni_text("Res-23-40.pdf")
+        result = parse_resolution(text, "res-23-40")
+        assert len(result.whereas_statements) == len(re.findall(WHEREAS_MARK, text, re.I)) == 13
 
     def test_extract_resolved_statements(self):
-        result = parse_resolution(SAMPLE_RESOLUTION, "test-001")
-        assert len(result.resolved_statements) >= 3
+        text = atni_text("Res-23-40.pdf")
+        result = parse_resolution(text, "res-23-40")
+        assert len(result.resolved_statements) == len(re.findall(RESOLVED_MARK, text, re.I)) == 2
 
     def test_extract_sponsors(self):
-        result = parse_resolution(SAMPLE_RESOLUTION, "test-001")
-        assert "Tulalip Tribes" in result.sponsors["primary"][0]
+        # ATNI's published form carries no sponsor/committee block, so nothing may be invented.
+        result = parse_resolution(atni_text("Res-23-40.pdf"), "res-23-40")
+        assert result.sponsors == {"primary": [], "co_sponsor": [], "committee": None}
 
     def test_extract_signatories(self):
-        result = parse_resolution(SAMPLE_RESOLUTION, "test-001")
-        assert len(result.signatories) >= 1
+        result = parse_resolution(atni_text("Res-23-40.pdf"), "res-23-40")
+        assert sorted(s["role"] for s in result.signatories) == ["President", "Secretary"]
 
     def test_parse_confidence(self):
-        result = parse_resolution(SAMPLE_RESOLUTION, "test-001")
+        result = parse_resolution(atni_text("Res-23-40.pdf"), "res-23-40")
         assert result.confidence_score >= 0.67
         assert result.needs_review == False
 
     def test_incomplete_document_flags_review(self):
-        # Document missing WHEREAS and RESOLVED
-        incomplete = "Resolution No. 24-01\nSome random text without proper structure"
-        result = parse_resolution(incomplete, "test-incomplete")
+        # Res-23-40.pdf cut before its first WHEREAS: header and preamble, no clauses
+        text = atni_text("Res-23-40.pdf")
+        result = parse_resolution(text[: text.index("WHEREAS")], "res-23-40-head")
+        assert result.resolution_number is not None
         assert result.needs_review == True
         assert result.confidence_score < 0.67
 
 
 class TestCitations:
+    # Generic legal citation strings, not resolution text (kept under D-052 rule 2).
     def test_normalize_public_law(self):
         assert normalize_citation("Public Law 93-638") == "P.L. 93-638"
         assert normalize_citation("P.L. 93-638") == "P.L. 93-638"
@@ -126,72 +106,134 @@ class TestCitations:
         assert len(citations) >= 1
 
     def test_extract_atni_resolution_reference(self):
-        text = "as stated in ATNI Resolution No. 22-05"
-        citations = extract_citations(text)
-        atni_cites = [c for c in citations if c["type"] == "prior_atni_resolution"]
-        assert len(atni_cites) >= 1
-        assert "ATNI-RES-22-05" in [c["normalized"] for c in atni_cites]
+        # verbatim from Res-26-34.pdf, WHEREAS 4
+        text = "prior resolutions, including, but not limited to: Resolution #25-41"
+        assert text in " ".join(atni_text("Res-26-34.pdf").split())
+        atni_cites = [c for c in extract_citations(text) if c["type"] == "prior_atni_resolution"]
+        assert "ATNI-RES-25-41" in [c["normalized"] for c in atni_cites]
 
 
 class TestClassifier:
     def test_classify_legal_basis(self):
-        text = "pursuant to P.L. 93-638"
+        text = "the treaty tribes are Columbia River fishery co-managers"  # published db, resolution 23-12
         assert classify_whereas_function(text) == "legal_basis"
 
     def test_classify_urgency(self):
-        text = "this represents an urgent crisis"
+        # verbatim from Res-26-34.pdf, WHEREAS 10
+        text = ("the rapid proliferation of artificial intelligence and machine learning technologies "
+                "presents urgent and heightened risks to Indigenous Data Sovereignty")
+        assert text in " ".join(atni_text("Res-26-34.pdf").split())
         assert classify_whereas_function(text) == "urgency"
 
     def test_classify_factual(self):
-        text = "studies show that 75% of tribes"
+        text = "92% of Native students are in public schools"  # published db, resolution 12-37
         assert classify_whereas_function(text) == "factual"
 
     def test_classify_historical_context(self):
-        text = "since 1855, tribes have traditionally managed these lands"
+        # published db, resolution 26-03
+        text = "intertribal trade has stood as a cornerstone for intertribal economics since time immemorial"
         assert classify_whereas_function(text) == "historical_context"
 
     def test_classify_organizational_reference(self):
-        text = "ATNI has adopted Resolution 20-01 supporting this position"
+        # verbatim from Res-26-34.pdf, WHEREAS 4
+        text = "ATNI has a demonstrated history of addressing data-related concerns through prior resolutions"
+        assert text in " ".join(atni_text("Res-26-34.pdf").split())
         assert classify_whereas_function(text) == "organizational_reference"
 
     def test_classify_request_urge(self):
-        text = "ATNI urges Congress to increase funding"
+        # verbatim from Res-26-34.pdf, RESOLVED clause 5
+        text = ("that ATNI encourages its member Tribes to review the TSDF and consider its applicability "
+                "to their own data governance needs")
+        assert text in " ".join(atni_text("Res-26-34.pdf").split())
         assert classify_resolved_action(text) == "request_urge"
 
     def test_classify_directive(self):
-        text = "ATNI directs its Executive Board"
+        # published db, resolution 26-14
+        text = ("that ATNI directs that this resolution be transmitted to NTIA, appropriate federal agencies, "
+                "and Congressional delegations")
         assert classify_resolved_action(text) == "directive"
 
     def test_classify_support(self):
-        text = "ATNI supports the establishment"
+        # verbatim from Res-2021-20.pdf, RESOLVED clause 2
+        text = ("that ATNI supports advocacy for the continued dissemination of, and implementation of the "
+                "goals within, the Strategic Vision and Action Plan")
+        assert text in " ".join(atni_text("Res-2021-20.pdf").split())
         assert classify_resolved_action(text) == "support_opposition"
 
     def test_classify_position_statement(self):
-        text = "ATNI declares its commitment to sovereignty"
+        text = "that ATNI reaffirms its commitment to a tribally controlled education"  # published db, resolution 16-24
         assert classify_resolved_action(text) == "position_statement"
 
     def test_classify_authorization(self):
-        text = "ATNI authorizes the President to negotiate"
+        # published db, resolution 26-25
+        text = ("that ATNI authorizes the public dissemination of this resolution as an expression of support "
+                "for the timely reauthorization and modernization of NAHASDA")
         assert classify_resolved_action(text) == "authorization"
 
     def test_unknown_returns_none(self):
-        text = "some generic text without keywords"
+        # verbatim from Res-26-34.pdf, RESOLVED clause 6
+        text = "that this will be the policy of ATNI until it is withdrawn or modified by subsequent resolution(s)"
+        assert text in " ".join(atni_text("Res-26-34.pdf").split())
         assert classify_whereas_function(text) is None
         assert classify_resolved_action(text) is None
 
 
 def test_real_resolution_keeps_finally_and_drops_self_citation():
     """Res-23-40 (real, T0): every BE IT [FURTHER|FINALLY] RESOLVED clause kept; own number not a citation."""
-    import re
-    from pathlib import Path
-    from src.ingestion.intake import extract_text_from_native_pdf
-
-    text = extract_text_from_native_pdf(Path(__file__).parent / "fixtures" / "atni" / "Res-23-40.pdf")
+    text = atni_text("Res-23-40.pdf")
     result = parse_resolution(text, "res-23-40")
-    markers = re.findall(r"\bBE\s+IT\s+(?:FURTHER\s+|FINALLY\s+)?RESOLVED\b", text, re.I)
+    markers = re.findall(RESOLVED_MARK, text, re.I)
     assert re.search(r"FINALLY\s+RESOLVED", text, re.I)
     assert len(result.resolved_statements) == len(markers)
     assert f"ATNI-RES-{result.resolution_number}" not in {c["normalized"] for c in result.citations}
+
+
+def test_res_12_41_has_no_text_layer():
+    """Res-12-41 (2012): both pages are images; native extraction yields nothing, so it is OCR-only."""
+    pdf = ATNI / "Res-12-41.pdf"
+    assert detect_pdf_type(pdf) == "pdf-scanned"
+    assert atni_text("Res-12-41.pdf").strip() == ""
+
+
+def test_res_2021_20_two_issuer_numbers():
+    """The PDF prints 21-20; ATNI's table lists RES_21_120 (21-120). One document, two issuer numbers."""
+    from src.ingestion.parser import normalize_resolution_number
+
+    text = atni_text("Res-2021-20.pdf")
+    printed = re.findall(r"RESOLUTION\s*#[^\n]*", text)
+    # The title header uses an en dash, which the normalizer does not accept; the running header uses "-".
+    assert {normalize_resolution_number(p) for p in printed} - {None} == {"21-20"}
+    assert "120" not in text
+    assert normalize_resolution_number("RES_21_120") == "21-120"
+
+
+@pytest.mark.parametrize("name, number", [("Res-23-40.pdf", "23-40"), ("Res-2021-20.pdf", "21-20"),
+                                          ("Res-26-34.pdf", "26-34")])
+def test_spaced_header_number_is_the_own_number(name, number):
+    """S04: spaced headers ("#2023 – 40", "# 2026 - 034") are read as the year only today (quarantined)."""
+    from src.ingestion.parser import normalize_resolution_number
+
+    parsed = parse_resolution(atni_text(name), name).resolution_number
+    assert normalize_resolution_number(parsed) == number
+
+
+def test_res_26_34_uc1_clauses_and_citations():
+    """UC-1 fixture: every clause marker parsed; cites prior ATNI resolutions; never itself."""
+    text = atni_text("Res-26-34.pdf")
+    result = parse_resolution(text, "res-26-34")
+    assert len(result.whereas_statements) == len(re.findall(WHEREAS_MARK, text, re.I)) == 16
+    assert len(result.resolved_statements) == len(re.findall(RESOLVED_MARK, text, re.I)) == 6
+    cited = {c["normalized"] for c in result.citations}
+    assert "ATNI-RES-26-34" not in cited
+    # The five resolutions WHEREAS 4 lists; UNDRIP, IEEE 2890, CARE and the license are missed (S05).
+    assert cited == {"ATNI-RES-25-41", "ATNI-RES-21-04", "ATNI-RES-15-53", "ATNI-RES-15-60", "ATNI-RES-09-69"}
+
+
+def test_res_26_34_clauses_exclude_running_header():
+    """S04: a clause crossing a page break must not carry the page's running header (quarantined)."""
+    result = parse_resolution(atni_text("Res-26-34.pdf"), "res-26-34")
+    clauses = result.whereas_statements + result.resolved_statements
+    assert not [c["text"][:60] for c in clauses if "AFFILIATED TRIBES OF NORTHWEST INDIANS RESOLUTION" in c["text"]]
 
 
 @pytest.mark.parametrize("raw, expected", [

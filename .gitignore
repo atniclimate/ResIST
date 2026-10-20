@@ -57,3 +57,7 @@ source-documents/
 
 # Acquired resolution originals (ATNI table, NCAI): corpus data, never tracked even when T0.
 docs/resolutions/*
+
+# ATNI's official fillable templates name officers and carry an ATNI email address (D-054); the pre-commit
+# contact scan cannot see inside a .docx, so ignore them here.
+docs/*_FILLABLE.docx

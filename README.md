@@ -13,7 +13,7 @@ atnitribes.org. Each record links to its source PDF, which is authoritative.
 
 ## Status
 
-Early prototype (`0.2.0.dev0`) under active rework. `pytest` on a fresh clone gives 142 passed, 0 failed.
+Early prototype (`0.2.0.dev0`) under active rework. `pytest` on a fresh clone gives 155 passed, 5 skipped, 0 failed: 4 tests of known parser defects are quarantined in `tests/quarantine.txt`, and 1 needs the built site database, which a clone does not have.
 The OCR engine class still targets the PaddleOCR 2.x API. Bulk ingest uses the Tesseract command line
 for image-only pages.
 
