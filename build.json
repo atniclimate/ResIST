@@ -3,8 +3,8 @@
  "year_min": 2007,
  "year_max": 2026,
  "needs_review": 27,
- "commit": "6122ff1",
+ "commit": "81368c3",
  "fts_tokenize": "unicode61 remove_diacritics 0 categories 'L* N* Co Mn Mc' tokenchars '''\u2019'",
- "built": "2026-10-20 12:55 UTC",
+ "built": "2026-10-20 18:26 UTC",
  "db_sha256": "51be485fec6991dd7103370b3d4a3da20b67d675d724ce6ca4b3bbd8fdfa0083"
 }
