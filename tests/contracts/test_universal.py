@@ -15,11 +15,12 @@ import pytest
 from resist import registry
 from resist.adapters import cli_tool
 from resist.errors import BadInput, DependencyError, ModelProvenanceError, TierRefused
-from resist.models import (FORBIDDEN_PROVENANCE, Availability, DocRef, DocumentResult, IndexDoc, PageFeatures,
-                           PageImage, Provenance, SearchRequest)
+from resist.models import (FORBIDDEN_PROVENANCE, Availability, DocRef, DocumentResult, IndexDoc,
+                           PageFeatures, PageImage, Provenance, SearchRequest)
 from resist.services import policy
 from tests import originals as o
-from tests.contracts import build_index, canon, h, index_docs, png_size, query_word, require_available, roundtrip_ok
+from tests.contracts import (build_index, canon, clause_texts, h, index_docs, png_size, query_word,
+                             require_available, roundtrip_ok)
 
 NA = {
     ("U1", "pdf"): "N/A: PdfBackend outputs carry no document id",
@@ -32,9 +33,11 @@ NA = {
     ("U8", "ocr"): "N/A: OCREngine receives page images of documents already admitted",
     ("U8", "router"): "N/A: PageRouter sees integer page features only",
     ("U8", "analytics"): "N/A: the null provider reads no document; no export path in LR-A (LR-B)",
+    ("U8", "resolver"): "N/A: a ReferenceResolver reads text its caller already admitted; it opens no document and has no export path",
     ("U6-path", "ocr"): "N/A: OCREngine writes only through cli_tool.run (test_run_refuses_work_dir_outside_pool_tmp)",
     ("U6-path", "router"): "N/A: PageRouter takes no path and writes nothing",
     ("U6-path", "analytics"): "N/A: the null provider takes no path and writes nothing",
+    ("U6-path", "resolver"): "N/A: a ReferenceResolver takes text, not a path, and writes nothing",
 }
 
 
@@ -120,6 +123,13 @@ def test_u1_identity(subject_id, subject, work, pool):
         img = _ocr_image(pool)
         assert img.sha256 == o.sha256_file(o.fixture("Res-12-41.pdf")[1])
         assert subject.recognize(img).status in ("ok", "empty", "failed")
+    elif kind == "resolver":
+        require_available(subject)
+        shas = set(o.fixtures())
+        for t in clause_texts():
+            assert t.sha256 in shas, t.sha256
+            for c in subject.find(t):
+                assert c.span.sha256 == t.sha256, t.sha256
     else:
         pytest.fail(f"no U1 rule for kind {kind}")
 
@@ -155,6 +165,12 @@ def test_u2_verbatim(subject_id, subject, work, pool):
             full = texts[s.sha256]
             assert s.text_sha256 == h(full), s.sha256
             assert h(s.quote) == h(full[s.start:s.end]), (s.sha256, s.start, s.end)
+    elif kind == "resolver":
+        require_available(subject)
+        for t in clause_texts():
+            for c in subject.find(t):
+                assert c.span.text_sha256 == h(t.text), t.sha256
+                assert h(c.span.quote) == h(t.text[c.span.start:c.span.end]), (t.sha256, c.span.start, c.span.end)
     else:
         pytest.fail(f"no U2 rule for kind {kind}")
 
@@ -197,6 +213,10 @@ def test_u3_determinism(subject_id, subject, pool):
     elif kind == "analytics":
         assert subject.measures() == subject.measures()
         assert subject.available() == subject.available()
+    elif kind == "resolver":
+        require_available(subject)
+        for t in clause_texts():
+            assert canon([c.to_dict() for c in subject.find(t)]) == canon([c.to_dict() for c in subject.find(t)]), t.sha256
     else:
         pytest.fail(f"no U3 rule for kind {kind}")
 
@@ -222,6 +242,12 @@ def test_u4_json_roundtrip(subject_id, subject, work, pool):
         assert roundtrip_ok(subject.search(SearchRequest(query_word())))
     elif kind == "analytics":
         assert all(roundtrip_ok(m) for m in subject.measures())
+    elif kind == "resolver":
+        require_available(subject)
+        for t in clause_texts():
+            assert roundtrip_ok(t), t.sha256
+            for c in subject.find(t):
+                assert roundtrip_ok(c), t.sha256
     # ocr: Availability only (above); recognize needs the tool.
 
 
@@ -253,6 +279,10 @@ def test_u5_no_socket_guarded_spawn(subject_id, subject, work, pool, guard):
         subject.measures()
         with pytest.raises(DependencyError):
             subject.compute("none", {})
+    elif kind == "resolver":
+        require_available(subject)
+        for t in clause_texts():
+            subject.find(t)
     assert guard == [], guard
 
 
@@ -288,6 +318,10 @@ def test_u6_writes_only_in_scratch_pool(subject_id, subject, work, pool, tmp_pat
         idx.search(SearchRequest(query_word()))
     elif kind == "analytics":
         subject.measures()
+    elif kind == "resolver":
+        require_available(subject)
+        for t in clause_texts():
+            subject.find(t)
     after = (_tree(tmp_path, pool), sorted(p.name for p in o.ROOT.iterdir()), _tree(o.REAL_POOL / "tmp"))
     assert after[0] == before[0], sorted(after[0] - before[0])
     assert after[1] == before[1], "repository root changed"
@@ -373,6 +407,28 @@ def test_u7_typed_unavailability(subject_id, subject, work, pool, monkeypatch):
         assert not av.ok and av.reason.startswith("no-metric") and av.remediation
         with pytest.raises(DependencyError):
             subject.compute("none", {})
+    elif kind == "resolver":
+        name = subject.name
+        # A committed fixture's own text (never an invented citation string); find raises before matching anyway.
+        sha = o.fixture("Res-23-40.pdf")[0]
+        ct = next(t for t in clause_texts() if t.sha256 == sha)
+        if name == "atni-number":
+            pytest.skip("N/A: atni-number is pure regex with no dependency")
+        elif name in ("eyecite", "citeurl"):
+            monkeypatch.setitem(sys.modules, name, None)
+            res = type(subject)()
+            av = res.available()
+            assert isinstance(av, Availability) and not av.ok and av.reason and av.remediation
+            with pytest.raises(DependencyError):
+                res.find(ct)
+        elif name == "instruments":
+            res = type(subject)(pool / "tmp" / "absent.toml")
+            av = res.available()
+            assert isinstance(av, Availability) and not av.ok and av.reason and av.remediation
+            with pytest.raises(DependencyError):
+                res.find(ct)
+        else:
+            pytest.fail(f"no U7 rule for resolver {name}")
     else:
         pytest.fail(f"no U7 rule for kind {kind}")
 
@@ -433,5 +489,9 @@ def test_u9_no_model_provenance(subject_id, subject, work, pool):
         outputs += [subject.search(SearchRequest(query_word())).to_dict(), subject.capabilities().to_dict()]
     elif kind == "analytics":
         outputs += [m.to_dict() for m in subject.measures()]
+    elif kind == "resolver":
+        require_available(subject)
+        for t in clause_texts():
+            outputs += [c.to_dict() for c in subject.find(t)]
     bad = _no_model_markers(json.loads(json.dumps(outputs)))
     assert not bad, bad

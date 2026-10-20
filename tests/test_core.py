@@ -18,9 +18,10 @@ from resist.errors import BadInput, InvalidConfig, ModelProvenanceError
 from resist import models as m
 
 DOCX_MT = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-SEVEN = {
+BUILTINS = {
     ("extractor", "pdf-inprocess"), ("extractor", "docx-python"), ("pdf", "pymupdf"), ("ocr", "tesseract-cli"),
     ("router", "min-text-50"), ("index", "fts5"), ("analytics", "null"),
+    ("resolver", "atni-number"), ("resolver", "citeurl"), ("resolver", "eyecite"), ("resolver", "instruments"),
 }
 
 
@@ -136,9 +137,9 @@ def test_pool_max_tier_invalid_raises(tmp_path, text):
 # ---- registry -------------------------------------------------------------------------------
 
 def test_registry_builtins():
-    assert set(registry.BUILTIN) == SEVEN
-    assert set(registry.KINDS) == {k for k, _ in SEVEN}
-    assert SEVEN <= set(registry.all_registered())
+    assert set(registry.BUILTIN) == BUILTINS
+    assert set(registry.KINDS) == {k for k, _ in BUILTINS}
+    assert BUILTINS <= set(registry.all_registered())
     for kind, (section, key) in registry.SELECTOR.items():
         assert config.DEFAULTS[section][key] in registry.names(kind)
     assert config.DEFAULTS["extract"][DOCX_MT] == "docx-python"
@@ -204,6 +205,10 @@ def _all_dtos() -> list:
         m.SearchRequest("abc"), m.Hit(sha, 1, -1.25, "fts5", (span,)), m.Hit(sha, 2, None, "fts5"),
         m.SearchResult("abc", (m.Hit(sha, 1, 1.0, "fts5", (span,)),)),
         m.MeasureSpec("count", "Count", "documents"), m.Measure("count", comp),
+        m.ClauseText(sha, "abc"), m.ClauseText(sha, "abc", 2, ("atni:res:25-41",)),
+        m.RefCandidate(span, "atni_resolution", "unlinked", ("atni-number",), "atni:res:25-41",
+                       issuer="atni", number="25-41", logical_id="atni:res:25-41"),
+        m.RefCandidate(span, "us_statute_and_eo", "unlinked", ("eyecite",), "25 U.S.C. 1901"),
     ]
 
 
@@ -312,13 +317,13 @@ def isolated(tmp_path, monkeypatch):
     return tmp_path
 
 
-def test_runner_list_prints_seven_json_lines(isolated, capsys):
+def test_runner_list_prints_one_line_per_builtin(isolated, capsys):
     from resist.contracts.__main__ import main
 
     assert main(["--list"]) == 0
     lines = [json.loads(x) for x in capsys.readouterr().out.splitlines() if x.strip()]
-    assert len(lines) == 7
-    assert {(r["kind"], r["name"]) for r in lines} == SEVEN
+    assert len(lines) == len(BUILTINS)
+    assert {(r["kind"], r["name"]) for r in lines} == BUILTINS
     for r in lines:
         assert set(r) == {"kind", "name", "version", "ok", "reason", "remediation"}
         assert isinstance(r["ok"], bool)

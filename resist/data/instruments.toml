@@ -1,0 +1,41 @@
+# Instrument identities for resist.refs.instruments (D-031, D-044). Bibliographic only: id, family, name, canonical
+# key and match patterns. Version rows (as_of, status, local-copy SHA-256, section pointers) and crosswalks are
+# human-authored registry updates and are not here yet (LR-E gap). Patterns are TOML literal strings.
+schema = "resist-instruments/1"
+
+[[instrument]]
+id = "undrip"
+family = "un_instrument"
+name = "United Nations Declaration on the Rights of Indigenous Peoples"
+canonical = "UNDRIP"
+patterns = ['United\s+Nations\s+Declaration\s+on\s+the\s+Rights\s+of\s+Indigenous\s+Peoples', '\bUNDRIP\b']
+pointer = '\bArticle\s+\d{1,3}\b'
+
+[[instrument]]
+id = "ieee-2890"
+family = "standard"
+name = "IEEE 2890"
+canonical = "IEEE 2890-{version}"
+patterns = ['\bIEEE\s+2890-\s*(?P<version>\d{4})\b']
+
+[[instrument]]
+id = "care-principles"
+family = "principles_framework"
+name = "CARE Principles for Indigenous Data Governance"
+canonical = "CARE Principles"
+patterns = ['\bCARE\s+Principles\b']
+
+[[instrument]]
+id = "ocap"
+family = "principles_framework"
+name = "OCAP"
+canonical = "OCAP"
+patterns = ['\bOCAP\b']
+
+[[instrument]]
+id = "cc-by-nc-sa"
+family = "license"
+name = "Creative Commons Attribution-NonCommercial-ShareAlike"
+canonical = "CC-BY-NC-SA-{version}"   # the SPDX identifier form
+patterns = ['\bCreative\s+Commons\s+Attribution-\s*Non[Cc]ommercial-\s*Share-?\s*Alike\s+(?P<version>\d\.\d)\b',
+            '\bCC\s+BY-NC-SA\s+(?P<version>\d\.\d)\b']

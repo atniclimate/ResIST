@@ -9,6 +9,7 @@ from typing import Iterable, Mapping, Protocol, runtime_checkable
 
 from resist.models import (
     Availability,
+    ClauseText,
     DocRef,
     DocumentResult,
     IndexCaps,
@@ -20,6 +21,7 @@ from resist.models import (
     PageClass,
     PageFeatures,
     PageImage,
+    RefCandidate,
     SearchRequest,
     SearchResult,
     TextLayer,
@@ -74,3 +76,8 @@ class AnalyticsProvider(Component, Protocol):
     def measures(self) -> list[MeasureSpec]: ...
 
     def compute(self, measure_id: str, params: Mapping[str, str]) -> Measure: ...
+
+
+@runtime_checkable
+class ReferenceResolver(Component, Protocol):
+    def find(self, text: ClauseText) -> list[RefCandidate]: ...

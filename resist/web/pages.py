@@ -19,6 +19,8 @@ PAGES = config.repo_root() / "pages"
 NO_STORE = {"Cache-Control": "no-store"}
 mimetypes.add_type("text/javascript", ".js")  # the Windows registry can map .js to text/plain (breaks ES modules)
 mimetypes.add_type("font/woff2", ".woff2")
+mimetypes.add_type("text/javascript", ".mjs")  # the vendored SQLite WASM module (same registry hazard as .js)
+mimetypes.add_type("application/wasm", ".wasm")  # streaming compile needs this exact type
 
 router = APIRouter(prefix="/app")
 
@@ -51,10 +53,9 @@ def _inline_hashes() -> str:
     return " ".join("'sha256-%s'" % base64.b64encode(hashlib.sha256(b.encode()).digest()).decode() for b in bodies)
 
 
-# The jsdelivr WASM module (pages/db.js:3, G34) runs with this origin's authority; this keeps its reach to
-# the CDN and this server (no other egress, and no Policy Sentinel Worker call from the local face, D-059 item 5).
-CSP = (f"script-src 'self' https://cdn.jsdelivr.net 'wasm-unsafe-eval' {_inline_hashes()}; "
-       "connect-src 'self' https://cdn.jsdelivr.net")
+# SQLite WASM is vendored under pages/vendor/ (D-074), so scripts and connections stay on this origin: no CDN,
+# no other egress, and no Policy Sentinel Worker call from the local face (D-059 item 5).
+CSP = f"script-src 'self' 'wasm-unsafe-eval' {_inline_hashes()}; connect-src 'self'"
 
 
 class _Static(StaticFiles):
