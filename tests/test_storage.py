@@ -1,20 +1,34 @@
 """Tests for storage layer, on real ATNI resolutions (D-052, tests/fixtures/atni/)."""
+import sqlite3
 from pathlib import Path
 
+import pymupdf
 import pytest
-from sqlmodel import Session
+from sqlmodel import Session, select
 
 from src.ingestion.intake import extract_text_from_native_pdf
 from src.ingestion.parser import parse_resolution
 from src.models.document import ParseResult
+from src.models.resolution import Statement
 
 ATNI = Path(__file__).parent / "fixtures" / "atni"
 
 
-def _real(name: str):
-    """Extracted text and parse of a real ATNI fixture PDF, document_id from the file stem."""
+def _real(name: str, paged: bool = False):
+    """Extracted text and parse of a real ATNI fixture PDF, document_id from the file stem. paged: the parse gets
+    the page texts extract_text_from_native_pdf joins, so each clause carries page_number (R1.21)."""
     text = extract_text_from_native_pdf(ATNI / f"{name}.pdf")
-    return text, parse_resolution(text, name.lower())
+    if not paged:
+        return text, parse_resolution(text, name.lower())
+    with pymupdf.open(str(ATNI / f"{name}.pdf")) as doc:
+        pages = [p.get_text() for p in doc]
+    return text, parse_resolution(text, name.lower(), pages)
+
+
+def _page_numbers(session, resolution) -> list:
+    rows = session.exec(select(Statement).where(Statement.resolution_id == resolution.id)
+                        .order_by(Statement.statement_type.desc(), Statement.index)).all()
+    return [(s.statement_type, s.index, s.page_number) for s in rows]
 
 
 @pytest.fixture
@@ -40,9 +54,8 @@ def test_save_resolution(session):
 
     assert resolution.id is not None
     assert resolution.document_id == "res-26-34"
-    # Known defect: the PDF prints "RESOLUTION # 2026 - 034" and the parser keeps only the year;
-    # this test checks that what the parser produced is what gets stored.
-    assert parse_result.resolution_number
+    # The PDF prints "RESOLUTION # 2026 - 034"; the parser normalizes it (R1.13) and that is what gets stored.
+    assert parse_result.resolution_number == "26-34"
     assert resolution.resolution_number == parse_result.resolution_number
     assert resolution.convention_year == 2026
     assert resolution.convention_location == "Snoqualmie"
@@ -127,3 +140,68 @@ def test_fts_highlight_snippets(session):
     # Should have highlight markers
     snippet = results[0]["snippet"]
     assert "<mark>" in snippet
+
+
+def _expected_pages(parse_result) -> list:
+    return ([("whereas", s["index"], s["page_number"]) for s in parse_result.whereas_statements]
+            + [("resolved", s["index"], s["page_number"]) for s in parse_result.resolved_statements])
+
+
+def test_save_resolution_persists_page_number(session):
+    """R1.21: each Statement row stores the page its clause begins on, as the parse computed it."""
+    from src.storage import save_resolution
+
+    text, parse_result = _real("Res-26-34", paged=True)
+    resolution = save_resolution(session, parse_result, text)
+
+    stored = _page_numbers(session, resolution)
+    assert stored == _expected_pages(parse_result)
+    assert len(stored) == 22
+    assert all(isinstance(p, int) for _, _, p in stored)
+    assert max(p for _, _, p in stored) == 4
+
+
+def test_save_resolution_page_number_null_without_pages(session):
+    """Without page boundaries (stored OCR text, uploads, DOCX) every row's page_number is NULL."""
+    from src.storage import save_resolution
+
+    text, parse_result = _real("Res-26-34")
+    resolution = save_resolution(session, parse_result, text)
+
+    stored = _page_numbers(session, resolution)
+    assert len(stored) == 22
+    assert [p for _, _, p in stored] == [None] * 22
+
+
+def test_engine_adds_page_number_to_older_database(data_root, monkeypatch):
+    """A database built before R1.21 gains the nullable column when the engine opens it; a second open is a no-op."""
+    import src.storage.database as database
+
+    db = data_root / "db" / "resolutions.db"
+
+    def columns():
+        con = sqlite3.connect(db)
+        try:
+            return [r[1] for r in con.execute("pragma table_info(statement)")]
+        finally:
+            con.close()
+
+    def reopen():
+        database.get_engine().dispose()
+        monkeypatch.setattr(database, "_engine", None)
+        database.get_engine()
+
+    database.get_engine().dispose()
+    con = sqlite3.connect(db)
+    con.execute("alter table statement drop column page_number")
+    con.commit()
+    con.close()
+    before = columns()
+    assert "page_number" not in before
+
+    reopen()
+    after = columns()
+    assert after == before + ["page_number"]
+
+    reopen()
+    assert columns() == after

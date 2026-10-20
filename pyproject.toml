@@ -54,8 +54,33 @@ dev = [
   "ruff>=0.5,<1",
 ]
 
+# Component registry (D-024, D-057): one entry-point group per port; resist.toml selects by name.
+[project.entry-points."resist.extractors"]
+pdf-inprocess = "resist.ocr.pdf_inprocess:PdfInProcess"
+docx-python = "resist.ocr.docx_python:DocxPython"
+
+[project.entry-points."resist.pdf_backends"]
+pymupdf = "resist.ocr.pymupdf_backend:PyMuPdfBackend"
+
+[project.entry-points."resist.ocr_engines"]
+tesseract-cli = "resist.ocr.tesseract_cli:TesseractCli"
+
+[project.entry-points."resist.page_routers"]
+min-text-50 = "resist.ocr.route:MinTextRouter"
+
+[project.entry-points."resist.indexes"]
+fts5 = "resist.index.fts5:Fts5Index"
+
+[project.entry-points."resist.analytics"]
+null = "resist.analytics.null:NullAnalytics"
+
 [tool.setuptools]
-packages = ["src", "src.api", "src.export", "src.ingestion", "src.ingestion.ocr", "src.storage", "src.analysis", "src.models"]
+packages = ["src", "src.api", "src.export", "src.ingestion", "src.ingestion.ocr", "src.storage", "src.analysis", "src.models",
+            "resist", "resist.models", "resist.contracts", "resist.adapters", "resist.services", "resist.ocr",
+            "resist.index", "resist.analytics", "resist.web", "resist.db"]
+
+[tool.setuptools.package-data]
+resist = ["data/*.toml"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

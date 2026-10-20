@@ -61,3 +61,6 @@ docs/resolutions/*
 # ATNI's official fillable templates name officers and carry an ATNI email address (D-054); the pre-commit
 # contact scan cannot see inside a .docx, so ignore them here.
 docs/*_FILLABLE.docx
+
+# Local component selection (D-024); resist.toml.example is the tracked template.
+resist.toml

@@ -212,9 +212,12 @@ const MESSAGES = {
 const meta = parts => parts.filter(Boolean).map(esc).join(", ");
 const link = (url, label) => url ? `<a href="${esc(url)}" target="_blank" rel="noopener noreferrer">${esc(label)}<span class="visually-hidden"> (opens in a new tab)</span></a>` : "";
 
+let allowed = false; // fail closed until capabilities.json says sentinel: true (D-059 item 5)
+export function allowLookup(on) { allowed = on === true; }
+
 export function openLookup({ query = "", onAddNote } = {}) {
   const dlg = document.createElement("dialog");
-  if (typeof dlg.showModal !== "function") { window.open(SENTINEL_HOME, "_blank", "noopener"); return; }
+  if (!allowed || typeof dlg.showModal !== "function") { window.open(SENTINEL_HOME, "_blank", "noopener"); return; }
   const opener = document.activeElement;
   dlg.className = "sentinel";
   dlg.setAttribute("aria-labelledby", "sn-title");

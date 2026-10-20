@@ -1,0 +1,25 @@
+# resist.toml: component selection by registered NAME only (D-024, D-057). Copy to resist.toml (gitignored).
+# Override any key with RESIST_<SECTION>__<KEY>, for example RESIST_SEARCH__INDEX=fts5; list values are comma-separated.
+# RESIST_OCR_BACKEND aliases [extract]."application/pdf" (R1.22). A path, version or hash here is refused (exit 2):
+# binary pins live only in resist/data/tool-pins.toml.
+
+[extract]
+"application/pdf" = "pdf-inprocess"
+"application/vnd.openxmlformats-officedocument.wordprocessingml.document" = "docx-python"
+
+[ocr]
+primary = "tesseract-cli"
+escalation = []
+router = "min-text-50"       # report 09 wrote "page-cid-guard"; that name is reserved for the CID-density router (LR-C)
+
+[pdf]
+backend = "pymupdf"          # "pypdfium2" is named by R2.23 but not implemented
+
+[search]
+index = "fts5"
+
+[analytics]
+provider = "null"
+
+[tools]
+enabled = ["tesseract"]      # names only; each also needs its pin and an outbound block rule

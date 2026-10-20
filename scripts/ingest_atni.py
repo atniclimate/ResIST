@@ -4,62 +4,51 @@ Usage:  python scripts/ingest_atni.py [docs/resolutions]
 
 Reads manifest-atni.csv plus csv/atni/{resolution-table,wp-media-pdfs}.csv and stores one resolution
 per distinct SHA-256. The SHA-256 is the document_id. Metadata comes from ATNI's own table (number,
-title, committee, convention) where a row links the PDF; parsed text fills the rest. Pages without a
-text layer are OCRed with the Tesseract CLI and the document is flagged for review. The run is
-idempotent: a SHA-256 already in the database is skipped.
+title, committee, convention) where a row links the PDF; parsed text fills the rest. Extraction goes
+through the registry's selected extractor (resist.toml, default pdf-inprocess, LR-A); pages without a
+text layer are OCRed by the selected engine, which spawns only through resist/adapters/cli_tool.py,
+and the document is flagged for review. The tier gate (resist.services.policy, D-052, D-040) runs
+before a document is opened: a non-admissible SHA-256 is refused and never read. The run is
+idempotent: a SHA-256 already in the database is skipped. main(res_dir, stored=...) is the LR-D rebuild's
+entry: a SHA-256 in `stored` (sha256 -> (full_text, pages, ocr_pages)) re-parses that stored text, page_number
+NULL, and its file is never opened or re-OCRed (D-069 item 7); scripts/rebuild_pool.py is the only caller.
 
-Output contract (CLAUDE.md): one JSON line per document on stdout, progress on stderr, exit 0 ok,
-1 bad input, 2 missing dependency, 3 some documents failed. No network. Writes only under
-RESIST_DATA_DIR.
+Output contract (CLAUDE.md, D-060): one JSON line per document on stdout, progress on stderr.
+Statuses: "ingested"; "refused" (tier or quarantine, nothing opened); "failed" (error is the exception
+type name only); "skipped" with reason "ocr_unavailable", plus "pages" and "ocr_pages_needed", when a
+page needs OCR and no OCR engine is available. A skipped document is NOT stored, so a later run with OCR
+ingests it in full. Exit codes 0 to 4: 0 ok, 1 bad input, 2 missing dependency (any document skipped
+for OCR), 3 some documents failed, 4 artifact failure. No network. Writes only under RESIST_DATA_DIR.
 """
 import csv
 import json
 import shutil
-import subprocess
 import sys
 from collections import defaultdict
-from datetime import date
+from collections.abc import Mapping
+from datetime import UTC, date, datetime
 from pathlib import Path
 
-import pymupdf
 from sqlmodel import Session, select
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from resist import config, netguard, registry  # noqa: E402
+from resist.errors import ArtifactError, ResistError  # noqa: E402
+from resist.services import policy  # noqa: E402
 from src.analysis.graph import ResolutionGraph, build_graph_from_resolutions  # noqa: E402
 from src.analysis.keywords import extract_all_keywords  # noqa: E402
 from src.analysis.linker import add_citation_edges_to_graph, link_all_references  # noqa: E402
 from src.ingestion.parser import normalize_resolution_number, parse_resolution  # noqa: E402
 from src.ingestion.validator import flag_for_review  # noqa: E402
 from src.models.resolution import Resolution  # noqa: E402
-from src.storage.database import DATA_DIR, get_engine, init_db  # noqa: E402
+from src.storage.database import get_engine, init_db  # noqa: E402
 from src.storage.repository import save_resolution  # noqa: E402
 
-MIN_TEXT_CHARS = 50  # below this a page is treated as image-only
 CONVENTIONS = {"winter": "Winter", "annual": "Annual", "mid year": "Mid-Year", "midyear": "Mid-Year"}
 
 
 def log(msg):
     print(msg, file=sys.stderr, flush=True)
-
-
-def ocr_page(page, tmp: Path, tesseract: str) -> str:
-    png = tmp / "ocr-page.png"
-    page.get_pixmap(dpi=300).save(png)
-    out = subprocess.run([tesseract, str(png), "stdout", "-l", "eng"], capture_output=True, text=True,
-                         encoding="utf-8", check=True)
-    return out.stdout
-
-
-def extract_text(path: Path, tmp: Path, tesseract):
-    """Return (text, pages, ocr_pages). OCR only the pages with no text layer."""
-    parts, ocr_pages = [], 0
-    with pymupdf.open(path) as doc:
-        for page in doc:
-            text = page.get_text()
-            if len(text.strip()) < MIN_TEXT_CHARS and tesseract:
-                text, ocr_pages = ocr_page(page, tmp, tesseract), ocr_pages + 1
-            parts.append(text)
-        return "\n".join(parts), len(doc), ocr_pages
 
 
 def convention_of(raw: str, number: str):
@@ -82,16 +71,17 @@ def filename_date(path: str):
         return None
 
 
-def main(res_dir: Path) -> int:
+def main(res_dir: Path, stored: Mapping[str, tuple[str, int, int]] | None = None) -> int:
+    netguard.install()  # D-039: socket deny before config, registry or any adapter code runs
     manifest = res_dir / "manifest-atni.csv"
     if not manifest.exists():
         log(f"no manifest at {manifest}")
         return 1
-    tesseract = shutil.which("tesseract") or next(
-        (p for p in [r"C:\Program Files\Tesseract-OCR\tesseract.exe"] if Path(p).exists()), None)
-    if not tesseract:
-        log("tesseract not found; image-only pages would be lost")
-        return 2
+    try:
+        extractor = registry.selected("extractor", config.load())
+    except ResistError as e:  # D-060: a bad resist.toml or missing adapter exits 2, not a traceback
+        log(f"{type(e).__name__}: {e}")
+        return e.exit_code
 
     table = {r["wdt_ID"]: r for r in csv.DictReader(open(res_dir / "csv/atni/resolution-table.csv", encoding="utf-8"))}
     media = {r["source_url"]: r for r in csv.DictReader(open(res_dir / "csv/atni/wp-media-pdfs.csv", encoding="utf-8"))}
@@ -101,10 +91,18 @@ def main(res_dir: Path) -> int:
             by_sha[r["sha256"]].append(r)
 
     init_db()
-    tmp = DATA_DIR / "tmp"
-    tmp.mkdir(parents=True, exist_ok=True)
+    run_id = datetime.now(UTC).strftime("ingest-%Y%m%dT%H%M%SZ")
+    work = config.data_dir() / "tmp" / run_id
+    work.mkdir(parents=True, exist_ok=True)
+    try:
+        return _ingest(res_dir, extractor, table, media, by_sha, work, stored or {})
+    finally:
+        shutil.rmtree(work, ignore_errors=True)
+
+
+def _ingest(res_dir, extractor, table, media, by_sha, work, stored: Mapping[str, tuple[str, int, int]]) -> int:
     engine = get_engine()
-    failed = done = skipped = 0
+    failed = done = skipped = refused = skipped_ocr = 0
     with Session(engine) as session:
         have = set(session.exec(select(Resolution.document_id)).all())
         for n, (sha, rows) in enumerate(sorted(by_sha.items()), 1):
@@ -115,8 +113,28 @@ def main(res_dir: Path) -> int:
             trow = table.get(ids[0]) if ids else None
             path = rows[0]["local_path"]
             try:
-                text, pages, ocr_pages = extract_text(res_dir / path, tmp, tesseract)
-                pr = parse_resolution(text, sha)
+                sp = policy.source_policy(sha, res_dir)  # inside the try: one bad manifest sha fails one row
+                if not policy.admissible(sp):  # nothing is opened
+                    refused += 1
+                    print(json.dumps({"sha256": sha, "status": "refused", "tier": sp.tier,
+                                      "decision": sp.decision_id, "quarantined": sp.quarantined}), flush=True)
+                    continue
+                if sha in stored:  # LR-D rebuild: the stored OCR output is re-parsed, never re-OCRed or dropped
+                    text, pages, ocr_pages = stored[sha]
+                    pr = parse_resolution(text, sha)  # no page boundaries: page_number stays NULL
+                else:
+                    ex = extractor.extract(sp.doc_ref(), res_dir / path, work)
+                    need = sum(1 for p in ex.pages if p.error.startswith("ocr_unavailable"))
+                    if need:  # not stored: never half-ingested, and a later run with OCR ingests it in full
+                        skipped_ocr += 1
+                        print(json.dumps({"sha256": sha, "status": "skipped", "reason": "ocr_unavailable",
+                                          "pages": ex.page_count, "ocr_pages_needed": need}), flush=True)
+                        continue
+                    if ex.disposition == "failed":
+                        raise ArtifactError(ex.extra.get("error") or "page-failed")
+                    text, pages = ex.text, ex.page_count
+                    ocr_pages = sum(1 for p in ex.pages if p.route == "ocr" and p.disposition != "failed")
+                    pr = parse_resolution(text, sha, [p.text for p in ex.pages])
                 if trow:
                     number = normalize_resolution_number(trow["number"]) or trow["number"] or None
                     title, committee, conv_raw = trow["title"], trow["committee"], trow["convention"]
@@ -153,7 +171,9 @@ def main(res_dir: Path) -> int:
             except Exception as e:  # a failed document is reported, never silently dropped
                 session.rollback()
                 failed += 1
-                print(json.dumps({"sha256": sha, "path": path, "status": "failed", "error": str(e)[:200]}), flush=True)
+                # the type name only: exception text can echo document text
+                print(json.dumps({"sha256": sha, "path": path, "status": "failed", "error": type(e).__name__}),
+                      flush=True)
             if n % 100 == 0:
                 log(f"{n}/{len(by_sha)} ingested={done} skipped={skipped} failed={failed}")
 
@@ -165,8 +185,9 @@ def main(res_dir: Path) -> int:
         add_citation_edges_to_graph(session, graph)
         graph.save()
         extract_all_keywords(session)
-    log(f"DONE distinct={len(by_sha)} ingested={done} skipped={skipped} failed={failed}")
-    return 3 if failed else 0
+    log(f"DONE distinct={len(by_sha)} ingested={done} skipped={skipped} failed={failed} refused={refused} "
+        f"skipped_ocr={skipped_ocr}")
+    return 3 if failed else 2 if skipped_ocr else 0
 
 
 if __name__ == "__main__":

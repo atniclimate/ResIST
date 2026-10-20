@@ -1,4 +1,5 @@
 """Resolution repository with CRUD and search operations."""
+import hashlib
 import re
 from typing import List, Optional, Dict, Any
 from sqlmodel import Session, select
@@ -61,6 +62,13 @@ def save_resolution(session: Session, parse_result: ParseResult, full_text: str)
     session.add(resolution)
     session.flush()  # Get resolution.id
 
+    # Span fields (LR-F): offsets into full_text and its sha256, all three or none
+    text_sha = hashlib.sha256(full_text.encode("utf-8")).hexdigest()
+
+    def offsets(stmt: dict) -> dict:
+        return {"char_start": stmt.get("start"), "char_end": stmt.get("end"),
+                "text_sha256": text_sha if stmt.get("start") is not None else None}
+
     # Create Statements
     for stmt in parse_result.whereas_statements:
         statement = Statement(
@@ -69,6 +77,8 @@ def save_resolution(session: Session, parse_result: ParseResult, full_text: str)
             index=stmt.get("index", 0),
             text=stmt.get("text", ""),
             function=stmt.get("function"),
+            page_number=stmt.get("page_number"),
+            **offsets(stmt),
         )
         session.add(statement)
 
@@ -79,6 +89,8 @@ def save_resolution(session: Session, parse_result: ParseResult, full_text: str)
             index=stmt.get("index", 0),
             text=stmt.get("text", ""),
             action_type=stmt.get("action_type"),
+            page_number=stmt.get("page_number"),
+            **offsets(stmt),
         )
         session.add(statement)
 

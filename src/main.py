@@ -5,12 +5,15 @@ from src.api.upload import router as upload_router
 from src.api.search import router as search_router
 from src.api.topics import router as topics_router
 from src.api.export import router as export_router
+from resist.web import api_v1, pages
+from resist.web.guard import LoopbackGuard
 
 app = FastAPI(
     title="ATNI-ResIST",
     description="Resolution Information Search Tool - Document Ingestion API",
     version="0.1.0"
 )
+app.add_middleware(LoopbackGuard)  # ahead of every route and mount, POST /api/upload included (D-059 item 5)
 
 # Mount static files
 app.mount("/static", StaticFiles(directory="src/static"), name="static")
@@ -21,6 +24,9 @@ app.include_router(upload_router)
 app.include_router(search_router)
 app.include_router(topics_router)
 app.include_router(export_router)
+app.include_router(api_v1.router)
+app.include_router(pages.router)
+pages.mount(app)  # after pages.router, so /app/resolutions.db, build.json, capabilities.json match first
 
 @app.get("/")
 async def root():

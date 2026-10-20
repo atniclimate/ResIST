@@ -1,6 +1,8 @@
 """FTS5 full-text search setup and queries."""
 from sqlalchemy import text
 
+from resist.index import resolution_fts_ddl
+
 
 def check_fts5_available(engine) -> bool:
     """Verify FTS5 extension is available."""
@@ -19,17 +21,8 @@ def create_fts_tables(engine):
     """Create FTS5 virtual table for resolution full-text search."""
     with engine.connect() as conn:
         # External content FTS5 table referencing resolution table
-        # Uses porter tokenizer for stemming, unicode61 for proper Unicode handling
-        conn.execute(text("""
-            CREATE VIRTUAL TABLE IF NOT EXISTS resolution_fts USING fts5(
-                resolution_number,
-                title,
-                full_text,
-                content='resolution',
-                content_rowid='id',
-                tokenize='porter unicode61'
-            )
-        """))
+        # D-013 tokenizer (R3.2); see resist/index
+        conn.execute(text(resolution_fts_ddl(if_not_exists=True)))
 
         # Trigger: sync FTS on INSERT
         conn.execute(text("""
