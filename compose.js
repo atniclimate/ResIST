@@ -100,9 +100,88 @@ export function clauseState(clause) {
   return now === body(removePageHeader(clause.source?.text)) ? "cleaned" : "edited";
 }
 
+export const newId = () => globalThis.crypto?.randomUUID?.() ?? `c${Date.now().toString(36)}${Math.random().toString(36).slice(2)}`;
 export function newClause(text, origin, source) {
-  const id = globalThis.crypto?.randomUUID?.() ?? `c${Date.now().toString(36)}${Math.random().toString(36).slice(2)}`;
+  const id = newId();
   return source ? { id, text: body(text), origin, source } : { id, text: body(text), origin };
+}
+
+// ---- Carried citations (UI-2, D-077) ------------------------------------------------------------------------------
+// clause.cites: [{ id, start, end, text, source }], sorted, non-overlapping; start/end are UTF-16 offsets into
+// clause.text and text === clause.text.slice(start, end) === squash(source.text). A clause without one has no key.
+
+// Plain and span pieces of a text, each with its whitespace collapsed; spans that do not fit are ignored.
+export function segments(text, spans = []) {
+  const t = String(text ?? ""), out = [];
+  let at = 0;
+  const push = (a, b, span) => out.push({ text: t.slice(a, b).replace(/\s+/g, " "), span });
+  for (const sp of spans) {
+    if (!(Number.isInteger(sp?.start) && Number.isInteger(sp?.end) && at <= sp.start && sp.start < sp.end && sp.end <= t.length)) continue;
+    push(at, sp.start, null); push(sp.start, sp.end, sp); at = sp.end;
+  }
+  push(at, t.length, null);
+  out[0].text = out[0].text.trimStart();
+  out.at(-1).text = out.at(-1).text.trimEnd();
+  return out.filter(p => p.span || p.text);
+}
+
+const isInt = v => Number.isInteger(v);
+const okSource = s => s && typeof s === "object" && typeof s.documentId === "string" && typeof s.text === "string" &&
+  ["whereas", "resolved"].includes(s.statementType) && isInt(s.index) && isInt(s.position) && isInt(s.start) &&
+  isInt(s.end) && (s.page === null || isInt(s.page));
+// A draft file is untrusted: only well-formed entries that still slice their clause survive (design D16).
+export function cleanCites(clause) {
+  if (!clause || !("cites" in clause)) return clause;
+  const list = Array.isArray(clause.cites) ? clause.cites : [], text = clause.text, keep = [];
+  for (const c of list) {
+    const end = keep.at(-1)?.end ?? 0;
+    if (c && typeof c.id === "string" && isInt(c.start) && isInt(c.end) && end <= c.start && c.start < c.end &&
+      c.end <= text.length && typeof c.text === "string" && c.text === text.slice(c.start, c.end) &&
+      okSource(c.source) && squash(c.source.text) === c.text) keep.push(c);
+  }
+  if (keep.length === list.length && list.length) return clause;
+  const { cites, ...rest } = clause;
+  return keep.length ? { ...rest, cites: keep } : rest;
+}
+
+// After the text changed: a citation still in place stays; a moved one follows its words (the occurrence nearest its
+// old start); one whose words changed loses its mark and the words stay as typed text (D14). -> number dropped.
+export function anchorCites(clause) {
+  const list = clause?.cites;
+  if (!Array.isArray(list)) return 0;
+  const t = String(clause.text ?? "");
+  const kept = list.filter(c => t.slice(c.start, c.end) === c.text);
+  const free = (a, b) => kept.every(k => b <= k.start || a >= k.end);
+  let dropped = 0;
+  for (const c of list) if (!kept.includes(c)) {
+    let best = -1;
+    for (let i = t.indexOf(c.text); c.text && i >= 0; i = t.indexOf(c.text, i + 1))
+      if (free(i, i + c.text.length) && (best < 0 || Math.abs(i - c.start) < Math.abs(best - c.start))) best = i;
+    if (best < 0) { dropped++; continue; }
+    c.start = best; c.end = best + c.text.length; kept.push(c);
+  }
+  kept.sort((a, b) => a.start - b.start);
+  if (kept.length) clause.cites = kept; else delete clause.cites;
+  return dropped;
+}
+
+// The Drafting Notes "From" cell of a compose() citation.
+export const citeFrom = x =>
+  `ATNI ${squash(x.number)}, ${x.clause}, ${Number.isInteger(x.page) ? `page ${x.page}` : "page unknown"}`;
+
+// Splices a citation's words into a clause at a position (clamped, and moved past a citation it falls inside), with
+// one separating space only where needed; later citations shift (D13). Mutates the clause. -> { start, end }.
+export function insertCite(clause, at, cite) {
+  const t = String(clause.text ?? ""), cites = clause.cites ?? [];
+  let p = isInt(at) ? Math.max(0, Math.min(at, t.length)) : t.length;
+  for (const c of cites) if (c.start < p && p < c.end) p = c.end;
+  const before = p > 0 && !/\s/.test(t[p - 1]) ? " " : "";
+  const after = p < t.length && !/[\s.,;:)]/.test(t[p]) ? " " : "";
+  const add = before + cite.text + after, start = p + before.length, end = start + cite.text.length;
+  clause.text = t.slice(0, p) + add + t.slice(p);
+  for (const c of cites) if (c.start >= p) { c.start += add.length; c.end += add.length; }
+  clause.cites = [...cites, { id: cite.id, start, end, text: cite.text, source: cite.source }].sort((a, b) => a.start - b.start);
+  return { start, end };
 }
 
 // Convention details: every one may be unknown when a draft starts.
@@ -146,18 +225,25 @@ export function compose(draft) {
   const whereas = live(draft.whereas), resolved = live(draft.resolved);
   const skipped = draft.whereas.length + draft.resolved.length - whereas.length - resolved.length;
   const position = (kind, i) => `${kind === "whereas" ? "WHEREAS" : "RESOLVED"} ${i + 1}`;
-  const sources = [];
+  const sources = [], citations = [];
   const lines = (kind, list) => list.map((c, i) => {
     const n = list.length, last = i === n - 1;
     const lead = kind === "whereas" ? "WHEREAS," : resolvedLead(i, n);
     const joiner = kind === "whereas" ? (last ? "; now" : "; and") : (last ? "." : "; and");
-    const state = clauseState(c);
+    const state = clauseState(c), text = body(c.text), cites = c.cites ?? [];
     if (hasPageHeader(c.text)) problems.push(`${position(kind, i)} contains page-header text from the source PDF.`);
     if (c.origin === "carried") sources.push({
       position: position(kind, i), state, number: c.source.number, title: c.source.title, year: c.source.year,
       convention: c.source.convention, url: c.source.url, documentId: c.source.documentId,
     });
-    return { id: c.id, lead, text: body(c.text) + joiner, state };
+    for (const x of cites) citations.push({
+      position: position(kind, i), text: x.text, number: x.source.number, title: x.source.title, year: x.source.year,
+      documentId: x.source.documentId, clause: position(x.source.statementType, x.source.position - 1),
+      page: Number.isInteger(x.source.page) ? x.source.page : null, url: x.source.url,
+    });
+    // Offsets index the line only while the stored text is already its own body.
+    const marks = text === c.text ? cites.map(x => ({ start: x.start, end: x.end })) : [];
+    return { id: c.id, lead, text: text + joiner, state, marks };
   });
   const convention = fill("Convention", h.convention);
   const others = squash(m.otherCommittee);
@@ -194,6 +280,7 @@ export function compose(draft) {
       ncai: m.ncai.forward ? { emergency: squash(m.ncai.emergency) } : null,
     },
     sources,
+    citations,
     notes: draft.notes,
     problems,
   };
@@ -224,9 +311,10 @@ export function validDraft(value) {
   meta.committees = Array.isArray(meta.committees) ? meta.committees.filter(c => COMMITTEES.includes(c)) : [];
   // A file can label any text "standard"; only ATNI's own form text keeps that label.
   const label = c => c.origin === "standard" && !isStandard(c.text) ? { ...c, origin: "typed" } : c;
+  const clean = c => cleanCites(label(c));
   return {
     ...base, ...d,
-    whereas: d.whereas.map(label), resolved: d.resolved.map(label),
+    whereas: d.whereas.map(clean), resolved: d.resolved.map(clean),
     header: { ...base.header, ...d.header },
     certification: { ...base.certification, ...d.certification },
     signatures: { ...base.signatures, ...d.signatures },

@@ -3,7 +3,7 @@
 // OOXML is written by hand and zipped here (STORE method, CRC-32, fixed timestamp, so the same draft always gives the
 // same bytes). Every word in the file is ATNI's form text, the person's own words, or text they carried verbatim.
 // An unknown detail becomes a fillable plain-text content control, and checkboxes stay clickable in Word.
-import { lineText, usDate, safeUrl, ATNI } from "./compose.js";
+import { lineText, usDate, safeUrl, ATNI, citeFrom } from "./compose.js";
 
 const NS = 'xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" ' +
   'xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" ' +
@@ -242,25 +242,28 @@ const TEXT_STATE = { verbatim: "Verbatim", cleaned: "Verbatim, page header remov
 const sha16 = s => String(s ?? "").slice(0, 16);
 function notes(m, w) {
   const S = { sz: 20 }, grey = { sz: 20, color: "595959" };
-  const out = [para(run("Prepared with ResIST. These notes record where carried clauses came from and what Policy Sentinel found. " +
-    "Delete this section before submitting if it is not wanted.", { i: true }))];
-  if (m.sources.length) {
-    const cols = [1500, 3400, 1500, 2960];
+  const out = [para(run("Prepared with ResIST. These notes record where carried clauses and citations came from and what " +
+    "Policy Sentinel found. Delete this section before submitting if it is not wanted.", { i: true }))];
+  const H = { b: true, sz: 20 };
+  const table = (heading, cols, head, rows) => {
     const cell = (content, width) => `<w:tc><w:tcPr><w:tcW w:w="${width}" w:type="dxa"/></w:tcPr>${para(content, { after: 40 })}</w:tc>`;
-    const row = (cells, head) => `<w:tr>${head ? "<w:trPr><w:tblHeader/></w:trPr>" : ""}${cells.map((c, i) => cell(c, cols[i])).join("")}</w:tr>`;
-    const H = { b: true, sz: 20 };
-    out.push(para(run("Sources of Carried Clauses", { b: true }), { keep: true, after: 80 }),
+    const row = (cells, isHead) => `<w:tr>${isHead ? "<w:trPr><w:tblHeader/></w:trPr>" : ""}${cells.map((c, i) => cell(c, cols[i])).join("")}</w:tr>`;
+    out.push(para(run(heading, { b: true }), { keep: true, after: 80 }),
       `<w:tbl><w:tblPr><w:tblStyle w:val="NotesTable"/><w:tblW w:w="9360" w:type="dxa"/><w:tblLayout w:type="fixed"/>` +
       '<w:tblLook w:val="0000" w:firstRow="0" w:lastRow="0" w:firstColumn="0" w:lastColumn="0" w:noHBand="1" w:noVBand="1"/></w:tblPr>' +
       `<w:tblGrid>${cols.map(c => `<w:gridCol w:w="${c}"/>`).join("")}</w:tblGrid>` +
-      row([run("Position", H), run("ATNI resolution", H), run("Text", H), run("Source", H)], true) +
-      m.sources.map(s => row([
-        run(s.position, S),
-        run([s.number, s.title, s.year].map(x => String(x ?? "")).filter(Boolean).join(", "), S),
-        run(TEXT_STATE[s.state] || "Verbatim", S),
-        w.link(s.url, S) + `<w:r><w:br/></w:r>` + run(`SHA-256 ${sha16(s.documentId)}`, grey),
-      ])).join("") + "</w:tbl>", blank({ after: 160 }));
-  }
+      row(head.map(t => run(t, H)), true) + rows.map(r => row(r)).join("") + "</w:tbl>", blank({ after: 160 }));
+  };
+  const source = (url, documentId) => w.link(url, S) + `<w:r><w:br/></w:r>` + run(`SHA-256 ${sha16(documentId)}`, grey);
+  if (m.sources.length) table("Sources of Carried Clauses", [1500, 3400, 1500, 2960], ["Position", "ATNI resolution", "Text", "Source"],
+    m.sources.map(s => [
+      run(s.position, S),
+      run([s.number, s.title, s.year].map(x => String(x ?? "")).filter(Boolean).join(", "), S),
+      run(TEXT_STATE[s.state] || "Verbatim", S),
+      source(s.url, s.documentId),
+    ]));
+  if (m.citations?.length) table("Carried Citations", [1500, 3100, 2300, 2460], ["Position", "Citation", "From", "Source"],
+    m.citations.map(c => [run(c.position, S), run(String(c.text ?? ""), S), run(citeFrom(c), S), source(c.url, c.documentId)]));
   for (const n of m.notes) {
     const meta = [n.issuingBody, n.kind, usDate(n.date)].map(x => String(x ?? "")).filter(Boolean).join(", ");
     out.push(para(run(String(n.title ?? ""), { b: true }), { keep: true, after: 40 }));
@@ -358,7 +361,7 @@ export function buildDocx(model, { seal, created } = {}) {
     ["header", "default", headerPart("header", "")],
     ["footer", "default", headerPart("footer", "")],
   ];
-  const hasNotes = m.sources.length > 0 || m.notes.length > 0;
+  const hasNotes = m.sources.length > 0 || m.citations?.length > 0 || m.notes.length > 0;
   const s3 = hasNotes ? [
     ["header", "default", headerPart("header", para(run("DRAFTING NOTES, NOT PART OF THE RESOLUTION", { b: true, sz: 20 }), hc))],
     ["footer", "default", headerPart("footer", "")],
