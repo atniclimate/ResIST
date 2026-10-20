@@ -3,7 +3,7 @@
  "year_min": 2007,
  "year_max": 2026,
  "needs_review": 27,
- "commit": "86baf0a",
- "built": "2026-10-19 19:37 UTC",
- "db_sha256": "86bcdf92e5834648b3ef305c97cd84e75f9c063844a646b5dcabeea13447ea12"
+ "commit": "5c2a6a7",
+ "built": "2026-10-20 06:09 UTC",
+ "db_sha256": "2767f76947c428a068df301821bd1b4e4e77db505663ae47bcd54cdc28ec909b"
 }
