@@ -2,6 +2,7 @@
 
 Node writes the documents (tests/js/docx-fixtures.mjs); this test skips cleanly when Node is missing.
 """
+import hashlib
 import json
 import re
 import shutil
@@ -113,7 +114,7 @@ def test_full_resolution_reads_like_the_template(built):
     clauses = [p for p in body_paras(d) if text(p).startswith(LEADS)]
     whereas = [p for p in clauses if text(p).startswith("WHEREAS,")]
     resolved = [p for p in clauses if not text(p).startswith("WHEREAS,")]
-    assert len(whereas) == 4 and len(resolved) == 4
+    assert len(whereas) == 5 and len(resolved) == 4  # 3 standard, 1 carried, 1 typed holding a carried citation
     for p in clauses:
         runs = xp(p, "w:r")
         assert text(runs[0]) in LEADS and bold(runs[0])
@@ -123,7 +124,7 @@ def test_full_resolution_reads_like_the_template(built):
     assert all(text(p).endswith("; and") for p in resolved[:-1]) and text(resolved[-1]).endswith(".")
     assert text(resolved[0]).startswith("THEREFORE, BE IT RESOLVED, that ATNI urges both Tribal and Public Schools")
     assert text(resolved[-1]).startswith("BE IT FINALLY RESOLVED, that this will be the policy of ATNI")
-    assert "PAGE 2" not in text(whereas[-1])
+    assert not any("PAGE 2" in text(p) for p in whereas)
 
     cert = para_with(d, "CERTIFICATION")
     assert xp(cert, "w:r/w:rPr/w:u") and xp(cert, "w:r/w:rPr/w:b")
@@ -200,6 +201,9 @@ def test_drafting_notes(built):
     assert "Consultation wording: “Executive Order 13175" in notes
     assert "Drafter's note: Check the consultation section before the committee meets." in notes
     assert "are not legal conclusions." in notes
+    cite = json.loads((built / "statements.json").read_text(encoding="utf-8"))["cite"]
+    assert "Carried Citations" in notes and f"SHA-256 {cite['documentId'][:16]}" in notes
+    assert notes.index("Sources of Carried Clauses") < notes.index("Carried Citations") < notes.index("Read by Policy")
     links = {r.target_ref for r in d.part.rels.values() if r.is_external}
     assert "https://www.federalregister.gov/d/2025-23880" in links
     assert any(u.startswith("https://atnitribes.org/wp-content/uploads/2026/09/20260917_26-51_") for u in links)
@@ -214,6 +218,33 @@ def test_fixture_clauses_are_verbatim_from_the_database(built):
             row = con.execute('SELECT s.text FROM statement s JOIN resolution r ON r.id = s.resolution_id '
                               'WHERE r.document_id = ? AND s.statement_type = ? AND s."index" = ?',
                               (fixture["documentId"], kind, index)).fetchone()
-            assert row and row[0] == stored, (kind, index)
+            found, same = row is not None, row is not None and _digest(row[0]) == _digest(stored)
+            assert found and same, (kind, index)
     finally:
         con.close()
+
+
+def _digest(s):
+    return hashlib.sha256(s.encode("utf-8")).hexdigest()
+
+
+@pytest.mark.skipif(not DB.exists(), reason="the site database is not built")
+def test_fixture_cite_is_verbatim_from_the_database(built):
+    """The carried citation in the fixtures is the stored clause's UTF-16 slice (digests only, never the text)."""
+    cite = json.loads((built / "statements.json").read_text(encoding="utf-8"))["cite"]
+    con = sqlite3.connect(f"file:{DB.as_posix()}?mode=ro", uri=True)
+    try:
+        row = con.execute('SELECT s.text FROM statement s JOIN resolution r ON r.id = s.resolution_id '
+                          'WHERE r.document_id = ? AND s.statement_type = ? AND s."index" = ?',
+                          (cite["documentId"], cite["statementType"], cite["index"])).fetchone()
+    finally:
+        con.close()
+    found = row is not None
+    assert found, "the fixture clause is in the export"
+    stored = row[0].encode("utf-16-le")
+    start, end, units = cite["start"], cite["end"], len(stored) // 2
+    assert 0 <= start < end <= units
+    clause, fixture_clause = _digest(row[0]), _digest(cite["statement"])
+    assert clause == fixture_clause
+    span, fixture_span = _digest(stored[2 * start:2 * end].decode("utf-16-le")), _digest(cite["text"])
+    assert span == fixture_span

@@ -17,7 +17,8 @@ Early prototype (`0.2.0.dev0`) under active rework. A `resist/` package holds sw
 extraction, OCR, search index, DOCX intake, citation resolvers) selected by name, a source-policy tier gate, a
 loopback-only `/api/v1`, and a socket guard so processing stages make no network calls. External tools such as
 Tesseract run only through one helper that requires a pinned binary and a Windows outbound block rule, so they
-report "unavailable" until those are set up. Skipped tests print the reason. The OCR engine class still targets
+report "unavailable" until those are set up. The site build (`scripts/build_pages.py`) writes a `cite` table of
+citations anchored to their clauses, with the coverage per kind in `build.json`. Skipped tests print the reason. The OCR engine class still targets
 the PaddleOCR 2.x API; its 3.x replacement is designed but not built yet.
 
 ## What it does
@@ -32,7 +33,13 @@ the PaddleOCR 2.x API; its 3.x replacement is designed but not built yet.
 - **Search:** SQLite FTS5 with `bm25()` ranking.
 - **Topics, timeline, citation graph** (NetworkX), and DOCX evidence-package export.
 - **Static site:** `pages/index.html` runs the same FTS5 index in the browser with the official SQLite
-  WASM build, vendored under `pages/vendor/`, so the page loads nothing from a CDN.
+  WASM build, vendored under `pages/vendor/`, so the page loads nothing from a CDN. A resolution's page shows each
+  clause with the PDF page it begins on, and every citation in it is marked in the clause text. A drafting tool
+  carries a clause, or a single citation, into a draft word for word with a record of where it came from; the
+  draft stays in the browser and exports to ATNI's Word template, with the sources listed under Drafting Notes.
+  Executive orders, U.S.C., public laws and C.F.R. citations can be looked up in Policy Sentinel, which sends only
+  the search words on a click (the local copy links out instead). The interface is keyboard and screen-reader
+  checked on both faces, but not yet by an automated accessibility scanner.
 
 ## Install and test (Windows, PowerShell, Python 3.11)
 

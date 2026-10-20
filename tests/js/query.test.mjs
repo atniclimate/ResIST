@@ -8,7 +8,11 @@ import { readFileSync } from "node:fs";
 import * as Q from "../../pages/query.js";
 
 const V = JSON.parse(readFileSync(new URL("../fixtures/query/fts-match-vectors.json", import.meta.url), "utf8"));
-const CAPS = { index: Q.INDEX }, BUILT = { fts_tokenize: Q.INDEX.tokenizer };
+const CAPS = { index: Q.INDEX }, BUILT = { fts_tokenize: Q.INDEX.tokenizer, page_numbers: true, refs: { version: 1 } };
+const STALE = { fts_tokenize: Q.INDEX.tokenizer, page_numbers: true }; // an export built before the cite table (UI-2 D9)
+const COLS = "id, sid, s0, s1, text, kind, src, l, n, tt".split(", ");
+// The alias list of a select: the last word of each top-level item between "select" and the first "from".
+const aliases = sql => sql.replace(/\s+/g, " ").match(/^\s*select (.*?) from /)[1].split(", ").map(x => x.split(" ").pop().split(".").pop());
 const recorder = () => {
   const calls = [];
   const exec = (sql, bind) => { calls.push({ sql, bind }); return []; };
@@ -87,6 +91,57 @@ test("resolution names its columns; sourceUrls keeps the build's order", () => {
   assert.ok(calls[1].sql.includes("order by rowid"));
 });
 
+test("statements selects page_number only when the export carries it", () => {
+  const { calls, exec } = recorder();
+  Q.useDatabase(exec, CAPS, BUILT);
+  Q.statements(1);
+  Q.useDatabase(exec, CAPS, { fts_tokenize: Q.INDEX.tokenizer }); // an export built before page_number (UI-1 D2)
+  Q.statements(1);
+  assert.equal(calls.length, 2);
+  assert.ok(calls[0].sql.includes("page_number p"));
+  assert.ok(calls[1].sql.includes("null p") && !calls[1].sql.includes("page_number"));
+  for (const c of calls) {
+    assert.deepEqual(c.bind, [1]);
+    assert.ok(!c.sql.includes("*"));
+    assert.deepEqual(aliases(c.sql), ["id", "t", "i", "text", "p"]);
+  }
+});
+
+test("citations reads cite when the export has it, else the legacy table in the same shape", () => {
+  const { calls, exec } = recorder();
+  Q.useDatabase(exec, CAPS, BUILT);
+  Q.citations(1);
+  Q.useDatabase(exec, CAPS, STALE);
+  Q.citations(1);
+  assert.equal(calls.length, 2);
+  assert.ok(calls[0].sql.includes("from cite"));
+  assert.ok(calls[1].sql.includes("from citation") && !calls[1].sql.includes("cite c"));
+  for (const c of calls) {
+    assert.deepEqual(aliases(c.sql), COLS);
+    assert.deepEqual(c.bind, [1]);
+    assert.ok(!c.sql.includes("*"));
+  }
+});
+
+test("citedBy and storedCite follow the export", () => {
+  const { calls, exec } = recorder();
+  Q.useDatabase(exec, CAPS, BUILT);
+  Q.citedBy(1);
+  assert.ok(calls[0].sql.includes("from cite c"));
+  assert.equal(Q.storedCite("a", "whereas", 0, 1, 5), null);
+  assert.deepEqual(calls[1].bind, ["a", "whereas", 0, 1, 5]);
+  assert.ok(!calls[1].sql.includes("*") && !calls[1].sql.includes("'a'") && !calls[1].sql.includes("'whereas'"));
+  for (const bad of [[-1, 1, 5], [0, 1.5, 5], [0, 1, "5"]]) {
+    assert.throws(() => Q.storedCite("a", "whereas", ...bad), /non-negative integers/);
+  }
+  Q.useDatabase(exec, CAPS, STALE);
+  const before = calls.length;
+  Q.citedBy(1);
+  assert.ok(calls[before].sql.includes("from citation c"));
+  assert.equal(Q.storedCite("a", "whereas", 0, 1, 5), undefined);
+  assert.equal(calls.length, before + 1, "no SQL without the cite table");
+});
+
 // Messages are fixed strings: a failure must not print a title, snippet or clause.
 test("every export runs on a real built site database", { skip: !process.env.RESIST_QUERY_DB && "RESIST_QUERY_DB not set (tests/test_query_vectors.py sets it)" }, async () => {
   const { DatabaseSync } = await import("node:sqlite");
@@ -116,7 +171,7 @@ test("every export runs on a real built site database", { skip: !process.env.RES
     for (const y of Q.yearCounts(all).keys()) {
       if (y != null) assert.equal(Q.searchTotal({ ...all, year: y }), Q.yearCounts(all).get(y));
     }
-    let dated = 0;
+    let dated = 0, firstCite = null;
     for (const { id } of rows) {
       const r = Q.resolution(id);
       assert.ok(r && r.id === id && /^[0-9a-f]{64}$/.test(r.document_id), "resolution by id carries its SHA-256");
@@ -126,16 +181,31 @@ test("every export runs on a real built site database", { skip: !process.env.RES
       if (r.convention_name) assert.ok(Q.searchTotal({ ...all, convention: r.convention_name }) >= 1, "convention filter");
       const st = Q.statements(id);
       assert.ok(st.every((s, i) => i === 0 || st[i - 1].i <= s.i), "statements in index order");
+      assert.ok(st.every(s => Object.keys(s).sort().join() === "i,id,p,t,text"), "statement keys");
+      assert.ok(st.every(s => s.p === null || (Number.isInteger(s.p) && s.p >= 1)), "page is null or a page number");
       if (st.length) {
         const same = Q.storedStatements(st[0].t, st[0].text, r.document_id);
         assert.ok(same.some(s => s.resolution_id === id), "storedStatements finds the stored clause");
       }
-      assert.ok(Array.isArray(Q.citations(id)) && Q.citedBy(id).every(c => c.id !== id), "citations and cited-by");
+      const cites = Q.citations(id);
+      assert.ok(cites.every(c => Object.keys(c).sort().join() === "id,kind,l,n,s0,s1,sid,src,text,tt"), "citation keys");
+      for (const c of cites.filter(x => x.sid !== null)) {
+        const s = st.find(x => x.id === c.sid);
+        assert.ok(s && s.text.slice(c.s0, c.s1) === c.text, "cite slices its clause");
+        if (!firstCite) firstCite = { r, s, c };
+      }
+      assert.ok(Q.citedBy(id).every(c => c.id !== id), "cited-by never lists the resolution itself");
       for (const c of Q.committeesOf(id)) assert.ok(Q.searchTotal({ ...all, committee: c }) >= 1, "committee filter");
       const urls = Q.sourceUrls(r.document_id);
       assert.ok(urls.length >= 1 && urls[0].startsWith("tests/fixtures/atni/"), "the atni-table url comes first");
     }
     if (n <= 25) assert.equal(Q.datedCount(), dated); // rows held every resolution
+    assert.ok(firstCite, "the built export holds an anchored citation");
+    const { r, s, c } = firstCite;
+    const got = Q.storedCite(r.document_id, s.t, s.i, c.s0, c.s1);
+    assert.ok(got && got.resolution_id === r.id && got.pos >= 1 && got.s0 === c.s0 && got.s1 === c.s1, "storedCite finds the row");
+    assert.ok(got.text === c.text, "storedCite returns the stored text");
+    assert.ok(Q.storedCite(r.document_id, s.t, s.i, c.s0, c.s1 + 1) === null, "another span is no stored citation");
   } finally {
     db.close();
   }

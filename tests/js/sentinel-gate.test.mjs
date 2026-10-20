@@ -3,7 +3,7 @@
 // gate is module state. document/window/fetch are minimal shims; no resolution text.
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { SENTINEL_HOME, SOURCES, allowLookup, openLookup } from "../../pages/sentinel.js";
+import { SENTINEL_HOME, SOURCES, allowLookup, isLookupLive, openLookup } from "../../pages/sentinel.js";
 
 function shims() {
   const seen = { opens: [], fetches: 0, modal: 0, appended: 0 };
@@ -42,5 +42,16 @@ test("openLookup links out unless allowLookup(true), and opening the dialog send
     assert.equal(after.modal, 0);
   } finally {
     Object.assign(globalThis, real);
+  }
+});
+
+test("isLookupLive follows allowLookup and fails closed", () => {
+  try {
+    for (const [on, live] of [[false, false], ["true", false], [true, true], [1, false]]) {
+      allowLookup(on);
+      assert.equal(isLookupLive(), live, String(on));
+    }
+  } finally {
+    allowLookup(false);
   }
 });
