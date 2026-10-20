@@ -1,9 +1,20 @@
-"""Tests for storage layer."""
+"""Tests for storage layer, on real ATNI resolutions (D-052, tests/fixtures/atni/)."""
+from pathlib import Path
+
 import pytest
-from datetime import date
 from sqlmodel import Session
 
+from src.ingestion.intake import extract_text_from_native_pdf
+from src.ingestion.parser import parse_resolution
 from src.models.document import ParseResult
+
+ATNI = Path(__file__).parent / "fixtures" / "atni"
+
+
+def _real(name: str):
+    """Extracted text and parse of a real ATNI fixture PDF, document_id from the file stem."""
+    text = extract_text_from_native_pdf(ATNI / f"{name}.pdf")
+    return text, parse_resolution(text, name.lower())
 
 
 @pytest.fixture
@@ -21,36 +32,28 @@ def session(db_engine):
 
 
 def test_save_resolution(session):
-    """Test saving a parsed resolution."""
+    """Test saving a parsed resolution (Res-26-34: 16 WHEREAS, 6 RESOLVED, 5 prior ATNI resolutions cited)."""
     from src.storage import save_resolution
 
-    parse_result = ParseResult(
-        document_id="test-doc-001",
-        resolution_number="24-01",
-        date_adopted=date(2024, 1, 15),
-        convention={"name": "Mid-Year Convention", "location": "Portland, OR", "year": 2024},
-        whereas_statements=[
-            {"index": 1, "text": "WHEREAS, tribal nations have inherent sovereignty;", "function": "legal_basis"}
-        ],
-        resolved_statements=[
-            {"index": 1, "text": "NOW, THEREFORE BE IT RESOLVED that ATNI supports...", "action_type": "position_statement"}
-        ],
-        citations=[
-            {"text": "P.L. 93-638", "normalized": "P.L. 93-638", "type": "public_law"}
-        ],
-        sponsors={"primary": ["Tulalip Tribes"], "co_sponsor": [], "committee": "Natural Resources"},
-        confidence_score=0.95,
-        needs_review=False,
-    )
-
-    resolution = save_resolution(session, parse_result, "Full text of resolution...")
+    text, parse_result = _real("Res-26-34")
+    resolution = save_resolution(session, parse_result, text)
 
     assert resolution.id is not None
-    assert resolution.document_id == "test-doc-001"
-    assert resolution.resolution_number == "24-01"
-    assert len(resolution.statements) == 2
-    assert len(resolution.citations) == 1
-    assert len(resolution.sponsors) == 2  # primary + committee
+    assert resolution.document_id == "res-26-34"
+    # Known defect: the PDF prints "RESOLUTION # 2026 - 034" and the parser keeps only the year;
+    # this test checks that what the parser produced is what gets stored.
+    assert parse_result.resolution_number
+    assert resolution.resolution_number == parse_result.resolution_number
+    assert resolution.convention_year == 2026
+    assert resolution.convention_location == "Snoqualmie"
+    assert resolution.full_text == text
+    assert len(resolution.statements) == 22
+    assert sum(s.statement_type == "whereas" for s in resolution.statements) == 16
+    assert sum(s.statement_type == "resolved" for s in resolution.statements) == 6
+    assert len(resolution.citations) == 5
+    assert all(c.citation_type == "prior_atni_resolution" for c in resolution.citations)
+    # Res-26-34 prints no sponsor block, so nothing is stored (sponsor persistence is uncovered here).
+    assert len(resolution.sponsors) == 0
 
 
 def test_get_resolution(session):
@@ -84,22 +87,12 @@ def test_search_resolutions(session):
     """Test FTS5 search returns results."""
     from src.storage import save_resolution, search_resolutions
 
-    # Save a resolution with searchable text
-    parse_result = ParseResult(
-        document_id="test-doc-search-001",
-        resolution_number="24-SEARCH",
-        convention={"name": "Annual Convention", "year": 2024},
-        confidence_score=0.9,
-    )
-    save_resolution(
-        session,
-        parse_result,
-        "Climate change impacts on tribal communities require immediate action and adaptation strategies."
-    )
+    text, parse_result = _real("Res-23-40")  # "climate" and "tribal" each appear in its text
+    save_resolution(session, parse_result, text)
 
-    # Search for keywords
     results = search_resolutions(session, "climate tribal")
     assert len(results) > 0
+    assert results[0]["document_id"] == "res-23-40"
     # Check result structure
     assert "id" in results[0]
     assert "snippet" in results[0]
@@ -110,45 +103,27 @@ def test_search_with_year_filter(session):
     """Test FTS5 search with year filter."""
     from src.storage import save_resolution, search_resolutions
 
-    # Save resolutions from different years
-    parse_result_2023 = ParseResult(
-        document_id="test-doc-2023",
-        resolution_number="23-FILTER",
-        convention={"year": 2023},
-        confidence_score=0.9,
-    )
-    save_resolution(session, parse_result_2023, "Water rights resolution for 2023")
+    # Both contain "sovereignty"; the parser reads convention years 2023 and 2026 from their headers
+    for name in ("Res-23-40", "Res-26-34"):
+        text, parse_result = _real(name)
+        save_resolution(session, parse_result, text)
 
-    parse_result_2024 = ParseResult(
-        document_id="test-doc-2024",
-        resolution_number="24-FILTER",
-        convention={"year": 2024},
-        confidence_score=0.9,
-    )
-    save_resolution(session, parse_result_2024, "Water rights resolution for 2024")
+    assert {r["document_id"] for r in search_resolutions(session, "sovereignty")} == {"res-23-40", "res-26-34"}
 
-    # Search with year filter
-    results_2024 = search_resolutions(session, "water rights", year=2024)
-    assert all(r["convention_year"] == 2024 for r in results_2024 if r["convention_year"])
+    results_2026 = search_resolutions(session, "sovereignty", year=2026)
+    assert [r["document_id"] for r in results_2026] == ["res-26-34"]
+    assert all(r["convention_year"] == 2026 for r in results_2026)
 
 
 def test_fts_highlight_snippets(session):
     """Test that FTS5 returns highlighted snippets."""
     from src.storage import save_resolution, search_resolutions
 
-    parse_result = ParseResult(
-        document_id="test-doc-highlight",
-        resolution_number="24-HIGHLIGHT",
-        confidence_score=0.9,
-    )
-    save_resolution(
-        session,
-        parse_result,
-        "The sovereignty of tribal nations must be protected and upheld."
-    )
+    text, parse_result = _real("Res-26-34")
+    save_resolution(session, parse_result, text)
 
     results = search_resolutions(session, "sovereignty")
     assert len(results) > 0
     # Should have highlight markers
     snippet = results[0]["snippet"]
-    assert "<mark>" in snippet or "sovereignty" in snippet.lower()
+    assert "<mark>" in snippet

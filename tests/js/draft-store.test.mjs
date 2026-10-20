@@ -10,7 +10,7 @@ globalThis.localStorage = {
   removeItem: k => { mem.delete(k); },
 };
 const { store } = await import("../../pages/draft.js");
-const { isStandard, STANDARD } = await import("../../pages/compose.js");
+const { isStandard, STANDARD, compose } = await import("../../pages/compose.js");
 const KEY = "resist-draft-v1";
 
 const source = (statementType, index, text) => ({
@@ -98,4 +98,36 @@ test("replace validates; addNote and reset", () => {
   store.reset();
   assert.equal(store.draft.title, "");
   assert.equal(store.draft.notes.length, 0);
+});
+
+test("own toString/valueOf keys in a stored draft cannot break the draft view", async () => {
+  store.reset();
+  const d = JSON.parse(mem.get(KEY));
+  d.title = { toString: 0 };
+  d.header.number = { toString: 1, valueOf: 1 };
+  mem.set(KEY, JSON.stringify(d));
+  const again = await import("../../pages/draft.js?reload=4");
+  assert.doesNotThrow(() => compose(again.store.draft));
+});
+
+test("provenance comes from the database: a forged label is corrected, unknown text becomes typed", () => {
+  globalThis.document ??= { getElementById: () => null };   // toast() has no page here
+  store.reset();
+  store.carry(R0); store.carry(W3);
+  const db = [R0, W3];
+  const lookup = c => db.find(s => s.documentId === c?.documentId && s.statementType === c?.statementType &&
+    s.text === c?.text) ?? null;
+  store.verifyWith(lookup);
+  assert.equal(store.carriedCount(), 2, "genuine carries are unchanged");
+  const forged = JSON.parse(JSON.stringify(store.draft));
+  forged.resolved[0].source.number = "23-40";
+  forged.whereas.at(-1).source.text = "the moon is made of cheese";
+  forged.whereas[0].text = "that ATNI opposes every federal consultation policy";   // still labelled "standard"
+  assert.equal(store.replace(forged), true);
+  assert.equal(store.draft.resolved[0].source.number, "26-51");
+  assert.equal(store.draft.whereas.at(-1).origin, "typed");
+  assert.equal(store.draft.whereas.at(-1).source, undefined);
+  assert.equal(store.draft.whereas[0].origin, "typed");
+  assert.equal(store.carriedCount(), 1);
+  store.verifyWith(null);
 });

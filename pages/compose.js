@@ -73,12 +73,14 @@ export const removePageHeader = text => squash(String(text ?? "").replace(PAGE_H
 // clause's position, not its text, so they are stripped here and added back by compose().
 const LEAD = /^(?:(?:now,?\s+)?(?:therefore,?\s+)?be\s+it\s+(?:further\s+|finally\s+)?resolved|whereas)\s*[,:]?\s*/i;
 const JOINER = /\s*[;,]\s*(?:and\s+now|and|now)?\s*[,;]?\s*$/i;
+// The next clause's "THEREFORE" sometimes lands at the end of the last WHEREAS in extraction.
+const NEXT_LEAD = /\s*\b(?:now,?\s+)?therefore\s*[,:]?\s*$/i;
 const ABBREVIATION = /(?:^|[\s(])(?:[A-Za-z]\.){2,}$|\b(?:etc|Inc|Co|Corp|Jr|Sr|No|Sec|Ch)\.$/;
 export function body(text) {
   let s = squash(text).replace(LEAD, "");
   for (let prev = null; prev !== s;) {
     prev = s;
-    s = s.replace(JOINER, "");
+    s = s.replace(NEXT_LEAD, "").replace(JOINER, "");
     if (s.endsWith(".") && !ABBREVIATION.test(s)) s = s.slice(0, -1).trimEnd();
   }
   return s;
@@ -220,8 +222,11 @@ export function validDraft(value) {
   const base = newDraft(Number(d.header?.year) || undefined);
   const meta = { ...base.meta, ...d.meta, ncai: { ...base.meta.ncai, ...d.meta?.ncai } };
   meta.committees = Array.isArray(meta.committees) ? meta.committees.filter(c => COMMITTEES.includes(c)) : [];
+  // A file can label any text "standard"; only ATNI's own form text keeps that label.
+  const label = c => c.origin === "standard" && !isStandard(c.text) ? { ...c, origin: "typed" } : c;
   return {
     ...base, ...d,
+    whereas: d.whereas.map(label), resolved: d.resolved.map(label),
     header: { ...base.header, ...d.header },
     certification: { ...base.certification, ...d.certification },
     signatures: { ...base.signatures, ...d.signatures },

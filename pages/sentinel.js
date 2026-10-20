@@ -324,7 +324,9 @@ export function openLookup({ query = "", onAddNote } = {}) {
   src.onchange = privacy;
   dlg.addEventListener("close", () => {
     run++; ctl?.abort(); dlg.remove();
-    try { opener?.focus(); } catch { /* the opener is gone */ }
+    // Adding a note repaints the draft editor, which replaces the opener with a new button of the same id.
+    const back = opener?.isConnected ? opener : opener?.id ? document.getElementById(opener.id) : null;
+    try { back?.focus(); } catch { /* the opener is gone */ }
   });
   privacy();
   dlg.showModal();

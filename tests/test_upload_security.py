@@ -6,6 +6,10 @@ from pathlib import Path
 from fastapi.testclient import TestClient
 
 from src.main import app
+from src.ingestion.intake import extract_text_from_native_pdf
+
+# Real ATNI resolution text (T0, D-052), extracted whole from the tracked fixture; the upload body.
+REAL_TEXT = extract_text_from_native_pdf(Path(__file__).parent / "fixtures" / "atni" / "Res-23-40.pdf").encode("utf-8")
 
 
 @pytest.fixture
@@ -28,7 +32,7 @@ def test_path_traversal_rejection(client):
 
     for filename in malicious_filenames:
         # Create simple text content
-        content = BytesIO(b"RESOLUTION #2024-01\nmalicious attempt")
+        content = BytesIO(REAL_TEXT)
 
         response = client.post(
             "/api/upload",
@@ -48,7 +52,7 @@ def test_path_traversal_rejection(client):
 def test_basename_extraction(client):
     """Verify only basename is used from uploaded filename."""
     # Filename with path components - should extract only basename
-    test_content = b"RESOLUTION #2024-01\ntest content"
+    test_content = REAL_TEXT
 
     response = client.post(
         "/api/upload",
@@ -70,7 +74,7 @@ def test_suspicious_pattern_rejection(client):
     ]
 
     for filename in suspicious_names:
-        content = BytesIO(b"RESOLUTION #2024-01\ntest content")
+        content = BytesIO(REAL_TEXT)
 
         response = client.post(
             "/api/upload",
@@ -92,7 +96,7 @@ def test_valid_filename_accepted(client):
     ]
 
     for filename in valid_filenames:
-        content = BytesIO(b"RESOLUTION #2024-01\nTest content\n\nWHEREAS testing\n\nRESOLVED testing")
+        content = BytesIO(REAL_TEXT)
 
         response = client.post(
             "/api/upload",
@@ -106,7 +110,7 @@ def test_valid_filename_accepted(client):
 
 def test_empty_filename_rejection(client):
     """Verify empty filename is rejected."""
-    content = BytesIO(b"RESOLUTION #2024-01\ntest content")
+    content = BytesIO(REAL_TEXT)
 
     # FastAPI may return 422 for missing required fields
     response = client.post(
@@ -128,7 +132,7 @@ def test_filename_with_only_extension(client):
     ]
 
     for filename in invalid_filenames:
-        content = BytesIO(b"RESOLUTION #2024-01\ntest content")
+        content = BytesIO(REAL_TEXT)
 
         response = client.post(
             "/api/upload",

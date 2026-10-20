@@ -73,12 +73,12 @@ main { display: block; padding: var(--atni-space-step-6) 0 var(--atni-space-step
 .field > span, .field > label { font-family: var(--atni-type-family-display); font-weight: var(--atni-type-weight-display-medium); font-size: var(--atni-type-label-size); letter-spacing: var(--atni-type-label-tracking); color: var(--atni-text-secondary); }
 .field small { color: var(--atni-text-muted); font-size: var(--atni-type-caption-size); }
 input[type="text"], input[type="search"], input[type="number"], select, textarea {
-  width: 100%; min-height: var(--atni-space-touch-primary); padding: 10px 12px; border: 1px solid var(--atni-non-text-rule);
+  width: 100%; min-height: var(--atni-space-touch-primary); padding: 10px 12px; border: 1px solid var(--atni-text-muted);
   border-radius: var(--atni-space-radius); background: var(--atni-ground-raised); color: var(--atni-text-heading);
   font: inherit; font-weight: var(--atni-type-weight-body-regular);
 }
 textarea { resize: vertical; line-height: 1.5; }
-input:hover, select:hover, textarea:hover { border-color: var(--atni-text-muted); }
+input:hover, select:hover, textarea:hover { border-color: var(--atni-text-secondary); }
 input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid var(--atni-non-text-accent); outline-offset: 0; border-color: transparent; }
 ::placeholder { color: var(--atni-text-muted); opacity: 1; }
 .check { display: flex; align-items: flex-start; gap: var(--atni-space-step-3); min-height: var(--atni-space-touch-min); cursor: pointer; }
