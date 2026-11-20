@@ -2,9 +2,12 @@
 // Version pinned; FTS5 is required and the stock sql.js build lacks it. Vendored (@sqlite.org/sqlite-wasm
 // 3.53.0-build1, SHA-256 in NOTICE), so loading the page makes no outbound request (D-074, closes D-070 item 7).
 import sqlite3InitModule from "./vendor/sqlite-wasm/index.mjs";
-import { useDatabase } from "./query.js";
+import { useDatabase, issuesFrom } from "./query.js";
 
 let db;
+export let issues = []; // pages/issues.json (the pinned Policy Sentinel issue names, D-078) after issuesFrom(); [] when absent or refused
+export let issuesOk = false; // issues.length > 0
+export let issuesRefused = false; // the file was served and failed its checks; a file that holds null, as the public build writes, is only absent
 export let build = null; // build.json: resolutions, year_min, year_max, needs_review, commit, built, db_sha256
 export let caps = null; // capabilities.json: face, sentinel, index manifest (report 09 section 5, D-070)
 
@@ -16,11 +19,16 @@ async function json(name) {
 }
 
 export async function load(onProgress = () => {}) {
-  const [sqlite3, res, info, capabilities] = await Promise.all([
-    sqlite3InitModule(), fetch("resolutions.db"), json("build.json"), json("capabilities.json")]);
+  // The issue names are optional: a missing, unreadable or refused file only means no names are added to a search.
+  const [sqlite3, res, info, capabilities, pinned] = await Promise.all([
+    sqlite3InitModule(), fetch("resolutions.db"), json("build.json"), json("capabilities.json"),
+    fetch("issues.json").then(r => (r.ok ? r.json() : null)).catch(() => undefined)]); // null: absent, undefined: unreadable
   if (!res.ok) throw new Error(`resolutions.db: HTTP ${res.status}`);
   build = info;
   caps = capabilities;
+  issues = issuesFrom(pinned);
+  issuesOk = issues.length > 0;
+  issuesRefused = pinned !== null && !issuesOk;
   const total = Number(res.headers.get("content-length")) || 0, reader = res.body.getReader(), chunks = [];
   let got = 0;
   for (;;) {

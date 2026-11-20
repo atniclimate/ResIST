@@ -15,9 +15,69 @@ export function requireIndex(index) {
 // The one grammar (D-070 item 3), identical to resist.index.fts_match: NFC, split on Python's str.split()
 // whitespace set (not JS \s), drop '"', quote each non-empty word, join with one space (implicit AND).
 const PY_SPACE = /[\t-\r\x1c-\x20\x85\xa0\u1680\u2000-\u200a\u2028\u2029\u202f\u205f\u3000]+/;
+const words = q => String(q ?? "").normalize("NFC").split(PY_SPACE).map(w => w.replace(/"/g, "")).filter(Boolean);
 export function ftsMatch(q) {
-  return String(q ?? "").normalize("NFC").split(PY_SPACE)
-    .map(w => w.replace(/"/g, "")).filter(Boolean).map(w => `"${w}"`).join(" ");
+  return words(q).map(w => `"${w}"`).join(" ");
+}
+
+// The broad grammar (D-078, RM-2), the twin of resist.index.broaden; tests/fixtures/query/broaden-vectors.json binds
+// both. Query side only: the index and its tokenizer are untouched. No typed character reaches FTS5 syntax: every
+// word and phrase is quoted with '"' removed, and OR, parentheses and * come only from here. exact gives ftsMatch.
+export const PREFIX_MIN = 4;
+const PLAIN = new RegExp(`^[\\p{L}\\p{Mn}\\p{Mc}'\\u2019]{${PREFIX_MIN},}$`, "u");
+const keyOf = ws => ws.join(" ").replace(/[A-Z]/g, c => c.toLowerCase());
+const quoted = ws => ws.map(w => `"${w}"`).join(" ");
+// issues is the output of issuesFrom(), never raw input.
+export function broaden(q, issues = [], { exact = false } = {}) {
+  const ws = words(q);
+  if (!ws.length) return { match: "", words: [], issue: null };
+  const typed = ws.map(text => ({ text, prefix: false }));
+  if (exact) return { match: quoted(ws), words: typed, issue: null };
+  const k = keyOf(ws);
+  const hits = issues.filter(i => i.triggers.some(t => keyOf(words(t)) === k));
+  if (hits.length === 1) { // two issues sharing a trigger: no expansion, neither is chosen
+    const [i] = hits, seen = new Set([k]), added = [];
+    for (const p of i.phrases) {
+      const pw = words(p.text), pk = keyOf(pw);
+      if (!pw.length || seen.has(pk)) continue;
+      seen.add(pk); added.push({ text: p.text, from: p.from });
+    }
+    // an issue whose every phrase is the typed words adds nothing: the words are searched as plain words below
+    if (added.length) {
+      const match = [`(${quoted(ws)})`, ...added.map(p => `"${words(p.text).join(" ")}"`)].join(" OR ");
+      return { match, words: typed, issue: { id: i.id, label: i.label, reviewedOn: i.reviewedOn, added } };
+    }
+  }
+  const terms = ws.map(text => ({ text, prefix: PLAIN.test(text) }));
+  return { match: terms.map(t => `"${t.text}"${t.prefix ? "*" : ""}`).join(" "), words: terms, issue: null };
+}
+
+// The pinned copy of Policy Sentinel's reviewed issue table (pages/issues.json, D-078). Accepted only whole: any
+// fault, an unknown schema included, gives [] and the page adds no names to the typed words (fail closed).
+const ISO = /^\d{4}-\d{2}-\d{2}$/;
+const FROM = ["name:official", "name:people_use", "rests_on:usc", "rests_on:cfr"];
+const str = (v, min, max) => typeof v === "string" && v.length >= min && v.length <= max;
+export function issuesFrom(file) {
+  try {
+    const s = file?.source;
+    if (file?.schema !== "resist-issue-names/1" || !s || typeof s !== "object") return [];
+    if (![s.repo, s.path, s.commit_date].every(v => typeof v === "string") ||
+      !(s.commit === "not tracked" || /^[0-9a-f]{40}$/.test(s.commit)) || !/^[0-9a-f]{64}$/.test(s.file_sha256) ||
+      !ISO.test(s.reviewed_on) || !ISO.test(s.pinned_on)) return [];
+    const ex = file.expansions;
+    if (!Array.isArray(ex) || ex.length < 1 || ex.length > 100) return [];
+    const out = [], ids = new Set();
+    for (const i of ex) {
+      if (!i || typeof i !== "object" || !str(i.id, 1, 80) || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(i.id) || ids.has(i.id) ||
+        !str(i.label, 1, 200) || !ISO.test(i.reviewedOn) || !Array.isArray(i.triggers) || i.triggers.length < 1 ||
+        i.triggers.length > 20 || !i.triggers.every(t => str(t, 1, 200)) || !Array.isArray(i.phrases) ||
+        i.phrases.length > 40 || !i.phrases.every(p => p && str(p.text, 2, 200) && FROM.includes(p.from))) return [];
+      ids.add(i.id);
+      out.push({ id: i.id, label: i.label, reviewedOn: i.reviewedOn, triggers: [...i.triggers],
+        phrases: i.phrases.map(p => ({ text: p.text, from: p.from })) });
+    }
+    return out;
+  } catch { return []; }
 }
 
 let exec = null; // exec(sql, bind) -> array of row objects
@@ -86,7 +146,7 @@ export function search(f, { sort, limit, offset }) {
   if (!Object.hasOwn(ORDER, sort) || (sort === "best" && !f.match)) throw new Error(`unsupported sort: ${sort}`);
   const { from, cond, bind } = filtered(f, true);
   const snip = f.match ? "snippet(resolution_fts, 2, char(2), char(3), ' ... ', 24)" : "null";
-  return run(`select r.id, r.resolution_number, r.title, r.convention_name, r.convention_year,
+  return run(`select r.id, r.document_id, r.resolution_number, r.title, r.convention_name, r.convention_year,
       r.convention_location, r.needs_review, ${snip} snip,
       (select group_concat(name, ', ') from sponsor s where s.resolution_id = r.id and s.sponsor_type = 'committee') committee
       from ${from} ${cond} order by ${ORDER[sort]} limit ? offset ?`, [...bind, count(limit), count(offset)]);
@@ -95,6 +155,11 @@ export function search(f, { sort, limit, offset }) {
 export function resolution(id) {
   return run(`select id, document_id, resolution_number, title, date_adopted, convention_name, convention_location,
     convention_year, needs_review, full_text from resolution where id = ?`, [id])[0] ?? null;
+}
+
+// The resolution id for an ATNI document's SHA-256 (a collected item's link), or null.
+export function resolutionByDocument(documentId) {
+  return run("select id from resolution where document_id = ?", [String(documentId)])[0]?.id ?? null;
 }
 
 // p: the page the clause begins on, or null (OCR-only document, or an export built before page_number; UI-1 D2)

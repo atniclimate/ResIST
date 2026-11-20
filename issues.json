@@ -1,0 +1,781 @@
+{
+  "schema": "resist-issue-names/1",
+  "source": {
+    "repo": "policy-sentinel",
+    "path": "config/issues.v1.json",
+    "commit": "2e3e9bb70129d3eeb3c2d6a200729368e9b88ec7",
+    "commit_date": "2026-11-19T00:15:19-08:00",
+    "file_sha256": "b7ca4d5ba7c029aa563b023065079b70578f28a70183b6958df800b2676d6382",
+    "schema_version": "1.0.0",
+    "license": "https://polyformproject.org/licenses/noncommercial/1.0.0",
+    "notice": "Required Notice: Copyright Affiliated Tribes of Northwest Indians (https://atnitribes.org)",
+    "reviewed_on": "2026-11-18",
+    "pinned_on": "2026-11-20"
+  },
+  "entries_sha256": "7ada6d8e520979015ffc6864a40fe0ced8c03f10262823029f4800c38dbb2e58",
+  "entries": [
+    {
+      "id": "tribal-consultation",
+      "label": "Consultation with Tribal governments",
+      "names": [
+        {
+          "name": "Consultation and Coordination With Indian Tribal Governments",
+          "basis": "official",
+          "reviewedOn": "2026-11-18"
+        },
+        {
+          "name": "Tribal Consultation",
+          "basis": "official",
+          "reviewedOn": "2026-11-18"
+        },
+        {
+          "name": "Executive Order 13175",
+          "basis": "official",
+          "reviewedOn": "2026-11-18"
+        },
+        {
+          "name": "E.O. 13175",
+          "basis": "people_use",
+          "reviewedOn": "2026-11-18"
+        },
+        {
+          "name": "EO 13175",
+          "basis": "people_use",
+          "reviewedOn": "2026-11-18"
+        },
+        {
+          "name": "XO 13175",
+          "basis": "people_use",
+          "reviewedOn": "2026-11-18"
+        }
+      ],
+      "restsOn": [
+        {
+          "kind": "executive_order",
+          "id": "E.O. 13175",
+          "label": "Executive Order 13175",
+          "readOn": "2026-11-18"
+        },
+        {
+          "kind": "fr_document",
+          "id": "E9-27142",
+          "label": "FR Doc. E9-27142 (74 FR 57881)",
+          "readOn": "2026-11-18"
+        }
+      ],
+      "reviewedOn": "2026-11-18",
+      "reviewerRole": "owner"
+    },
+    {
+      "id": "icwa",
+      "label": "Indian child welfare",
+      "names": [
+        {
+          "name": "Indian Child Welfare Act",
+          "basis": "official",
+          "reviewedOn": "2026-11-18"
+        },
+        {
+          "name": "ICWA",
+          "basis": "official",
+          "reviewedOn": "2026-11-18"
+        }
+      ],
+      "restsOn": [
+        {
+          "kind": "usc",
+          "id": "25 U.S.C. 1901",
+          "label": "25 U.S.C. 1901",
+          "readOn": "2026-11-18"
+        },
+        {
+          "kind": "public_law",
+          "id": "Pub. L. 95-608",
+          "label": "Pub. L. 95-608",
+          "readOn": "2026-11-18"
+        },
+        {
+          "kind": "cfr",
+          "id": "25 CFR 23",
+          "label": "25 CFR Part 23",
+          "readOn": "2026-11-18"
+        }
+      ],
+      "reviewedOn": "2026-11-18",
+      "reviewerRole": "owner"
+    },
+    {
+      "id": "indian-self-determination-contracting",
+      "label": "Indian self-determination contracting",
+      "names": [
+        {
+          "name": "Indian Self-Determination and Education Assistance Act",
+          "basis": "official",
+          "reviewedOn": "2026-11-18"
+        },
+        {
+          "name": "ISDEAA",
+          "basis": "people_use",
+          "reviewedOn": "2026-11-18"
+        },
+        {
+          "name": "Indian Self-Determination Act",
+          "basis": "people_use",
+          "reviewedOn": "2026-11-18"
+        }
+      ],
+      "restsOn": [
+        {
+          "kind": "public_law",
+          "id": "Pub. L. 93-638",
+          "label": "Pub. L. 93-638",
+          "readOn": "2026-11-18"
+        },
+        {
+          "kind": "usc",
+          "id": "25 U.S.C. 5301",
+          "label": "25 U.S.C. 5301",
+          "readOn": "2026-11-18"
+        },
+        {
+          "kind": "usc",
+          "id": "25 U.S.C. 5325",
+          "label": "25 U.S.C. 5325",
+          "readOn": "2026-11-18"
+        },
+        {
+          "kind": "cfr",
+          "id": "25 CFR 900",
+          "label": "25 CFR Part 900",
+          "readOn": "2026-11-18"
+        }
+      ],
+      "reviewedOn": "2026-11-18",
+      "reviewerRole": "owner"
+    },
+    {
+      "id": "nagpra",
+      "label": "Native American graves protection and repatriation",
+      "names": [
+        {
+          "name": "Native American Graves Protection and Repatriation Act",
+          "basis": "official",
+          "reviewedOn": "2026-11-18"
+        },
+        {
+          "name": "NAGPRA",
+          "basis": "official",
+          "reviewedOn": "2026-11-18"
+        }
+      ],
+      "restsOn": [
+        {
+          "kind": "usc",
+          "id": "25 U.S.C. 3001",
+          "label": "25 U.S.C. 3001",
+          "readOn": "2026-11-18"
+        },
+        {
+          "kind": "public_law",
+          "id": "Pub. L. 101-601",
+          "label": "Pub. L. 101-601",
+          "readOn": "2026-11-18"
+        },
+        {
+          "kind": "cfr",
+          "id": "43 CFR 10",
+          "label": "43 CFR Part 10",
+          "readOn": "2026-11-18"
+        },
+        {
+          "kind": "fr_document",
+          "id": "2023-27040",
+          "label": "FR Doc. 2023-27040 (88 FR 86452)",
+          "readOn": "2026-11-18"
+        },
+        {
+          "kind": "rin",
+          "id": "1024-AE19",
+          "label": "RIN 1024-AE19",
+          "readOn": "2026-11-18"
+        }
+      ],
+      "reviewedOn": "2026-11-18",
+      "reviewerRole": "owner"
+    },
+    {
+      "id": "roadless-area-conservation",
+      "label": "Roadless area conservation",
+      "names": [
+        {
+          "name": "Roadless Rule",
+          "basis": "official",
+          "reviewedOn": "2026-11-18"
+        },
+        {
+          "name": "Roadless Area Conservation Rule",
+          "basis": "official",
+          "reviewedOn": "2026-11-18"
+        },
+        {
+          "name": "2001 Roadless Rule",
+          "basis": "official",
+          "reviewedOn": "2026-11-18"
+        }
+      ],
+      "restsOn": [
+        {
+          "kind": "cfr",
+          "id": "36 CFR 294",
+          "label": "36 CFR Part 294",
+          "readOn": "2026-11-18"
+        },
+        {
+          "kind": "fr_document",
+          "id": "01-726",
+          "label": "FR Doc. 01-726 (66 FR 3244)",
+          "readOn": "2026-11-18"
+        },
+        {
+          "kind": "fr_document",
+          "id": "2026-16965",
+          "label": "FR Doc. 2026-16965",
+          "readOn": "2026-11-18"
+        },
+        {
+          "kind": "docket",
+          "id": "FS-2025-0001",
+          "label": "Docket FS-2025-0001",
+          "readOn": "2026-11-18"
+        },
+        {
+          "kind": "rin",
+          "id": "0596-AD66",
+          "label": "RIN 0596-AD66",
+          "readOn": "2026-11-18"
+        }
+      ],
+      "reviewedOn": "2026-11-18",
+      "reviewerRole": "owner"
+    },
+    {
+      "id": "section-106",
+      "label": "Section 106 consultation",
+      "names": [
+        {
+          "name": "Section 106",
+          "basis": "official",
+          "reviewedOn": "2026-11-18"
+        },
+        {
+          "name": "Section 106 Compliance",
+          "basis": "people_use",
+          "reviewedOn": "2026-11-18"
+        },
+        {
+          "name": "NHPA",
+          "basis": "people_use",
+          "reviewedOn": "2026-11-18"
+        }
+      ],
+      "restsOn": [
+        {
+          "kind": "usc",
+          "id": "54 U.S.C. 306108",
+          "label": "54 U.S.C. 306108",
+          "readOn": "2026-11-18"
+        },
+        {
+          "kind": "cfr",
+          "id": "36 CFR 800",
+          "label": "36 CFR Part 800",
+          "readOn": "2026-11-18"
+        }
+      ],
+      "reviewedOn": "2026-11-18",
+      "reviewerRole": "owner"
+    },
+    {
+      "id": "tribal-general-welfare-exclusion",
+      "label": "Tribal general welfare exclusion",
+      "names": [
+        {
+          "name": "Tribal General Welfare Exclusion Act of 2014",
+          "basis": "official",
+          "reviewedOn": "2026-11-18"
+        },
+        {
+          "name": "Tribal General Welfare Benefits",
+          "basis": "official",
+          "reviewedOn": "2026-11-18"
+        },
+        {
+          "name": "General Welfare Exclusion",
+          "basis": "people_use",
+          "reviewedOn": "2026-11-18"
+        },
+        {
+          "name": "TGWE",
+          "basis": "people_use",
+          "reviewedOn": "2026-11-18"
+        }
+      ],
+      "restsOn": [
+        {
+          "kind": "usc",
+          "id": "26 U.S.C. 139E",
+          "label": "26 U.S.C. 139E",
+          "readOn": "2026-11-18"
+        },
+        {
+          "kind": "public_law",
+          "id": "Pub. L. 113-168",
+          "label": "Pub. L. 113-168",
+          "readOn": "2026-11-18"
+        },
+        {
+          "kind": "fr_document",
+          "id": "2025-22873",
+          "label": "FR Doc. 2025-22873 (90 FR 58378)",
+          "readOn": "2026-11-18"
+        },
+        {
+          "kind": "rin",
+          "id": "1545-BQ95",
+          "label": "RIN 1545-BQ95",
+          "readOn": "2026-11-18"
+        }
+      ],
+      "reviewedOn": "2026-11-18",
+      "reviewerRole": "owner"
+    },
+    {
+      "id": "us-israel-defense-technology-cooperation",
+      "label": "United States-Israel defense technology cooperation",
+      "names": [
+        {
+          "name": "United States-Israel Defense Technology Cooperation Initiative",
+          "basis": "official",
+          "reviewedOn": "2026-11-18"
+        }
+      ],
+      "restsOn": [],
+      "reviewedOn": "2026-11-18",
+      "reviewerRole": "owner"
+    },
+    {
+      "id": "water-quality-standards-fish-consumption",
+      "label": "Water quality standards and fish consumption rates",
+      "names": [
+        {
+          "name": "Water Quality Standards",
+          "basis": "official",
+          "reviewedOn": "2026-11-18"
+        }
+      ],
+      "restsOn": [
+        {
+          "kind": "usc",
+          "id": "33 U.S.C. 1313",
+          "label": "33 U.S.C. 1313",
+          "readOn": "2026-11-18"
+        },
+        {
+          "kind": "cfr",
+          "id": "40 CFR 131",
+          "label": "40 CFR Part 131",
+          "readOn": "2026-11-18"
+        },
+        {
+          "kind": "fr_document",
+          "id": "2024-09427",
+          "label": "FR Doc. 2024-09427 (89 FR 35717)",
+          "readOn": "2026-11-18"
+        },
+        {
+          "kind": "docket",
+          "id": "EPA-HQ-OW-2021-0791",
+          "label": "Docket EPA-HQ-OW-2021-0791",
+          "readOn": "2026-11-18"
+        },
+        {
+          "kind": "rin",
+          "id": "2040-AG17",
+          "label": "RIN 2040-AG17",
+          "readOn": "2026-11-18"
+        }
+      ],
+      "reviewedOn": "2026-11-18",
+      "reviewerRole": "owner"
+    }
+  ],
+  "expansions": [
+    {
+      "id": "tribal-consultation",
+      "label": "Consultation with Tribal governments",
+      "reviewedOn": "2026-11-18",
+      "triggers": [
+        "Consultation with Tribal governments",
+        "Consultation and Coordination With Indian Tribal Governments",
+        "Tribal Consultation",
+        "Executive Order 13175",
+        "E.O. 13175",
+        "EO 13175",
+        "XO 13175"
+      ],
+      "phrases": [
+        {
+          "text": "Consultation and Coordination With Indian Tribal Governments",
+          "from": "name:official"
+        },
+        {
+          "text": "Tribal Consultation",
+          "from": "name:official"
+        },
+        {
+          "text": "Executive Order 13175",
+          "from": "name:official"
+        },
+        {
+          "text": "E.O. 13175",
+          "from": "name:people_use"
+        },
+        {
+          "text": "EO 13175",
+          "from": "name:people_use"
+        },
+        {
+          "text": "XO 13175",
+          "from": "name:people_use"
+        }
+      ]
+    },
+    {
+      "id": "icwa",
+      "label": "Indian child welfare",
+      "reviewedOn": "2026-11-18",
+      "triggers": [
+        "Indian child welfare",
+        "Indian Child Welfare Act",
+        "ICWA"
+      ],
+      "phrases": [
+        {
+          "text": "Indian Child Welfare Act",
+          "from": "name:official"
+        },
+        {
+          "text": "ICWA",
+          "from": "name:official"
+        },
+        {
+          "text": "25 U.S.C. 1901",
+          "from": "rests_on:usc"
+        },
+        {
+          "text": "25 USC 1901",
+          "from": "rests_on:usc"
+        },
+        {
+          "text": "25 CFR 23",
+          "from": "rests_on:cfr"
+        },
+        {
+          "text": "25 CFR Part 23",
+          "from": "rests_on:cfr"
+        },
+        {
+          "text": "25 C.F.R. 23",
+          "from": "rests_on:cfr"
+        },
+        {
+          "text": "25 C.F.R. Part 23",
+          "from": "rests_on:cfr"
+        }
+      ]
+    },
+    {
+      "id": "indian-self-determination-contracting",
+      "label": "Indian self-determination contracting",
+      "reviewedOn": "2026-11-18",
+      "triggers": [
+        "Indian self-determination contracting",
+        "Indian Self-Determination and Education Assistance Act",
+        "ISDEAA",
+        "Indian Self-Determination Act"
+      ],
+      "phrases": [
+        {
+          "text": "Indian Self-Determination and Education Assistance Act",
+          "from": "name:official"
+        },
+        {
+          "text": "ISDEAA",
+          "from": "name:people_use"
+        },
+        {
+          "text": "Indian Self-Determination Act",
+          "from": "name:people_use"
+        },
+        {
+          "text": "25 U.S.C. 5301",
+          "from": "rests_on:usc"
+        },
+        {
+          "text": "25 USC 5301",
+          "from": "rests_on:usc"
+        },
+        {
+          "text": "25 U.S.C. 5325",
+          "from": "rests_on:usc"
+        },
+        {
+          "text": "25 USC 5325",
+          "from": "rests_on:usc"
+        },
+        {
+          "text": "25 CFR 900",
+          "from": "rests_on:cfr"
+        },
+        {
+          "text": "25 CFR Part 900",
+          "from": "rests_on:cfr"
+        },
+        {
+          "text": "25 C.F.R. 900",
+          "from": "rests_on:cfr"
+        },
+        {
+          "text": "25 C.F.R. Part 900",
+          "from": "rests_on:cfr"
+        }
+      ]
+    },
+    {
+      "id": "nagpra",
+      "label": "Native American graves protection and repatriation",
+      "reviewedOn": "2026-11-18",
+      "triggers": [
+        "Native American graves protection and repatriation",
+        "Native American Graves Protection and Repatriation Act",
+        "NAGPRA"
+      ],
+      "phrases": [
+        {
+          "text": "Native American Graves Protection and Repatriation Act",
+          "from": "name:official"
+        },
+        {
+          "text": "NAGPRA",
+          "from": "name:official"
+        },
+        {
+          "text": "25 U.S.C. 3001",
+          "from": "rests_on:usc"
+        },
+        {
+          "text": "25 USC 3001",
+          "from": "rests_on:usc"
+        },
+        {
+          "text": "43 CFR 10",
+          "from": "rests_on:cfr"
+        },
+        {
+          "text": "43 CFR Part 10",
+          "from": "rests_on:cfr"
+        },
+        {
+          "text": "43 C.F.R. 10",
+          "from": "rests_on:cfr"
+        },
+        {
+          "text": "43 C.F.R. Part 10",
+          "from": "rests_on:cfr"
+        }
+      ]
+    },
+    {
+      "id": "roadless-area-conservation",
+      "label": "Roadless area conservation",
+      "reviewedOn": "2026-11-18",
+      "triggers": [
+        "Roadless area conservation",
+        "Roadless Rule",
+        "Roadless Area Conservation Rule",
+        "2001 Roadless Rule"
+      ],
+      "phrases": [
+        {
+          "text": "Roadless Rule",
+          "from": "name:official"
+        },
+        {
+          "text": "Roadless Area Conservation Rule",
+          "from": "name:official"
+        },
+        {
+          "text": "2001 Roadless Rule",
+          "from": "name:official"
+        },
+        {
+          "text": "36 CFR 294",
+          "from": "rests_on:cfr"
+        },
+        {
+          "text": "36 CFR Part 294",
+          "from": "rests_on:cfr"
+        },
+        {
+          "text": "36 C.F.R. 294",
+          "from": "rests_on:cfr"
+        },
+        {
+          "text": "36 C.F.R. Part 294",
+          "from": "rests_on:cfr"
+        }
+      ]
+    },
+    {
+      "id": "section-106",
+      "label": "Section 106 consultation",
+      "reviewedOn": "2026-11-18",
+      "triggers": [
+        "Section 106 consultation",
+        "Section 106",
+        "Section 106 Compliance",
+        "NHPA"
+      ],
+      "phrases": [
+        {
+          "text": "Section 106",
+          "from": "name:official"
+        },
+        {
+          "text": "Section 106 Compliance",
+          "from": "name:people_use"
+        },
+        {
+          "text": "NHPA",
+          "from": "name:people_use"
+        },
+        {
+          "text": "54 U.S.C. 306108",
+          "from": "rests_on:usc"
+        },
+        {
+          "text": "54 USC 306108",
+          "from": "rests_on:usc"
+        },
+        {
+          "text": "36 CFR 800",
+          "from": "rests_on:cfr"
+        },
+        {
+          "text": "36 CFR Part 800",
+          "from": "rests_on:cfr"
+        },
+        {
+          "text": "36 C.F.R. 800",
+          "from": "rests_on:cfr"
+        },
+        {
+          "text": "36 C.F.R. Part 800",
+          "from": "rests_on:cfr"
+        }
+      ]
+    },
+    {
+      "id": "tribal-general-welfare-exclusion",
+      "label": "Tribal general welfare exclusion",
+      "reviewedOn": "2026-11-18",
+      "triggers": [
+        "Tribal general welfare exclusion",
+        "Tribal General Welfare Exclusion Act of 2014",
+        "Tribal General Welfare Benefits",
+        "General Welfare Exclusion",
+        "TGWE"
+      ],
+      "phrases": [
+        {
+          "text": "Tribal General Welfare Exclusion Act of 2014",
+          "from": "name:official"
+        },
+        {
+          "text": "Tribal General Welfare Benefits",
+          "from": "name:official"
+        },
+        {
+          "text": "General Welfare Exclusion",
+          "from": "name:people_use"
+        },
+        {
+          "text": "TGWE",
+          "from": "name:people_use"
+        },
+        {
+          "text": "26 U.S.C. 139E",
+          "from": "rests_on:usc"
+        },
+        {
+          "text": "26 USC 139E",
+          "from": "rests_on:usc"
+        }
+      ]
+    },
+    {
+      "id": "us-israel-defense-technology-cooperation",
+      "label": "United States-Israel defense technology cooperation",
+      "reviewedOn": "2026-11-18",
+      "triggers": [
+        "United States-Israel defense technology cooperation",
+        "United States-Israel Defense Technology Cooperation Initiative"
+      ],
+      "phrases": [
+        {
+          "text": "United States-Israel Defense Technology Cooperation Initiative",
+          "from": "name:official"
+        }
+      ]
+    },
+    {
+      "id": "water-quality-standards-fish-consumption",
+      "label": "Water quality standards and fish consumption rates",
+      "reviewedOn": "2026-11-18",
+      "triggers": [
+        "Water quality standards and fish consumption rates",
+        "Water Quality Standards"
+      ],
+      "phrases": [
+        {
+          "text": "Water Quality Standards",
+          "from": "name:official"
+        },
+        {
+          "text": "33 U.S.C. 1313",
+          "from": "rests_on:usc"
+        },
+        {
+          "text": "33 USC 1313",
+          "from": "rests_on:usc"
+        },
+        {
+          "text": "40 CFR 131",
+          "from": "rests_on:cfr"
+        },
+        {
+          "text": "40 CFR Part 131",
+          "from": "rests_on:cfr"
+        },
+        {
+          "text": "40 C.F.R. 131",
+          "from": "rests_on:cfr"
+        },
+        {
+          "text": "40 C.F.R. Part 131",
+          "from": "rests_on:cfr"
+        }
+      ]
+    }
+  ]
+}

@@ -1,9 +1,9 @@
 {
- "resolutions": 1157,
+ "resolutions": 1129,
  "year_min": 2007,
  "year_max": 2026,
  "needs_review": 27,
- "commit": "f913de0",
+ "commit": "0db442e",
  "fts_tokenize": "unicode61 remove_diacritics 0 categories 'L* N* Co Mn Mc' tokenchars '''\u2019'",
  "page_numbers": true,
  "refs": {
@@ -15,10 +15,10 @@
    "instruments": "1"
   },
   "link": "issuer_alias",
-  "rows": 873,
-  "anchored": 776,
-  "unanchored": 97,
-  "linked": 181,
+  "rows": 860,
+  "anchored": 764,
+  "unanchored": 96,
+  "linked": 174,
   "by_kind": {
    "cfr": {
     "refs": 11,
@@ -27,7 +27,7 @@
    },
    "executive_order": {
     "refs": 0,
-    "legacy": 105,
+    "legacy": 103,
     "both": 0
    },
    "federal_law": {
@@ -57,12 +57,12 @@
    },
    "prior_atni_resolution": {
     "refs": 13,
-    "legacy": 69,
-    "both": 126
+    "legacy": 68,
+    "both": 120
    },
    "public_law": {
     "refs": 3,
-    "legacy": 58,
+    "legacy": 57,
     "both": 53
    },
    "resolution_number": {
@@ -72,25 +72,27 @@
    },
    "treaty": {
     "refs": 0,
-    "legacy": 24,
+    "legacy": 22,
     "both": 0
    },
    "usc": {
     "refs": 36,
     "legacy": 26,
-    "both": 75
+    "both": 74
    }
   },
   "legacy_rows": {
    "cfr": 22,
-   "executive_order": 79,
+   "executive_order": 77,
    "other": 113,
-   "prior_atni_resolution": 187,
-   "public_law": 75,
-   "treaty": 17,
-   "usc": 77
+   "prior_atni_resolution": 181,
+   "public_law": 74,
+   "treaty": 15,
+   "usc": 76
   }
  },
- "built": "2026-10-20 22:44 UTC",
- "db_sha256": "69694d0c3fd26a1f690241d0756a26f64047f3eaad6e2a144206946f7db3f3c5"
+ "copies_not_listed": 17,
+ "drafts_not_listed": 11,
+ "built": "2026-11-20 12:43 UTC",
+ "db_sha256": "41caf84cc4668218404eb428325dce9f5ca9265c7f3ff348107888e5c8ce6645"
 }

@@ -7,6 +7,10 @@
   "docx": "client",
   "pdf": null
  },
+ "reports": {
+  "available": false,
+  "formats": []
+ },
  "sentinel": true,
  "annotate": false,
  "analytics": false,

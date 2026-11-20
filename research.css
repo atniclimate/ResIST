@@ -1,0 +1,37 @@
+/* The Research view (D-078). ATNI tokens only, so both themes hold; radius 0. The collected words are the one loud thing:
+   set larger than their provenance, which stays small and muted. Rows reuse draft.css's .crow as a base and override its grid. */
+.research-view { max-width: 76rem; }
+.research-view h1 { margin-bottom: var(--atni-space-step-4); }
+.research-view .lead { margin-bottom: var(--atni-space-step-5); }
+.research-view .notice { display: flex; flex-wrap: wrap; align-items: center; gap: var(--atni-space-step-2) var(--atni-space-step-4); margin-bottom: var(--atni-space-step-4); }
+.research-actions { display: flex; flex-wrap: wrap; gap: var(--atni-space-step-3); margin: 0 0 var(--atni-space-step-4); }
+.research-view .count-line { margin-bottom: var(--atni-space-step-5); }
+.research-view section { margin: 0 0 var(--atni-space-step-7); }
+.research-view section > h2 { padding-bottom: var(--atni-space-step-3); border-bottom: 1px solid var(--atni-non-text-rule); }
+.research-rows { list-style: none; margin: 0; padding: 0; }
+.research-view .crow.research-row { grid-template-columns: 8rem minmax(0, 1fr); padding: var(--atni-space-step-4) 0 var(--atni-space-step-4) 0; border-left: 0; border-top: 1px solid var(--atni-non-text-rule); }
+.research-view .crow.research-row:first-child { border-top: 0; }
+.research-lead { min-width: 0; padding-top: 0.2em; }
+.research-lead .num { display: block; font-family: var(--atni-type-family-display); font-weight: var(--atni-type-weight-display-semibold); font-size: 1.05rem; line-height: 1.3; color: var(--atni-text-heading); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.research-main { min-width: 0; }
+.research-text { margin: 0 0 var(--atni-space-step-2); max-width: 42rem; overflow-wrap: anywhere; font-size: 1.0625rem; line-height: 1.6; color: var(--atni-text-heading); }
+.research-title { margin: 0 0 var(--atni-space-step-1); max-width: 42rem; font-family: var(--atni-type-family-display); font-weight: var(--atni-type-weight-display-medium); font-size: var(--atni-type-heading-3-size); line-height: 1.3; overflow-wrap: anywhere; }
+.research-title a { color: var(--atni-text-heading); text-decoration-color: var(--atni-non-text-accent); }
+.research-main .meta { margin: 0 0 var(--atni-space-step-2); overflow-wrap: anywhere; }
+.research-facts { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: var(--atni-space-step-1) var(--atni-space-step-4); margin: 0 0 var(--atni-space-step-3); font-size: var(--atni-type-caption-size); line-height: var(--atni-type-caption-line-height); }
+.research-facts dt { font-family: var(--atni-type-family-display); font-weight: var(--atni-type-weight-display-medium); color: var(--atni-text-muted); }
+.research-facts dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+.crow-acts { display: flex; flex-wrap: wrap; gap: var(--atni-space-step-2); }
+.research-view .empty-state .btn { margin-top: var(--atni-space-step-2); }
+@media (max-width: 40rem) {
+  .research-view .crow.research-row { grid-template-columns: minmax(0, 1fr); }
+  .research-lead .num { display: inline; }
+  .research-view .btn.small { min-height: var(--atni-space-touch-primary); }
+}
+/* A printed collection keeps its provenance: the source address follows each link, and no button is printed. */
+@media print {
+  .research-actions, .research-view .crow-acts, #research-gone { display: none; }
+  .research-view .crow.research-row { break-inside: avoid; }
+  .research-src a[href]::after { content: " (" attr(href) ")"; }
+  .research-src .visually-hidden { display: none; }
+}

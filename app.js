@@ -2,11 +2,15 @@
 // draft.js; Policy Sentinel lookups are sentinel.js; every database query is a named export of query.js. Every
 // string from the database passes through esc(); user search text reaches a query only through Q.ftsMatch() or as
 // a bound parameter.
-import { load, build, caps } from "./db.js";
+import { load, build, caps, issues, issuesOk, issuesRefused } from "./db.js";
 import * as Q from "./query.js";
 import { esc, local, toast, say, refreshDock } from "./ui.js";
 import { isStandard, hasPageHeader, resolvedLead, usDate, squash, segments } from "./compose.js";
 import { store, renderDraft, refreshLookupLabel } from "./draft.js";
+import { renderReports } from "./reports.js";
+import { collection, resolutionItem, statementItem, itemLabel, MAX_ITEMS } from "./collect.js";
+import { renderResearch } from "./research.js";
+import { searchedHTML } from "./searched.js";
 import { openLookup, allowLookup, lookupWords, FEDERAL_TYPES, SENTINEL_HOME, isLookupLive, wordsHTML, copyText } from "./sentinel.js";
 
 const PAGE = 25;
@@ -54,6 +58,15 @@ function syncDraft() {
   refreshDock();
 }
 store.subscribe(syncDraft);
+
+/* Research count in the header, and pressed state of any "Collect" toggles on screen (D-078). */
+function syncResearch() {
+  const n = collection.count();
+  document.getElementById("research-count").textContent = n ? String(n) : "";
+  document.getElementById("research-count-words").textContent = n ? ` (${plural(n, "item")})` : "";
+  main.querySelectorAll("button.collect[data-rkey]").forEach(b => b.setAttribute("aria-pressed", String(collection.has(b.dataset.rkey))));
+}
+collection.subscribe(syncResearch);
 document.getElementById("dock-ins-clear").addEventListener("click", () => {
   const open = main.querySelector(".cpop:not([hidden])");
   closePop(false);
@@ -69,11 +82,13 @@ function parse() {
   const [path, query = ""] = location.hash.slice(1).split("?");
   return { path: path || "/", q: new URLSearchParams(query) };
 }
-let lastSearch = "#/", lastView = "";
+let lastSearch = "#/", lastView = "", backTo = null;
 
-// The draft workspace never reads the database, so it opens at once; every other view waits for the download.
+// Draft opens at once while its stored provenance is checked in the background.
+// Reports use only the authoritative local API and do not start the public database download.
 const LOADING = main.innerHTML;
-let ready = false, loadError = "";
+let ready = false, loadError = "", loadingDatabase = false;
+let disposeReport = () => {};
 
 // Back to results (UI-1 D5): the scroll position and the opened result, keyed by the normalized search href.
 // In memory only, so a reload starts at the top as before.
@@ -82,16 +97,25 @@ try { history.scrollRestoration = "manual"; } catch { /* the browser restores as
 let countTimer;
 
 function route() {
+  disposeReport();
+  disposeReport = () => {};
   const { path, q } = parse();
-  const view = path.startsWith("/r/") ? "detail" : path === "/draft" ? "draft" : path === "/about" ? "about" : "search";
+  const view = path.startsWith("/r/") ? "detail" : path === "/draft" ? "draft" : path === "/reports" ? "reports" : path === "/research" ? "research" : path === "/about" ? "about" : "search";
   document.body.dataset.view = view;
-  // Busy only while a view is waiting for the download; the draft never waits.
-  if (!ready && !loadError && view !== "draft") main.setAttribute("aria-busy", "true");
+  const needsDatabase = !["draft", "reports", "research"].includes(view);
+  if (view !== "reports") void loadDatabase();
+  // Busy only while a view is waiting for the download; the draft and Research never wait.
+  if (!ready && !loadError && needsDatabase) main.setAttribute("aria-busy", "true");
   else main.removeAttribute("aria-busy");
-  if (!ready && view !== "draft") {
+  // A resolution opened from Research goes back to Research. "" is the loading placeholder, which keeps what was set.
+  if (view !== "detail") backTo = null;
+  else if (lastView === "research") backTo = "#/research";
+  else if (lastView) backTo = null;
+  if (!ready && needsDatabase) {
     main.innerHTML = loadError ? `<div class="wrap wide"><div class="notice" role="alert"><p>${esc(loadError)}</p></div></div>` : LOADING;
     lastView = "";
     syncDraft();
+    syncResearch();
     return;
   }
   if (lastView === "search" && view === "detail") back.set(lastSearch, { y: window.scrollY, id: Number(path.slice(3)) });
@@ -102,6 +126,8 @@ function route() {
   try {
     if (view === "detail") detailView(Number(path.slice(3)));
     else if (view === "draft") { document.title = "Draft Resolution, ResIST"; renderDraft(main); }
+    else if (view === "reports") disposeReport = renderReports(main);
+    else if (view === "research") { document.title = "Research, ResIST"; disposeReport = renderResearch(main); }
     else if (view === "about") aboutView();
     else searchView(q);
   } catch (e) {
@@ -111,6 +137,7 @@ function route() {
   document.querySelectorAll(".site-nav a[data-nav]").forEach(a =>
     a.dataset.nav === view || (view === "detail" && a.dataset.nav === "search") ? a.setAttribute("aria-current", "page") : a.removeAttribute("aria-current"));
   syncDraft();
+  syncResearch();
   lastView = view;
   clearTimeout(countTimer);
   // Back from a resolution to the results it was opened from: same place, focus on that result, no count announced.
@@ -122,9 +149,11 @@ function route() {
   }
   // The result count is said once the filters settle: arrowing through a closed select fires one change per arrow.
   if (view === "search" && !firstRender) {
+    // The count, then what was searched, then a fallback notice when there is one (RM-2: the person hears the words too).
     countTimer = setTimeout(() => {
       const count = document.body.dataset.view === "search" && main.querySelector("#results-count");
-      if (count) say(count.textContent);
+      if (count) say([count, main.querySelector("#searched-lead"), main.querySelector("#search-fallback")].filter(Boolean)
+        .map(el => el.textContent.trim().replace(/\.$/, "")).join(". ") + ".");
     }, 500);
   }
   // A filter change keeps focus on the control used; any other route change moves focus to the new h1.
@@ -156,6 +185,8 @@ main.addEventListener("click", e => {
       say(ok ? "Search words copied" : "Search words selected. Press Control and C to copy."));
     return;
   }
+  const collect = e.target.closest("button.collect");
+  if (collect) { collectItem(collect); return; }
   const mark = e.target.closest("button[data-mark]");
   if (mark) { togglePop(Number(mark.dataset.mark)); return; }
   const close = e.target.closest("button[data-close-pop]");
@@ -217,6 +248,25 @@ function lookCite(b) {
   });
 }
 
+// Collect (D-078): one click adds the item to the Research collection, the next removes it. The item is built from the
+// database, never from the button's attributes; the button only names which one. Focus stays on the button.
+function collectItem(b) {
+  if (collection.has(b.dataset.rkey)) {
+    const gone = collection.remove(b.dataset.rkey);
+    if (gone) toast(`Removed ${itemLabel(gone.item)} from your research.`);
+    return;
+  }
+  const r = Q.resolution(Number(b.dataset.rid));
+  const s = b.dataset.rkind === "statement" && r ? Q.statements(r.id).find(x => x.t === b.dataset.rtype && x.i === Number(b.dataset.ri)) : null;
+  if (!r || (b.dataset.rkind === "statement" && !s)) return;
+  const url = Q.sourceUrls(r.document_id)[0];
+  const item = s ? statementItem(r, s, url) : resolutionItem(r, url);
+  const out = collection.add(item);
+  toast(out === "added"
+    ? `Collected ${itemLabel(item)}. Your research has ${plural(collection.count(), "item")}.${collection.saved?.ok === false ? " This browser would not keep it after you leave." : ""}`
+    : out === "full" ? `Your research holds ${plural(MAX_ITEMS, "item")}. Remove one to add another.` : "This item could not be collected.");
+}
+
 /* Search */
 let topCommittees;
 function committees() {
@@ -229,23 +279,43 @@ function searchView(q) {
   const year = /^\d{4}$/.test(q.get("year") || "") ? q.get("year") : "";
   const conv = CONVENTIONS.find(c => c[0] === q.get("convention")) || null;
   const committee = committees().includes(q.get("committee")) ? q.get("committee") : "";
-  const match = Q.ftsMatch(text);
+  // The words as searched (D-078): exact=1 in the address searches only the typed words; otherwise the broad grammar runs.
+  const exact = q.get("exact") === "1";
+  let b = Q.broaden(text, issues, { exact });
+  const match = b.match; // empty exactly when no word was typed, in either grammar
   const sort = ["new", "old"].includes(q.get("sort")) ? q.get("sort") : match ? "best" : "new";
   const page = Math.max(1, Math.floor(Number(q.get("page"))) || 1);
 
-  const f = { match, convention: conv?.[2] || "", committee, year: year ? Number(year) : "" };
-  const byYear = Q.yearCounts(f);
-  const total = Q.searchTotal(f);
-  const pages = Math.max(1, Math.ceil(total / PAGE)), at = Math.min(page, pages);
-  const hits = Q.search(f, { sort, limit: PAGE, offset: (at - 1) * PAGE });
+  const run = () => {
+    const f = { match: b.match, convention: conv?.[2] || "", committee, year: year ? Number(year) : "" };
+    const byYear = Q.yearCounts(f), total = Q.searchTotal(f);
+    const pages = Math.max(1, Math.ceil(total / PAGE)), at = Math.min(page, pages);
+    return { byYear, total, pages, at, hits: Q.search(f, { sort, limit: PAGE, offset: (at - 1) * PAGE }) };
+  };
+  // If the browser's SQLite refuses the broad query, the typed words are searched exactly and the page says so.
+  let fellBack = false, res;
+  try { res = run(); } catch (e) {
+    if (exact) throw e;
+    b = Q.broaden(text, [], { exact: true });
+    fellBack = true;
+    res = run();
+  }
+  const { byYear, total, pages, at, hits } = res;
 
-  const state = { q: text, year, convention: conv?.[0] || "", committee, sort: sort === "best" || sort === (match ? "" : "new") ? "" : sort, page: "" };
+  const state = { q: text, year, convention: conv?.[0] || "", committee, exact: exact ? "1" : "", sort: sort === "best" || sort === (match ? "" : "new") ? "" : sort, page: "" };
   const href = changes => {
     const p = { ...state, ...changes };
     return "#/?" + new URLSearchParams(Object.entries(p).filter(([, v]) => v !== "" && v != null));
   };
   lastSearch = href({ page: at > 1 ? at : "" });
   const filtered = Boolean(year || conv || committee);
+  // The Searched block and its one link between the two searches; each link is offered only when it would change the words searched.
+  const exactNow = exact || fellBack;
+  const searched = searchedHTML(b, {
+    exact: exactNow,
+    hrefExact: !exactNow && b.match !== Q.ftsMatch(text) ? href({ exact: "1", page: "" }) : "",
+    hrefBroad: exact && Q.broaden(text, issues).match !== b.match ? href({ exact: "", page: "" }) : "",
+  });
 
   const option = (value, label, current) => `<option value="${esc(value)}"${value === current ? " selected" : ""}>${esc(label)}</option>`;
   const yearsWith = [...byYear.keys()].filter(Boolean).sort((a, b) => b - a);
@@ -268,7 +338,11 @@ function searchView(q) {
           placeholder="Such as salmon or 23-40">
         <button class="btn primary" type="submit">Search</button>
       </div>
+      ${exact ? '<input type="hidden" name="exact" value="1">' : ""}
       <p class="meta search-note">${num(build.resolutions)} resolutions from ${build.year_min} to ${build.year_max}. Search runs in this browser; nothing you type is sent anywhere.</p>
+      ${searched}
+      ${fellBack ? '<div class="notice" id="search-fallback" role="status"><p>The broader search did not run in this browser, so your words were searched exactly.</p></div>' : ""}
+      ${text && !exact && issuesRefused ? '<p class="meta" id="issues-note">Policy Sentinel issue names could not be loaded here, so no names are added to your words.</p>' : ""}
       ${chips.length ? `<nav class="ychips" aria-label="${match ? "Matching resolutions" : "Resolutions"} by convention year">${chips.join("")}</nav>` : ""}
       <div class="filters">
         <label class="field"><span>Year</span><select id="f-year" name="year">${option("", "All years", year)}${yearsWith.map(y => option(String(y), `${y} (${num(byYear.get(y) || 0)})`, year)).join("")}</select></label>
@@ -290,13 +364,15 @@ function searchView(q) {
           <h2><a href="#/r/${h.id}">${esc(h.title)}</a></h2>
           <p class="meta">${meta}${h.needs_review ? ' <span class="chip review">OCR, unreviewed</span>' : ""}</p>
           ${snipHtml ? `<p class="snip">${snipHtml}</p>` : ""}
+          <div class="acts"><button type="button" class="btn small collect" data-rkind="resolution" data-rid="${Number(h.id)}" data-rkey="${esc(h.document_id)}"
+            aria-pressed="false" aria-label="Collect resolution ${esc(h.resolution_number)}">Collect</button></div>
         </div></li>`;
     }).join("")}</ol>` : `<div class="empty-state">
       <h2>Nothing Matched</h2>
       <p>No resolution matches ${text ? `the words “${esc(text)}”` : "this selection"}${filtered ? " with these filters" : ""}.</p>
       <p>${filtered ? `<a class="btn" href="${href({ year: "", convention: "", committee: "", page: "" })}">Clear filters</a>` : ""}
         ${text ? `<a class="btn quiet" href="#/">Clear the search</a>` : ""}</p>
-      ${text && !filtered ? `<p class="meta">Every word must appear in a resolution. Try fewer words or a different spelling.</p>` : ""}
+      ${text && !filtered ? `<p class="meta">Every word must appear in a resolution${exactNow ? "" : ", and a word also matches longer words that start with it"}. Try fewer words or a different spelling.</p>` : ""}
     </div>`}
     ${pages > 1 ? `<nav class="pager" aria-label="Pages">
       ${at > 1 ? `<a class="btn" href="${href({ page: at - 1 > 1 ? at - 1 : "" })}">Previous page</a>` : ""}
@@ -350,6 +426,19 @@ function storedCiteSource(claim) {
   if (row === undefined) return undefined;
   const r = row && Q.resolution(row.resolution_id);
   return r ? citeSourceFrom(r, { t: row.t, i: row.i, p: row.p }, row, row.pos, Q.sourceUrls(r.document_id)[0]) : null;
+}
+
+// The database's record for a collected item (D-078): the same document and, for a statement, the same text; or null.
+// Found items are rebuilt from the record, so a changed title, link or page replaces the stored one.
+function storedItem(item) {
+  const id = Q.resolutionByDocument(item.documentId);
+  const r = id && Q.resolution(id);
+  if (!r) return null;
+  const url = Q.sourceUrls(r.document_id)[0];
+  if (item.kind === "resolution") return resolutionItem(r, url);
+  const same = Q.statements(r.id).filter(s => s.t === item.statementType && s.text === item.text);
+  const hit = same.find(s => s.i === item.index) ?? same[0];
+  return hit ? statementItem(r, hit, url) : null;
 }
 
 const KIND = { executive_order: "Executive order", usc: "United States Code", public_law: "Public law", cfr: "Code of Federal Regulations",
@@ -430,8 +519,12 @@ function detailView(id) {
           ${std ? '<span class="chip">ATNI standard text</span>' : ""}
           ${hasPageHeader(s.text) ? '<p class="meta header-note">Includes page-header text from the PDF; you can remove it in your draft.</p>' : ""}
         </div>
-        <button type="button" class="btn small carry" data-key="${esc(key)}" data-type="${type}" data-i="${i}"
-          aria-pressed="false" aria-label="Add to draft, ${word} ${i + 1}">Add to draft</button>
+        <div class="clause-acts">
+          <button type="button" class="btn small carry" data-key="${esc(key)}" data-type="${type}" data-i="${i}"
+            aria-pressed="false" aria-label="Add to draft, ${word} ${i + 1}">Add to draft</button>
+          <button type="button" class="btn small collect" data-rkind="statement" data-rid="${Number(r.id)}" data-rtype="${type}" data-ri="${Number(s.i)}"
+            data-rkey="${esc(key)}" aria-pressed="false" aria-label="Collect ${word} ${i + 1}">Collect</button>
+        </div>
       </li>`;
     }).join("");
     const title = type === "resolved" ? "Resolved" : "Whereas";
@@ -477,11 +570,14 @@ function detailView(id) {
 
   document.title = `Resolution ${r.resolution_number}, ResIST`;
   main.innerHTML = `<div class="wrap wide detail-view">
-    <p class="back"><a href="${esc(lastSearch)}">${lastSearch === "#/" ? "Search all resolutions" : "Back to results"}</a></p>
+    <p class="back">${backTo ? `<a href="${backTo}">Back to your research</a>`
+      : `<a href="${esc(lastSearch)}">${lastSearch === "#/" ? "Search all resolutions" : "Back to results"}</a>`}</p>
     <header class="detail-head">
       ${where.length ? `<p class="eyebrow">${where.map(esc).join(", ")}</p>` : ""}
       <h1 tabindex="-1">Resolution ${esc(r.resolution_number)}</h1>
       <p class="lead">${esc(r.title)}</p>
+      <div class="acts"><button type="button" class="btn small collect" data-rkind="resolution" data-rid="${Number(r.id)}" data-rkey="${esc(r.document_id)}"
+        aria-pressed="false" aria-label="Collect resolution ${esc(r.resolution_number)}">Collect resolution</button></div>
     </header>
     ${r.needs_review ? `<div class="notice"><p>This document is a scan. Its text was read by OCR and has not been reviewed; the PDF has the authoritative wording.</p></div>` : ""}
     ${jump}
@@ -535,7 +631,16 @@ function aboutView() {
         <p>Every word shown is ATNI's published text, quoted verbatim. Clauses are separated by fixed rules from the PDFs ATNI publishes at <a href="https://atnitribes.org/resolutions/" rel="noopener">atnitribes.org</a>. Each record links its PDF and shows the file's SHA-256. The PDF is authoritative.</p>
         <p>Nothing on this site is generated, summarized or paraphrased by AI.</p></section>
       <section><h2>Search in This Browser</h2>
-        <p>The whole collection (${num(build.resolutions)} documents, ${build.year_min} to ${build.year_max}) downloads once and is searched here with SQLite full-text search, best matches first. Nothing you type is sent anywhere.</p></section>
+        <p>The whole collection (${num(build.resolutions)} documents, ${build.year_min} to ${build.year_max}) downloads once and is searched here with SQLite full-text search, best matches first. Every word you type must appear in a resolution, and a word of four or more letters also matches longer words that start with it.${issuesOk ? " Typing the name of an issue that Policy Sentinel lists also searches the names and references it gives for that issue." : ""} The page shows exactly what was searched and links to a search of only your words. Nothing you type is sent anywhere.</p></section>
+      <section><h2>Research</h2>
+        <ul class="squares">
+          <li>“Collect” on a result, a resolution or a single WHEREAS or RESOLVED clause keeps it in your research, word for word, with its source PDF link, the file's SHA-256 and the clause's page when ATNI's PDF gives it.</li>
+          <li>Open Research to review what you collected, remove an item and undo, download it as JSON or text, or print it. “Add to draft” there carries a clause into your draft.</li>
+          <li>Your research stays in this browser, apart from your draft. It is never sent anywhere. Nothing is summarized or rewritten.</li>
+        </ul></section>
+      ${issuesOk ? `<section><h2>Names From Policy Sentinel</h2>
+        <p>Issue names and the laws and regulations they rest on come only from a copy of the reviewed issue table of <a href="${SENTINEL_HOME}" rel="noopener">Policy Sentinel</a>, kept with this site and last reviewed ${esc(usDate(issues.map(i => i.reviewedOn).sort().at(-1)))}. Matches in resolutions come only from ATNI's published text. The copy (<a href="issues.json">issues.json</a>) is Policy Sentinel's, under the <a href="https://polyformproject.org/licenses/noncommercial/1.0.0" rel="noopener">PolyForm Noncommercial License 1.0.0</a>; its required notice is inside the file.</p>
+        <p>A result is a text match: the words appear in that resolution. It is not a finding or a legal conclusion.</p></section>` : ""}
       <section><h2>The Draft Tool</h2>
         <ul class="squares">
           <li>On any resolution, “Add to draft” carries a WHEREAS or RESOLVED clause into your draft, word for word, with a record of where it came from.</li>
@@ -557,7 +662,7 @@ function aboutView() {
         </ul></section>
       <section><h2>Data and Code</h2>
         <p>Under the <a href="${TSDF}" rel="noopener">Tiered Sovereign Data Framework</a>, ATNI's web-published resolutions are T0: public. This site carries no other material.</p>
-        <p>Code: <a href="${CODE}" rel="noopener">github.com/atniclimate/ResIST</a>, licensed AGPL-3.0-or-later.</p>
+        <p>Code: <a href="${CODE}" rel="noopener">github.com/atniclimate/ResIST</a>, under the <a href="https://polyformproject.org/licenses/noncommercial/1.0.0" rel="noopener">PolyForm Noncommercial License 1.0.0</a>. Required Notice: Copyright Affiliated Tribes of Northwest Indians (https://atnitribes.org)</p>
         <p class="meta">Built ${esc(usDate(build.built) || build.built)} from commit <code>${esc(build.commit)}</code>; database SHA-256 <code>${esc(String(build.db_sha256).slice(0, 16))}</code>.</p></section>
     </div>
   </div>`;
@@ -568,6 +673,9 @@ function aboutView() {
 document.querySelector(".skip")?.addEventListener("click", e => { e.preventDefault(); main.focus(); });
 addEventListener("hashchange", route);
 route();
+async function loadDatabase() {
+  if (loadingDatabase || ready || loadError) return;
+  loadingDatabase = true;
 try {
   await load(f => {
     const pct = Math.round(f * 100), status = document.getElementById("status"), bar = document.getElementById("loadbar");
@@ -578,11 +686,14 @@ try {
   refreshLookupLabel(); // an open draft rendered before this point shows the pre-load label (D12)
   ready = true;
   store.verifyWith(storedSource, storedCiteSource);
+  const dropped = collection.verifyWith(storedItem);
+  if (dropped) toast(`${plural(dropped, "collected item")} ${dropped === 1 ? "is" : "are"} not in this version of the data and ${dropped === 1 ? "was" : "were"} removed from your research.`);
 } catch (e) {
   loadError = `The resolution database did not load (${e.message}). Reload the page to try again.`;
 }
 main.removeAttribute("aria-busy");
-if (parse().path !== "/draft") {
+if (!["/draft", "/reports", "/research"].includes(parse().path)) {
   route(); // re-rendering an open draft would take focus from the person typing
   if (ready) say("Resolutions loaded");
+}
 }
