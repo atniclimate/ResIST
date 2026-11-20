@@ -23,6 +23,96 @@ test("ftsMatch agrees with every shared vector", () => {
   for (const v of V.vectors) assert.equal(Q.ftsMatch(v.q), v.match, JSON.stringify(v.q));
 });
 
+// The broad grammar (D-078): tests/test_broaden_vectors.py runs the same file against resist.index.broaden.
+const B = JSON.parse(readFileSync(new URL("../fixtures/query/broaden-vectors.json", import.meta.url), "utf8"));
+const same = (a, b) => JSON.stringify(a) === JSON.stringify(b); // fold to a boolean so a failure prints no text
+
+test("broaden agrees with every shared vector", () => {
+  assert.equal(B.schema, "resist-broaden-vectors/1");
+  assert.deepEqual({ ...Q.INDEX }, B.index);
+  assert.equal(B.vectors.length, 27);
+  B.vectors.forEach((v, n) => assert.ok(same(Q.broaden(v.q, B.issues, { exact: v.exact }), v.expected), `vector ${n}`));
+});
+
+test("broaden with exact reproduces ftsMatch, and its words are the typed words", () => {
+  for (const [n, v] of V.vectors.entries()) {
+    const b = Q.broaden(v.q, B.issues, { exact: true });
+    assert.ok(b.match === v.match && b.match === Q.ftsMatch(v.q) && b.issue === null, `old vector ${n}`);
+    assert.ok(b.words.every(w => w.prefix === false), `old vector ${n} words`);
+  }
+});
+
+test("no typed character reaches FTS5 syntax", () => {
+  for (const q of [...V.vectors, ...B.vectors].map(v => v.q)) {
+    const m = Q.broaden(q, B.issues).match;
+    assert.ok(/^(?:"[^"]*"\*?|\(| OR |\)|\s)*$/.test(m), "only quoted terms, parentheses and OR outside quotes");
+  }
+  const m = Q.broaden('NOT NEAR(a b) "x" c*', B.issues).match;
+  assert.ok(m.split('"').filter((_, i) => i % 2 === 0).join("").replace(/[\s*]/g, "") === "", "typed operators stay inside quotes");
+});
+
+test("a broad match is one bound parameter", () => {
+  const { calls, exec } = recorder();
+  Q.useDatabase(exec, CAPS, BUILT);
+  const { match } = Q.broaden("Section 106", B.issues);
+  assert.ok(match.includes(" OR "));
+  Q.search({ match, convention: "", committee: "", year: "" }, { sort: "best", limit: 25, offset: 0 });
+  assert.equal(calls.length, 1);
+  assert.ok(!/Section|NHPA|306108|CFR|OR "/.test(calls[0].sql), "the SQL holds no typed word, phrase or OR");
+  assert.deepEqual(calls[0].bind, [match, 25, 0]);
+});
+
+test("search selects document_id; resolutionByDocument binds one parameter", () => {
+  const { calls, exec } = recorder();
+  Q.useDatabase(exec, CAPS, BUILT);
+  Q.search({ match: "", convention: "", committee: "", year: "" }, { sort: "new", limit: 25, offset: 0 });
+  assert.ok(/^\s*select r\.id, r\.document_id, r\.resolution_number, /.test(calls[0].sql) && !calls[0].sql.includes("*"));
+  const doc = "ab".repeat(32);
+  assert.equal(Q.resolutionByDocument(doc), null);
+  assert.ok(!calls[1].sql.includes("*") && !calls[1].sql.includes(doc));
+  assert.deepEqual(calls[1].bind, [doc]);
+  Q.useDatabase(() => [{ id: 7 }], CAPS, BUILT);
+  assert.equal(Q.resolutionByDocument(doc), 7);
+});
+
+test("issuesFrom accepts a well-formed file and refuses each damage", () => {
+  const good = () => ({
+    schema: "resist-issue-names/1",
+    source: { repo: "policy-sentinel", path: "config/issues.v1.json", commit: "not tracked", commit_date: "2026-11-19",
+      file_sha256: "a".repeat(64), reviewed_on: "2026-11-18", pinned_on: "2026-11-20", schema_version: "1.0.0" },
+    expansions: structuredClone(B.issues),
+  });
+  const got = Q.issuesFrom(good());
+  assert.equal(got.length, 3);
+  assert.ok(same(got, B.issues), "the accepted copy keeps exactly the vectors' fields");
+  const sha = good(); sha.source.commit = "b".repeat(40);
+  assert.equal(Q.issuesFrom(sha).length, 3, "a 40-hex commit is accepted");
+  const damage = [
+    f => { f.schema = "resist-issue-names/2"; },
+    f => { delete f.source.file_sha256; },
+    f => { f.source.file_sha256 = "a".repeat(63); },
+    f => { f.source.file_sha256 = "A".repeat(64); },
+    f => { f.source.commit = "abc"; },
+    f => { f.source.reviewed_on = "11/18/2026"; },
+    f => { f.source.pinned_on = undefined; },
+    f => { delete f.source; },
+    f => { f.expansions = []; },
+    f => { f.expansions = "x"; },
+    f => { f.expansions[1].id = f.expansions[0].id; },
+    f => { f.expansions[0].id = "Not Valid"; },
+    f => { f.expansions[0].label = ""; },
+    f => { f.expansions[0].reviewedOn = "2026-1-1"; },
+    f => { f.expansions[0].phrases[0].text = "x"; },
+    f => { f.expansions[0].phrases = Array.from({ length: 41 }, () => ({ text: "ab", from: "name:official" })); },
+    f => { f.expansions[0].triggers[0] = 7; },
+    f => { f.expansions[0].triggers = []; },
+    f => { f.expansions[0].phrases[0].from = "name:official-ish"; },
+    f => { f.expansions[0].phrases[1] = null; },
+  ];
+  damage.forEach((d, n) => { const f = good(); d(f); assert.ok(Q.issuesFrom(f).length === 0, `damage ${n}`); });
+  for (const bad of [null, undefined, [], "x", 7, {}]) assert.equal(Q.issuesFrom(bad).length, 0);
+});
+
 test("INDEX is the vectors file's index manifest", () => {
   assert.deepEqual({ ...Q.INDEX }, V.index);
   Q.requireIndex(Q.INDEX);
@@ -157,15 +247,20 @@ test("every export runs on a real built site database", { skip: !process.env.RES
     const rows = Q.search(all, { sort: "new", limit: 25, offset: 0 });
     assert.equal(rows.length, Math.min(n, 25));
     assert.deepEqual(Object.keys(rows[0]).sort(), ["committee", "convention_location", "convention_name",
-      "convention_year", "id", "needs_review", "resolution_number", "snip", "title"]);
+      "convention_year", "document_id", "id", "needs_review", "resolution_number", "snip", "title"]);
+    assert.ok(rows.every(r => /^[0-9a-f]{64}$/.test(r.document_id) && Q.resolutionByDocument(r.document_id) === r.id),
+      "a result's document_id finds its resolution");
+    assert.equal(Q.resolutionByDocument("0".repeat(64)), null);
     assert.ok(rows.every(r => r.snip === null), "no snippet without a match");
-    assert.deepEqual(Q.search(all, { sort: "old", limit: 25, offset: 0 }).map(r => r.id).sort(), rows.map(r => r.id).sort());
-    assert.equal(Q.search(all, { sort: "new", limit: 25, offset: n }).length, 0);
+    if (n <= 25) { // a larger export has different first pages for new and old
+      assert.deepEqual(Q.search(all, { sort: "old", limit: 25, offset: 0 }).map(r => r.id).sort(), rows.map(r => r.id).sort());
+      assert.equal(Q.search(all, { sort: "new", limit: 25, offset: n }).length, 0);
+    }
 
     // "Tribes" is in the issuer's own name, Affiliated Tribes of Northwest Indians: an operator word, not clause text.
     const f = { ...all, match: Q.ftsMatch("Tribes") };
     const hits = Q.search(f, { sort: "best", limit: 25, offset: 0 });
-    assert.ok(hits.length > 0 && hits.length === Q.searchTotal(f), "a full-text match finds and counts the same rows");
+    assert.ok(hits.length > 0 && hits.length === Math.min(25, Q.searchTotal(f)), "a full-text match finds and counts the same rows");
     assert.ok(hits.every(r => typeof r.snip === "string" && r.snip.includes("\x02")), "snippet marks the match");
 
     for (const y of Q.yearCounts(all).keys()) {
@@ -197,7 +292,7 @@ test("every export runs on a real built site database", { skip: !process.env.RES
       assert.ok(Q.citedBy(id).every(c => c.id !== id), "cited-by never lists the resolution itself");
       for (const c of Q.committeesOf(id)) assert.ok(Q.searchTotal({ ...all, committee: c }) >= 1, "committee filter");
       const urls = Q.sourceUrls(r.document_id);
-      assert.ok(urls.length >= 1 && urls[0].startsWith("tests/fixtures/atni/"), "the atni-table url comes first");
+      assert.ok(urls.length >= 1 && /^(tests\/fixtures\/atni\/|https:\/\/atnitribes\.org\/)/.test(urls[0]), "the atni-table url comes first");
     }
     if (n <= 25) assert.equal(Q.datedCount(), dated); // rows held every resolution
     assert.ok(firstCite, "the built export holds an anchored citation");
@@ -206,6 +301,27 @@ test("every export runs on a real built site database", { skip: !process.env.RES
     assert.ok(got && got.resolution_id === r.id && got.pos >= 1 && got.s0 === c.s0 && got.s1 === c.s1, "storedCite finds the row");
     assert.ok(got.text === c.text, "storedCite returns the stored text");
     assert.ok(Q.storedCite(r.document_id, s.t, s.i, c.s0, c.s1 + 1) === null, "another span is no stored citation");
+  } finally {
+    db.close();
+  }
+});
+
+// A broad search finds at least what the exact search finds (RM-2), and every broad match string runs in SQLite
+// (Node's own build here, not the vendored WASM, which the interface test covers). Counts and ids only.
+test("every broad match runs and finds a superset of the exact search", { skip: !process.env.RESIST_QUERY_DB && "RESIST_QUERY_DB not set (tests/test_query_vectors.py sets it)" }, async () => {
+  const { DatabaseSync } = await import("node:sqlite");
+  const db = new DatabaseSync(process.env.RESIST_QUERY_DB, { readOnly: true });
+  try {
+    Q.useDatabase((sql, bind) => db.prepare(sql).all(...bind), CAPS, BUILT);
+    const ids = match => new Set(Q.search({ match, convention: "", committee: "", year: "" },
+      { sort: "new", limit: 5000, offset: 0 }).map(r => r.id));
+    const queries = ["salmon", ...B.issues.map(i => i.label), ...B.vectors.filter(v => !v.exact).map(v => v.q)];
+    for (const [n, q] of queries.entries()) {
+      const broad = Q.broaden(q, B.issues).match;
+      if (!broad) continue;
+      const wide = ids(broad), narrow = ids(Q.broaden(q, B.issues, { exact: true }).match);
+      assert.ok([...narrow].every(id => wide.has(id)), `query ${n}: broad holds every exact result`);
+    }
   } finally {
     db.close();
   }

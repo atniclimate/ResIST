@@ -12,7 +12,7 @@ const ROOT = fileURLToPath(new URL("../../", import.meta.url));
 export const seal = new Uint8Array(readFileSync(join(ROOT, "pages", "atni-seal-color.jpg")));
 const conventions = JSON.parse(readFileSync(join(ROOT, "pages", "conventions.json"), "utf8")).conventions;
 
-const R2651 = {
+export const R2651 = {
   resolutionId: 409, number: "26-51", year: 2026, convention: "Annual Convention",
   title: "Supporting Responsible Governance of Youth Use of Artificial Intelligence Chatbots in Schools and Education",
   documentId: "5b62a9708e4081fd5baa676ba2ea0aae0c3dad1daf03f05dc4cab722fc193a91",

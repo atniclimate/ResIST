@@ -52,6 +52,8 @@ ul.squares > li::before { content: ""; position: absolute; left: 0; top: 0.62em;
 .site-nav { margin-left: auto; display: flex; align-items: center; gap: 0; flex-wrap: nowrap; }
 .site-nav a { font-family: var(--atni-type-family-display); font-weight: var(--atni-type-weight-display-medium); font-size: var(--atni-type-button-size); color: var(--atni-text-secondary); text-decoration: none; padding: 0 var(--atni-space-step-2); min-height: var(--atni-space-touch-primary); display: inline-flex; align-items: center; gap: var(--atni-space-step-1); white-space: nowrap; }
 @media (min-width: 40rem) { .site-nav { gap: var(--atni-space-step-1); } .site-nav a { padding: 0 var(--atni-space-step-3); gap: var(--atni-space-step-2); } .site-header .bar { gap: var(--atni-space-step-4); } }
+/* Five links, two counts and the theme button do not fit one row on a phone: the header is static there, so it may wrap. */
+@media (max-width: 39.99rem) { .site-header .bar { height: auto; flex-wrap: wrap; padding-top: var(--atni-space-step-1); padding-bottom: var(--atni-space-step-1); } .site-nav { flex-wrap: wrap; justify-content: flex-end; } }
 .icon-btn { display: inline-flex; align-items: center; justify-content: center; flex: none; width: var(--atni-space-touch-primary); height: var(--atni-space-touch-primary); padding: 0; border: 1px solid transparent; border-radius: var(--atni-space-radius); background: transparent; color: var(--atni-text-secondary); cursor: pointer; }
 .icon-btn:hover { color: var(--atni-text-heading); border-color: var(--atni-non-text-rule); }
 .site-nav a:hover { color: var(--atni-text-heading); }
@@ -126,7 +128,7 @@ dialog .dialog-head h2 { font-size: var(--atni-type-heading-3-size); flex: 1; }
 dialog .dialog-body { padding: var(--atni-space-step-5); }
 
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
-@media print { .site-header, .site-footer, .dock, .jump { display: none; } body { padding-bottom: 0; } }
+@media print { .site-header, .site-footer, .dock, .jump, .btn.collect { display: none; } body { padding-bottom: 0; } }
 
 /* ===== ui-shell views (app.js): header details, loading, search, detail, about. Extends the base above. ===== */
 
@@ -174,6 +176,15 @@ main:focus, h1[tabindex="-1"]:focus { outline: none; }
 .result h2 a:hover { text-decoration: underline; text-decoration-color: var(--atni-non-text-accent); }
 .result .meta { margin: var(--atni-space-step-1) 0 0; }
 .result .chip { margin-left: var(--atni-space-step-2); }
+.result .acts { margin-top: var(--atni-space-step-3); }
+/* What was searched (D-078): a statement of fact about the query, so a muted rule, not the red of an action. */
+.searched { max-width: 48rem; margin: 0 0 var(--atni-space-step-5); padding: var(--atni-space-step-3) var(--atni-space-step-4); background: var(--atni-ground-raised); border-left: 3px solid var(--atni-text-muted); }
+.searched p { margin: 0 0 var(--atni-space-step-2); }
+.searched > :last-child { margin-bottom: 0; }
+#searched-lead { font-family: var(--atni-type-family-display); font-weight: var(--atni-type-weight-display-medium); color: var(--atni-text-heading); }
+.searched ul.squares { display: grid; grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr)); gap: 0 var(--atni-space-step-4); margin: 0 0 var(--atni-space-step-2); color: var(--atni-text-secondary); overflow-wrap: anywhere; }
+#search-mode { display: inline-block; padding: var(--atni-space-step-1) 0; }
+#issues-note { margin: 0 0 var(--atni-space-step-5); }
 .snip { margin: var(--atni-space-step-2) 0 0; max-width: 46rem; color: var(--atni-text-secondary); overflow-wrap: anywhere; }
 .empty-state { padding: var(--atni-space-step-6) 0; max-width: 40rem; }
 .empty-state h2 { margin-bottom: var(--atni-space-step-3); }
@@ -189,6 +200,7 @@ main:focus, h1[tabindex="-1"]:focus { outline: none; }
 .back { margin: 0 0 var(--atni-space-step-5); font-family: var(--atni-type-family-display); font-weight: var(--atni-type-weight-display-medium); }
 .detail-head { margin: 0 0 var(--atni-space-step-6); }
 .detail-head .lead { max-width: 46rem; margin: var(--atni-space-step-3) 0 0; }
+.detail-head .acts { margin-top: var(--atni-space-step-4); }
 .detail-grid { display: grid; gap: var(--atni-space-step-7); }
 @media (min-width: 64rem) {
   .detail-grid { grid-template-columns: minmax(0, 1fr) 20rem; gap: var(--atni-space-step-8); align-items: start; }
@@ -219,13 +231,14 @@ h2[tabindex="-1"]:focus-visible { outline: 2px solid var(--atni-non-text-accent)
 .clause-text p { margin: 0; max-width: 42rem; overflow-wrap: anywhere; }
 .clause-text .chip { margin-top: var(--atni-space-step-2); }
 .clause-text .header-note { margin-top: var(--atni-space-step-2); }
-.clause .carry { align-self: start; }
-/* The label stays "Add to draft" (it is the button's name); aria-pressed carries the state, the mark shows it. */
-.btn.carry[aria-pressed="true"]::before { content: "\2713"; content: "\2713" / ""; }
+.clause-acts { display: flex; flex-direction: column; align-items: stretch; align-self: start; gap: var(--atni-space-step-2); }
+/* The label stays "Add to draft" or "Collect" (it is the button's name); aria-pressed carries the state, the mark shows it. */
+.btn.carry[aria-pressed="true"]::before, .btn.collect[aria-pressed="true"]::before { content: "\2713"; content: "\2713" / ""; }
 @media (max-width: 48rem) {
   .clause { grid-template-columns: minmax(0, 1fr); }
   .clause-lead b, .clause-lead .pg { display: inline; margin-right: var(--atni-space-step-2); }
-  .clause .carry { justify-self: start; min-height: var(--atni-space-touch-primary); }
+  .clause-acts { flex-direction: row; flex-wrap: wrap; justify-self: start; }
+  .clause .carry, .clause .collect { min-height: var(--atni-space-touch-primary); }
 }
 .full-text { margin-top: var(--atni-space-step-7); border-top: 1px solid var(--atni-non-text-rule); }
 .full-text summary { display: flex; align-items: center; min-height: var(--atni-space-touch-primary); cursor: pointer; font-family: var(--atni-type-family-display); font-weight: var(--atni-type-weight-display-medium); color: var(--atni-text-secondary); }

@@ -212,9 +212,14 @@ def test_statement_offsets(pool):
     assert sha_mismatch == 0, f"{sha_mismatch} statements whose text_sha256 differs from sha256(full_text)"
 
 
-def test_reserved_columns_and_edges_empty(pool):
-    assert _one(pool, "select count(*) from document where version_group_id is not null "
-                      "or version_role is not null") == 0
+def test_version_columns_match_the_ledger_and_edges_empty(pool):
+    """The version columns hold only what the corrections ledger records (D-079); no ledger, no values."""
+    ledger, want = REAL_RES / "csv" / "atni" / "corrections.csv", Counter()
+    if ledger.is_file():
+        with ledger.open(encoding="utf-8-sig", newline="") as f:
+            want = Counter(r["field"] for r in csv.DictReader(f))
+    assert _one(pool, "select count(*) from document where version_group_id is not null") == want["version_group_id"]
+    assert _one(pool, "select count(*) from document where version_role is not null") == want["version_role"]
     assert _one(pool, "select count(*) from edge") == 0
     assert _one(pool, "select count(*) from edge where edge_type = 'supersedes'") == 0
 

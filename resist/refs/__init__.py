@@ -6,10 +6,12 @@ This package imports no resolver module at import time (registry.get loads them 
 resist.refs works even when a resolver's optional dependency is blocked (U7).
 """
 
+import sqlite3
+from collections.abc import Iterable, Sequence
 from dataclasses import replace
-from typing import Iterable, Sequence
 
 from resist import registry
+from resist.contracts import ReferenceResolver
 from resist.errors import DependencyError
 from resist.models import ClauseText, RefCandidate
 
@@ -41,15 +43,31 @@ def merge(*found: Iterable[RefCandidate]) -> list[RefCandidate]:
     return out
 
 
-def find_all(text: ClauseText, names: Sequence[str] | None = None) -> list[RefCandidate]:
-    """Run each named resolver (default: every registered resolver) and merge. A resolver whose available()
-    is not ok raises DependencyError(reason, remediation); nothing is skipped silently (D8: no selector)."""
+def load_resolvers(names: Sequence[str] | None = None) -> list[ReferenceResolver]:
+    """Acquire available resolvers once for a batch; refuse rather than silently skip a missing dependency."""
     chosen = list(names) if names is not None else registry.names("resolver")
-    results: list[list[RefCandidate]] = []
+    resolvers = []
     for name in chosen:
         resolver = registry.get("resolver", name)
         avail = resolver.available()
         if not avail.ok:
             raise DependencyError(avail.reason, avail.remediation)
-        results.append(resolver.find(text))
-    return merge(*results)
+        resolvers.append(resolver)
+    return resolvers
+
+
+def find_with(text: ClauseText, resolvers: Iterable[ReferenceResolver],
+              con: sqlite3.Connection | None = None) -> list[RefCandidate]:
+    """Merge a batch's held resolvers; optionally link using the caller's read-only source connection.
+
+    Candidate offsets and text hashes identify the supplied ClauseText, with no masking or unit conversion.
+    """
+    from resist.refs.link import link
+
+    found = merge(*(resolver.find(text) for resolver in resolvers))
+    return link(found, con) if con is not None else found
+
+
+def find_all(text: ClauseText, names: Sequence[str] | None = None) -> list[RefCandidate]:
+    """Run each named resolver (default: all registered); unavailable dependencies raise DependencyError."""
+    return find_with(text, load_resolvers(names))

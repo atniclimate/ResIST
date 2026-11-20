@@ -41,7 +41,7 @@ def test_query_js_runs_on_a_real_built_site(data_root, monkeypatch, tmp_path):
     store(*FIXTURES)
     bp = load(monkeypatch, data_root)
     stub_git(bp, monkeypatch)
-    assert bp.main(manifest(tmp_path / "res", *FIXTURES)) == 0
+    assert bp.main(manifest(tmp_path / "res", *FIXTURES, real_urls=True)) == 0  # sourceUrls needs admitted source rows
     out = data_root / "exchange" / "pages"
     build = json.loads((out / "build.json").read_text(encoding="utf-8"))
     assert build["fts_tokenize"] == VECTORS["index"]["tokenizer"]  # what useDatabase() requires of the export

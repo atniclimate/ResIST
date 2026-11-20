@@ -1,0 +1,21 @@
+/* Local report reading uses the existing body face, measure and controls. */
+.report-view { max-width: 76rem; }
+.report-view [hidden] { display: none; }
+.report-view h1 { margin-bottom: var(--atni-space-step-4); }
+.report-view h2, .report-view h3 { margin: var(--atni-space-step-5) 0 var(--atni-space-step-3); }
+.report-view form { max-width: 36rem; margin: var(--atni-space-step-5) 0; }
+.report-actions { display: flex; flex-wrap: wrap; gap: var(--atni-space-step-3); margin-bottom: var(--atni-space-step-4); }
+.report-view .btn { white-space: normal; padding-block: .5em; }
+.report-view blockquote { white-space: pre-wrap; overflow-wrap: anywhere; margin: 0 0 1em; max-width: var(--atni-space-measure); }
+.report-view details { margin: 0 0 var(--atni-space-step-4); }
+.report-view summary { cursor: pointer; padding: .5em 0; }
+.report-view pre { white-space: pre-wrap; overflow-wrap: anywhere; font: inherit; }
+.report-view code { overflow-wrap: anywhere; }
+.report-clause { border-top: 1px solid var(--atni-non-text-rule); padding-top: var(--atni-space-step-3); }
+.report-view dl { display: grid; grid-template-columns: minmax(7rem, 1fr) minmax(0, 3fr); gap: .5em 1em; }
+.report-view dd { margin: 0; overflow-wrap: anywhere; }
+.report-view .report-counts { font-variant-numeric: tabular-nums; }
+.site-header .bar { min-height: var(--hdr); height: auto; flex-wrap: wrap; }
+.site-nav { flex-wrap: wrap; }
+@media (max-width: 48rem) { .site-header { position: relative; } }
+@media (max-width: 35rem) { .report-view dl { display: block; } .report-view dd { margin-bottom: .75em; } }

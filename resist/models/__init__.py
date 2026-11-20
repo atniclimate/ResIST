@@ -273,7 +273,8 @@ RefState = Literal["resolved", "ambiguous", "unlinked"]                 # report
 @dataclass(frozen=True)
 class ClauseText(Record):
     """Text handed to a ReferenceResolver: a statement or a whole document's text. Offsets in the candidates it
-    yields are into `text`; text_sha256 = sha256(text) identifies it (statement.text_sha256 for a stored clause)."""
+    yields are into `text`; text_sha256 = sha256(text) identifies it. A stored statement.text_sha256 instead
+    identifies the entire resolution.full_text; it is not the hash of statement.text."""
     sha256: Sha256                 # the citing document
     text: str
     page: int | None = None        # copied into every Span

@@ -35,6 +35,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from resist import config, netguard, registry  # noqa: E402
 from resist.errors import ArtifactError, ResistError  # noqa: E402
 from resist.services import policy  # noqa: E402
+from resist.services.extraction_evidence import record_extraction, validate_extraction
 from src.analysis.graph import ResolutionGraph, build_graph_from_resolutions  # noqa: E402
 from src.analysis.keywords import extract_all_keywords  # noqa: E402
 from src.analysis.linker import add_citation_edges_to_graph, link_all_references  # noqa: E402
@@ -112,6 +113,7 @@ def _ingest(res_dir, extractor, table, media, by_sha, work, stored: Mapping[str,
             ids = sorted({i for r in rows for i in r["table_wdt_ids"].split(";") if i}, key=int)
             trow = table.get(ids[0]) if ids else None
             path = rows[0]["local_path"]
+            ex = None  # Stored-text rebuilds have no historical extraction result.
             try:
                 sp = policy.source_policy(sha, res_dir)  # inside the try: one bad manifest sha fails one row
                 if not policy.admissible(sp):  # nothing is opened
@@ -124,7 +126,13 @@ def _ingest(res_dir, extractor, table, media, by_sha, work, stored: Mapping[str,
                     pr = parse_resolution(text, sha)  # no page boundaries: page_number stays NULL
                 else:
                     ex = extractor.extract(sp.doc_ref(), res_dir / path, work)
+                    validate_extraction(ex, sha, ex.text)
                     need = sum(1 for p in ex.pages if p.error.startswith("ocr_unavailable"))
+                    if need or ex.disposition == "failed" or len(ex.pages) != ex.page_count:
+                        record_extraction(session.connection().connection.driver_connection, ex)
+                        session.commit()  # An unsuccessful attempt has no producing-resolution binding.
+                    if len(ex.pages) != ex.page_count:
+                        raise ArtifactError("extraction-pages-incomplete")
                     if need:  # not stored: never half-ingested, and a later run with OCR ingests it in full
                         skipped_ocr += 1
                         print(json.dumps({"sha256": sha, "status": "skipped", "reason": "ocr_unavailable",
@@ -156,7 +164,7 @@ def _ingest(res_dir, extractor, table, media, by_sha, work, stored: Mapping[str,
                     pr.sponsors["committee"] = committee
                 if not text.strip():
                     pr.needs_review = True
-                res = save_resolution(session, pr, text)
+                res = save_resolution(session, pr, text, extraction=ex)
                 res.title = title
                 res.needs_review = pr.needs_review or ocr_pages > 0
                 session.add(res)

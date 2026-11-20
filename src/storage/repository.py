@@ -1,12 +1,15 @@
 """Resolution repository with CRUD and search operations."""
 import hashlib
-import re
-from typing import List, Optional, Dict, Any
-from sqlmodel import Session, select
-from sqlalchemy import text
+from typing import Any, Dict, List, Optional
 
-from src.models.resolution import Resolution, Statement, Citation, Sponsor, Theme, ResolutionTheme
+from sqlalchemy import text
+from sqlmodel import Session, select
+
+from resist.models import DocumentResult
+from resist.services.extraction_evidence import record_extraction, validate_extraction
 from src.models.document import ParseResult
+from src.models.resolution import Citation, Resolution, ResolutionTheme, Sponsor, Statement, Theme
+
 from .database import get_engine
 
 
@@ -34,7 +37,8 @@ def sanitize_snippet(snippet: str) -> str:
     return snippet
 
 
-def save_resolution(session: Session, parse_result: ParseResult, full_text: str) -> Resolution:
+def save_resolution(session: Session, parse_result: ParseResult, full_text: str,
+                    extraction: DocumentResult | None = None) -> Resolution:
     """
     Save a parsed resolution to the database.
 
@@ -46,6 +50,8 @@ def save_resolution(session: Session, parse_result: ParseResult, full_text: str)
     Returns:
         Created Resolution with id populated
     """
+    if extraction is not None:
+        validate_extraction(extraction, parse_result.document_id, full_text)
     # Create Resolution
     resolution = Resolution(
         document_id=parse_result.document_id,
@@ -118,6 +124,8 @@ def save_resolution(session: Session, parse_result: ParseResult, full_text: str)
         sponsor = Sponsor(resolution_id=resolution.id, name=sponsors["committee"], sponsor_type="committee")
         session.add(sponsor)
 
+    if extraction is not None:
+        record_extraction(session.connection().connection.driver_connection, extraction, resolution_id=resolution.id)
     session.commit()
     session.refresh(resolution)
     return resolution

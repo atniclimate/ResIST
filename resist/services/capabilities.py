@@ -49,6 +49,7 @@ def document(face: Literal["local", "static"]) -> dict:
         "tier_max": tier_max,
         "api": api,
         "export": {"docx": "client", "pdf": None},  # pdf "server" only once D-068's route exists
+        "reports": {"available": face == "local", "formats": ["json", "md", "docx"] if face == "local" else []},
         "sentinel": sentinel,
         "annotate": False,
         "analytics": False,  # D-063: /api/v1/analytics/ is reserved, no endpoint

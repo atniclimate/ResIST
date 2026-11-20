@@ -1,9 +1,11 @@
 ATNI-ResIST (Resolution Information Synthesis Tool)
 Copyright (C) 2026 ATNI Climate / Affiliated Tribes of Northwest Indians
 
-This program is free software: you can redistribute it and/or modify it under the terms of the
-GNU Affero General Public License as published by the Free Software Foundation, either version 3
-of the License, or (at your option) any later version. See LICENSE.
+Since 2026-11-20 this software is offered under the PolyForm Noncommercial License 1.0.0
+(https://polyformproject.org/licenses/noncommercial/1.0.0). See LICENSE.
+Required Notice: Copyright Affiliated Tribes of Northwest Indians (https://atnitribes.org)
+Versions published before that date were offered under the GNU Affero General Public License,
+version 3 or later, and stay available under it.
 
 This repository contains code only. It contains no resolution documents or corpus data; Tribal
 resolutions and anything derived from them stay on ATNI-controlled infrastructure.
@@ -11,7 +13,10 @@ resolutions and anything derived from them stay on ATNI-controlled infrastructur
 Third-party components (installed as dependencies, not vendored; exact versions are pinned in
 constraints/dev-py311.lock.txt):
 
-- PyMuPDF (pymupdf), Artifex Software, Inc. -- GNU AGPL v3. This is why the project is AGPL.
+- PyMuPDF (pymupdf), Artifex Software, Inc. -- GNU AGPL v3, or a commercial licence from Artifex. It is installed
+  separately, is not part of this repository and is not under this project's licence; its own terms apply to
+  anyone who runs or redistributes it with this software. It sits behind the PdfBackend seam so that a
+  permissively licensed reader (pypdfium2) can replace it.
 - FastAPI, Uvicorn, SQLModel, Pydantic, python-multipart, httpx -- MIT / BSD-3-Clause
 - SQLAlchemy -- MIT
 - Jinja2 -- BSD-3-Clause
@@ -36,3 +41,13 @@ Vendored third-party files (committed in this repository, unmodified):
   jsdelivr copy the site loaded before 2026-10-20. Files and SHA-256:
     dist/index.mjs   -> index.mjs    f80870f0fa03a39a3338d17ed3fbea04808d344c88e724d90d5f37b9b7b83154
     dist/sqlite3.wasm -> sqlite3.wasm 02d7e48164395fa68f81c6ec33e9da5461be397dc57602ac0cd89b4bbba1d312
+
+Pinned sibling data (copied with provenance; published under its own licence):
+
+- pages/issues.json -- issue names and references from the reviewed issue table of Policy Sentinel (repository
+  policy-sentinel, config/issues.v1.json, file SHA-256 b7ca4d5ba7c029aa563b023065079b70578f28a70183b6958df800b2676d6382,
+  last changed in commit 2e3e9bb70129d3eeb3c2d6a200729368e9b88ec7 on 2026-11-19, rows reviewed 2026-11-18). Policy
+  Sentinel is under the PolyForm Noncommercial License 1.0.0
+  (https://polyformproject.org/licenses/noncommercial/1.0.0), and this copy stays under it:
+  "Required Notice: Copyright Affiliated Tribes of Northwest Indians (https://atnitribes.org)".
+  The file carries the licence address and that notice in its own source block.

@@ -4,6 +4,7 @@ import ast
 import csv
 import hashlib
 import importlib.util
+import re
 import socket
 import sqlite3
 from pathlib import Path
@@ -59,14 +60,21 @@ def store(*names: str) -> None:
     db_module.get_engine().dispose()
 
 
-def manifest(res_dir: Path, *names: str) -> Path:
-    """A manifest derived at test time from the fixture files: fetched atni-table rows, url = fixture path."""
+# Each fixture's own source address, read from the table in the fixtures' README.
+URLS = dict(re.findall(r"^\| `([\w-]+)\.pdf` \| `[0-9a-f]{64}` \| `(https://atnitribes\.org/[^`]+)`",
+                       (ATNI / "README.md").read_text(encoding="utf-8"), re.MULTILINE))
+
+
+def manifest(res_dir: Path, *names: str, real_urls: bool = False) -> Path:
+    """A manifest derived at test time from the fixture files: fetched atni-table rows, url = fixture path (which the
+    export refuses as a source), or with real_urls the fixture's own atnitribes.org address (which it admits)."""
     res_dir.mkdir()
     with open(res_dir / "manifest-atni.csv", "w", encoding="utf-8", newline="") as f:
         w = csv.DictWriter(f, fieldnames=MANIFEST_HEADER)
         w.writeheader()
         for n in names:
-            w.writerow({"source": "atni-table", "url": f"tests/fixtures/atni/{n}.pdf", "local_path": f"atni/{n}.pdf",
+            w.writerow({"source": "atni-table", "url": URLS[n] if real_urls else f"tests/fixtures/atni/{n}.pdf",
+                        "local_path": f"atni/{n}.pdf",
                         "sha256": sha(n), "status": "fetched", "tsdf_tier": "T0"})
     return res_dir
 
@@ -128,4 +136,4 @@ def test_source_rows_only_admitted(data_root, monkeypatch, capsys, tmp_path):
                           uri=True)
     shas = {d for (d,) in con.execute("select document_id from source")}
     con.close()
-    assert shas == {sha("Res-23-40")}
+    assert shas == set()  # Fixture filesystem paths are not eligible public source URLs.

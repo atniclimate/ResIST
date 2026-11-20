@@ -9,6 +9,7 @@ import hashlib
 import struct
 from datetime import UTC, datetime
 from pathlib import Path
+from tempfile import TemporaryDirectory
 
 from resist import config as _config
 from resist import registry
@@ -36,7 +37,7 @@ def _png_size(path: Path) -> tuple[int, int]:
 
 class PdfInProcess:
     name = "pdf-inprocess"
-    version = "1"
+    version = "2"
     media_types = frozenset({"application/pdf"})
 
     def __init__(self, backend=None, router=None, ocr=None, config: _config.Config | None = None):
@@ -85,14 +86,23 @@ class PdfInProcess:
         bav = self.backend.available()
         if not bav.ok:
             raise DependencyError(bav.reason, bav.remediation)
-        path = Path(path)
-        if hashlib.sha256(path.read_bytes()).hexdigest() != doc.sha256:
+        data = Path(path).read_bytes()
+        if hashlib.sha256(data).hexdigest() != doc.sha256:
             raise BadInput("sha256-mismatch")  # U1
         prov = Provenance("pdf-inprocess", self.version, self.config.digest(), work_dir.name,
                           datetime.now(UTC).isoformat(timespec="seconds"))
+        work_dir.mkdir(parents=True, exist_ok=True)
+        # Every backend reopen must read the admitted bytes, even if the original is replaced.
+        with TemporaryDirectory(prefix="pdf-", dir=work_dir) as temporary:
+            temporary = Path(temporary)
+            snapshot = temporary / "source.pdf"
+            snapshot.write_bytes(data)
+            return self._extract_snapshot(doc, snapshot, temporary, prov)
+
+    def _extract_snapshot(self, doc: DocRef, path: Path, work_dir: Path, prov: Provenance) -> DocumentResult:
         try:
             n = self.backend.page_count(path)
-        except Exception as e:  # the document completes as failed; the type name only, never message text
+        except Exception as e:  # noqa: BLE001 - backend boundary returns a typed, sanitized failure
             return DocumentResult(doc.sha256, doc.media_type, "failed", 0, (), "", prov,
                                   extra={"error": type(e).__name__})
         pages: list[PageResult] = []

@@ -1,4 +1,4 @@
-"""The nine additive LR-F tables and the three statement columns (design 1.1; L1 to L9).
+"""Additive pool tables, including prospective extraction evidence, and statement columns.
 
 Every enumeration is a tuple that generates its CHECK. ensure() is idempotent and never touches resolution, the
 FTS tables or their triggers. PRAGMA user_version stays 0.
@@ -24,10 +24,17 @@ REVIEW_KINDS = ("duplicate_number", "number_unnormalized", "status_conflict", "s
                 "committee_label_unmapped", "amended_link", "amended_unresolved")
 ORGANIZATIONS = (("atni", 0, "D-052"), ("ncai", 1, "D-040"))  # (org_id, quarantined, decision_id); L9
 TABLES = ("organization", "work", "issuer_alias", "session", "document", "committee", "committee_alias",
-          "edge", "review_item")
+          "edge", "review_item", "extraction_record")
 STATEMENT_COLUMNS = (("char_start", "integer"), ("char_end", "integer"), ("text_sha256", "text"))
 WORK_ID_RE = re.compile(r"^w:[0-9a-f]{20}$")
 SHA_RE = re.compile(r"^[0-9a-f]{64}$")
+
+EXTRACTION_DDL = """extraction_record(
+    source_sha256 TEXT NOT NULL CHECK (length(source_sha256) = 64),
+    text_sha256 TEXT NOT NULL CHECK (length(text_sha256) = 64),
+    run_id TEXT NOT NULL, resolution_id INTEGER REFERENCES resolution(id),
+    result_json TEXT NOT NULL, result_sha256 TEXT NOT NULL CHECK (length(result_sha256) = 64),
+    PRIMARY KEY (source_sha256, text_sha256, run_id))"""
 
 
 def _in(values: tuple[str, ...]) -> str:
@@ -78,6 +85,7 @@ _DDL = {
         ref TEXT NOT NULL, detail TEXT, source TEXT NOT NULL,
         state TEXT NOT NULL DEFAULT 'open' CHECK (state IN ('open', 'resolved', 'dismissed')),
         UNIQUE (kind, ref, source))""",
+    "extraction_record": EXTRACTION_DDL,
 }
 
 _INDEXES = (
@@ -96,7 +104,7 @@ def mint_work_id(first_seen: str) -> str:
 
 
 def ensure(con: sqlite3.Connection) -> list[str]:
-    """Create the nine tables and their indexes, insert the two organization rows, and append the statement
+    """Create the tables and their indexes, insert the two organization rows, and append the statement
     columns that are absent (only when a statement table exists). Idempotent; commits. Returns what it created
     ("table:<n>", "column:<n>"), empty on a second run."""
     created = []

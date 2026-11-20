@@ -39,6 +39,8 @@ def test_extra_table_and_column_never_reach_the_site(data_root, monkeypatch, tmp
     assert bp.main(manifest(tmp_path / "res", *FIXTURES)) == 0
 
     out = data_root / "exchange" / "pages"
+    # the pinned issue table is published as it stands in pages/, licence address and Required Notice inside (D-080)
+    assert (out / "issues.json").read_bytes() == (bp.ROOT / "pages" / "issues.json").read_bytes()
     built, src = ro(out / "resolutions.db"), ro(pool)
     try:
         tables = bp._tables(built)
@@ -52,7 +54,7 @@ def test_extra_table_and_column_never_reach_the_site(data_root, monkeypatch, tmp
             assert n_built == n_pool, (table, n_built, n_pool)
         assert built.execute("select count(*) from sqlite_master where type = 'trigger'").fetchone()[0] == 0
         assert {d for (d,) in built.execute("select document_id from resolution")} == {sha(n) for n in FIXTURES}
-        assert {d for (d,) in built.execute("select document_id from source")} == {sha(n) for n in FIXTURES}
+        assert built.execute("select count(*) from source").fetchone()[0] == 0  # Fixture paths stay local.
     finally:
         built.close()
         src.close()

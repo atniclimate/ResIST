@@ -12,8 +12,10 @@ version = "0.2.0.dev0"
 description = "ATNI-ResIST: Resolution Information Synthesis Tool for the Affiliated Tribes of Northwest Indians. Local, offline, no-LLM resolution archive with classical retrieval and provenance."
 readme = "README.md"
 requires-python = ">=3.11,<3.12"
-# OQ7 answered by D-051 (PyMuPDF is AGPLv3). Table form because the build floor is setuptools 69, pre-PEP 639.
-license = { text = "AGPL-3.0-or-later" }
+# OQ7 re-answered by the owner on 2026-11-20 (D-080): PolyForm Noncommercial 1.0.0, replacing D-051's
+# AGPL-3.0-or-later. PyMuPDF below is AGPLv3 and is not covered by this licence (open item in D-080).
+# Table form because the build floor is setuptools 69, pre-PEP 639.
+license = { text = "PolyForm-Noncommercial-1.0.0" }
 authors = [{ name = "ATNI Climate / Affiliated Tribes of Northwest Indians" }]
 
 # Core: everything the test-only install needs. No OCR engines, no WeasyPrint (R0.5 rule).
@@ -26,7 +28,7 @@ dependencies = [
   "pydantic>=2.0,<3",            # imported directly via sqlmodel models; H03
   "python-multipart>=0.0.20,<1",
   "jinja2>=3.1,<4",
-  "pymupdf>=1.26,<2",            # AGPL-3.0; PdfBackend seam at R2.23 keeps pypdfium2 swappable
+  "pymupdf>=1.26,<2",            # AGPL-3.0, its own terms (D-080); PdfBackend seam at R2.23 keeps pypdfium2 swappable
   "eyecite>=2.7,<3",
   "citeurl>=12.0,<13",           # MIT; R1.20 CiteURL cases (owner-approved G34 install, docs/security 2026-10-20)
   "markdown>=3.11,<4",           # BSD-3; citeurl/__init__ imports it but does not declare it (upstream bug; owner-approved 2026-10-20)
@@ -86,7 +88,7 @@ citeurl = "resist.refs.citeurl_resolver:CiteurlResolver"
 [tool.setuptools]
 packages = ["src", "src.api", "src.export", "src.ingestion", "src.ingestion.ocr", "src.storage", "src.analysis", "src.models",
             "resist", "resist.models", "resist.contracts", "resist.adapters", "resist.services", "resist.ocr",
-            "resist.index", "resist.analytics", "resist.web", "resist.db", "resist.refs"]
+            "resist.index", "resist.analytics", "resist.web", "resist.db", "resist.refs", "resist.report"]
 
 [tool.setuptools.package-data]
 resist = ["data/*.toml"]

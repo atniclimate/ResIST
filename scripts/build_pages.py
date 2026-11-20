@@ -13,29 +13,30 @@ Only ATNI web-published (T0, D-052) material is in the database, which is checke
 resolution is T0 by source_policy and by any stored document.tier, every statement/citation/sponsor row belongs to one, and the source table
 holds only admitted SHA-256 rows.
 """
-import csv
 import hashlib
 import json
+import os
 import re
 import shutil
 import sqlite3
 import subprocess
 import sys
-from contextlib import closing
-from datetime import datetime, UTC
+from contextlib import closing, contextmanager
+from datetime import UTC, datetime
 from pathlib import Path
+from tempfile import TemporaryDirectory
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
-from resist import netguard, registry  # noqa: E402
-from resist.errors import ArtifactError, BadInput, DependencyError  # noqa: E402
-from resist.index import FTS5_TOKENIZE, has_d013_tokenizer, resolution_fts_ddl  # noqa: E402
-from resist.models import ClauseText, RefCandidate, max_tier  # noqa: E402
-from resist.refs import merge  # noqa: E402
-from resist.refs.link import link  # noqa: E402
-from resist.services import capabilities, edges, policy  # noqa: E402
-from src.ingestion.parser import normalize_resolution_number  # noqa: E402
-from src.storage.database import DATA_DIR, DATABASE_PATH  # noqa: E402
+from resist import netguard
+from resist.errors import ArtifactError, BadInput, DependencyError
+from resist.index import FTS5_TOKENIZE, has_d013_tokenizer, resolution_fts_ddl
+from resist.models import ClauseText, RefCandidate, max_tier
+from resist.refs import find_with, load_resolvers
+from resist.services import capabilities, edges, policy
+from resist.services.reports import SOURCE_URL
+from src.ingestion.parser import normalize_resolution_number
+from src.storage.database import DATA_DIR, DATABASE_PATH
 
 # (table, column) pairs that must point at an existing resolution.id (ownership closure, Codex LR-A 5)
 OWNED = (("statement", "resolution_id"), ("citation", "resolution_id"), ("citation", "linked_resolution_id"),
@@ -58,7 +59,6 @@ ALLOW: dict[str, tuple[tuple[str, str], ...]] = {
     "sponsor": (("id", "INTEGER NOT NULL PRIMARY KEY"), ("resolution_id", "INTEGER NOT NULL"),
                 ("name", "VARCHAR NOT NULL"), ("sponsor_type", "VARCHAR NOT NULL")),
 }
-MASKED = {("resolution", "full_text"), ("statement", "text"), ("citation", "text")}
 INDEXES = ("create index ix_resolution_convention_year on resolution(convention_year)",
            "create index ix_statement_resolution_id on statement(resolution_id)",
            "create index ix_citation_resolution_id on citation(resolution_id)",
@@ -150,34 +150,64 @@ def _missing_columns(con: sqlite3.Connection) -> int:
     return n
 
 
+NOT_LISTED = ("copy", "draft")  # document.version_role values the export leaves out
+
+
+def _not_listed(con: sqlite3.Connection) -> dict[str, tuple[str, str | None]]:
+    """sha256 of each document marked a copy (the same text in other bytes, D-079) or a draft (an earlier version of
+    an adopted final, or a draft with no final; D-080, owner: finals only) -> (its role, the one listed document of
+    its version group, or None). The export lists such a resolution once. Empty for a pool with no document table
+    or one made before the version columns."""
+    if "version_role" not in {r[1] for r in con.execute("pragma table_info(document)")}:
+        return {}
+    marks = ", ".join("?" * len(NOT_LISTED))
+    out: dict[str, tuple[str, str | None]] = {}
+    for sha, group, role in con.execute("select sha256, version_group_id, version_role from document "
+                                        f"where version_role in ({marks})", NOT_LISTED).fetchall():
+        kept = [s for (s,) in con.execute("select sha256 from document where version_group_id = ? and "
+                                          f"(version_role is null or version_role not in ({marks}))",
+                                          (group, *NOT_LISTED))]
+        out[sha] = (role, kept[0] if len(kept) == 1 else None)
+    return out
+
+
 def _copy(src: sqlite3.Connection, dst: sqlite3.Connection) -> None:
-    """Create each ALLOW table in dst and copy exactly its columns, masking contact details on the way in."""
+    """Create each ALLOW table in dst and copy exactly its columns, masking contact details on the way in. A copy or
+    draft (see _not_listed) and its rows are left out; a citation that linked to it links to the document kept."""
+    ids = dict(src.execute("select document_id, id from resolution"))
+    # a left-out document's id -> its keeper's id (None when no one document is kept in its place)
+    gone = {ids[c]: ids.get(k) for c, (_, k) in _not_listed(src).items() if c in ids}
     for table, cols in ALLOW.items():
         names = ", ".join(f'"{c}"' for c, _ in cols)
         dst.execute(f'create table "{table}" (' + ", ".join(f'"{c}" {t}' for c, t in cols) + ")")
-        masked = [i for i, (c, _) in enumerate(cols) if (table, c) in MASKED]
+        own = [c for c, _ in cols].index("id" if table == "resolution" else "resolution_id")
+        link = [c for c, _ in cols].index("linked_resolution_id") if table == "citation" else None
         rows = []
         for row in src.execute(f'select {names} from "{table}" order by id'):
-            row = list(row)
-            for i in masked:
-                if row[i] is not None:  # None stays None (never turned into "")
-                    row[i] = CONTACT.sub(MASK, row[i])
+            if row[own] in gone:
+                continue
+            if link is not None and row[link] in gone:
+                row = (*row[:link], gone[row[link]], *row[link + 1:])
+            if any(value is not None and "VARCHAR" in kind and not isinstance(value, str)
+                   for value, (_, kind) in zip(row, cols, strict=True)):
+                raise TypeError("non-text export value")
+            # Metadata can carry contact details too; preserve nulls and numeric values.
+            row = [CONTACT.sub(MASK, value) if isinstance(value, str) else value for value in row]
             rows.append(row)
         dst.executemany(f'insert into "{table}" ({names}) values ({", ".join("?" * len(cols))})', rows)
 
 
+def _contact_leaks(con: sqlite3.Connection) -> int:
+    """Check every exported field, including metadata and manifest-derived URLs; counts only."""
+    return sum(bool(CONTACT.search(value))
+               for table in (*ALLOW, "source", "cite")
+               for row in con.execute(f'select * from "{table}"')
+               for value in row if isinstance(value, str))
+
+
 def _resolvers() -> list[object]:
-    """Every registered resolver, held once for the whole build (registry.get makes a new instance per call, and a
-    citeurl citator per statement would take an hour). Repeats find_all's availability rule: not ok raises
-    DependencyError(reason, remediation). Recorded bypass of resist.refs.find_all (D-077)."""
-    out = []
-    for name in registry.names("resolver"):
-        r = registry.get("resolver", name)
-        av = r.available()
-        if not av.ok:
-            raise DependencyError(av.reason, av.remediation)
-        out.append(r)
-    return out
+    """Hold each resolver once for the build; rebuilding CiteURL per clause would take an hour."""
+    return load_resolvers()
 
 
 def _u16(s: str, i: int) -> int:
@@ -230,9 +260,7 @@ def _cites(src: sqlite3.Connection, dst: sqlite3.Connection, resolvers: list[obj
     stmts = dst.execute('select id, resolution_id, text, page_number from statement order by id').fetchall()
     kept: dict[int, list[dict]] = {}  # statement id -> non-overlapping spans sorted by start
     for sid, rid, text, page in stmts:
-        cands = merge(*(r.find(ClauseText(res[rid][0], text, page, own(rid))) for r in resolvers))
-        if linking:
-            cands = link(cands, src)
+        cands = find_with(ClauseText(res[rid][0], text, page, own(rid)), resolvers, src if linking else None)
         spans: dict[tuple[int, int], dict] = {}
         for c in cands:
             if c.span.start >= c.span.end:
@@ -321,19 +349,14 @@ def _cite_misanchored(con: sqlite3.Connection) -> int:
     return n
 
 
-def main(res_dir: Path) -> int:
-    netguard.install()  # D-039: this process makes no network call; the git child below is a recorded bypass
-    if not DATABASE_PATH.exists():
-        print(f"no database at {DATABASE_PATH}; run scripts/ingest_atni.py first", file=sys.stderr)
-        return 1
-    live = sqlite3.connect(f"file:{DATABASE_PATH}?mode=ro", uri=True)
+def _build(res_dir: Path, live: sqlite3.Connection, out: Path) -> int:
     fts_sql = live.execute("select sql from sqlite_master where name = 'resolution_fts'").fetchone()
-    doc_ids = [d for (d,) in live.execute("select document_id from resolution")]
+    hidden = _not_listed(live)
+    doc_ids = [d for (d,) in live.execute("select document_id from resolution") if d not in hidden]
     stored = dict(live.execute("select sha256, tier from document")) if "document" in _tables(live) else {}
     orphans = _orphans(live)
     missing = _missing_columns(live)
     above = _edges_above_t0(live, res_dir)
-    live.close()
     if orphans:
         print(f"{orphans} statement, citation or sponsor rows belong to no resolution; refusing to build",
               file=sys.stderr)
@@ -352,8 +375,7 @@ def main(res_dir: Path) -> int:
               file=sys.stderr)
         return 1
     # T0 guard: every document must be an ATNI-acquired PDF from the manifest (a check, not an assert: -O)
-    manifest = [r for r in csv.DictReader(open(res_dir / "manifest-atni.csv", encoding="utf-8"))
-                if r["status"] == "fetched"]
+    manifest = [r for rows in policy.load_manifests(res_dir).atni.values() for r in rows]
     admitted = set(doc_ids)
     unknown = len(admitted - {r["sha256"] for r in manifest})
     if unknown:
@@ -367,19 +389,15 @@ def main(res_dir: Path) -> int:
     except DependencyError as e:
         print(f"resolver unavailable: {e.reason}; refusing to build", file=sys.stderr)
         return 2
-    out = DATA_DIR / "exchange" / "pages"
-    out.mkdir(parents=True, exist_ok=True)
-    for old in out.iterdir():  # empty it rather than delete it: a local preview server may hold it open
-        shutil.rmtree(old) if old.is_dir() else old.unlink()
+    out.mkdir()
     db_out = out / "resolutions.db"
     # A fresh database from the allow-list, not a backup plus a drop list: no triggers, no stray tables or columns.
     # closing(): sqlite3's own context manager commits but never closes, and Windows cannot unlink an open file
     con = None
     try:
-        with closing(sqlite3.connect(f"file:{DATABASE_PATH}?mode=ro", uri=True)) as src, \
-                closing(sqlite3.connect(db_out)) as dst:
-            _copy(src, dst)
-            refs = _cites(src, dst, resolvers)
+        with closing(sqlite3.connect(db_out)) as dst:
+            _copy(live, dst)
+            refs = _cites(live, dst, resolvers)
             dst.commit()
         con = sqlite3.connect(db_out)
         if {d for (d,) in con.execute("select document_id from resolution")} != admitted or _orphans(con):
@@ -390,13 +408,13 @@ def main(res_dir: Path) -> int:
         seen = set()
         for r in sorted(manifest, key=lambda r: r["source"] != "atni-table"):  # table URL first
             # Only admitted documents: a refused row (e.g. T3 convention media) never reaches the public db
-            if r["sha256"] in admitted and (r["sha256"], r["url"]) not in seen:
-                seen.add((r["sha256"], r["url"]))
-                con.execute("insert into source values (?, ?)", (r["sha256"], r["url"]))
+            url = r.get("url") or ""
+            if (r["sha256"] in admitted and SOURCE_URL.fullmatch(url)
+                    and (r["sha256"], url) not in seen):
+                seen.add((r["sha256"], url))
+                con.execute("insert into source values (?, ?)", (r["sha256"], url))
         # Contact details never go public (CLAUDE.md), even ATNI's own; _copy masked them, this rechecks.
-        leaks = sum(bool(CONTACT.search(t or "")) for (t,) in con.execute(
-            "select full_text from resolution union all select text from statement"
-            " union all select text from citation union all select text from cite"))
+        leaks = _contact_leaks(con)
         if leaks:
             _fail(con, db_out, f"{leaks} contact details survived masking")
         # The index is built here from the masked, allow-listed content with the D-013 tokenizer (R3.2)
@@ -420,20 +438,157 @@ def main(res_dir: Path) -> int:
 
     # Recorded bypass of resist/adapters/cli_tool.py (Codex LR-A 5): local, read-only, no corpus bytes
     commit = subprocess.run(["git", "-C", str(ROOT), "rev-parse", "--short", "HEAD"],
-                            capture_output=True, text=True).stdout.strip()
+                            capture_output=True, text=True, check=False).stdout.strip()
     build = {"resolutions": n, "year_min": y0, "year_max": y1, "needs_review": review, "commit": commit,
              "fts_tokenize": FTS5_TOKENIZE, "page_numbers": True, "refs": refs,
+             "copies_not_listed": sum(r == "copy" for r, _ in hidden.values()),
+             "drafts_not_listed": sum(r == "draft" for r, _ in hidden.values()),
              "built": datetime.now(UTC).strftime("%Y-%m-%d %H:%M UTC"),
              "db_sha256": hashlib.sha256(db_out.read_bytes()).hexdigest()}
     (out / "build.json").write_text(json.dumps(build, indent=1), encoding="utf-8")
     (out / "capabilities.json").write_text(json.dumps(capabilities.document("static"), ensure_ascii=False,
                                                       indent=1), encoding="utf-8")
     # A stray file in pages/ can never overwrite the build's own output
+    # pages/issues.json (the pinned Policy Sentinel issue table) is published with the site and carries its own
+    # licence address and Required Notice (owner 2026-11-20, D-080, closing D-078 item 4).
     shutil.copytree(ROOT / "pages", out, dirs_exist_ok=True,
                     ignore=shutil.ignore_patterns("resolutions.db", "build.json", "capabilities.json"))
     (out / ".nojekyll").write_text("", encoding="utf-8")
-    print(json.dumps({"out": str(out), **build}))
     return 0
+
+
+@contextmanager
+def _export_lock(out: Path):
+    """Serialize promotion/recovery; OS locks release even when a builder exits abruptly."""
+    with (out.parent / ".pages-build.lock").open("a+b") as lock:
+        if lock.tell() == 0:
+            lock.write(b"0")
+            lock.flush()
+        lock.seek(0)
+        try:
+            if os.name == "nt":
+                import msvcrt
+                msvcrt.locking(lock.fileno(), msvcrt.LK_NBLCK, 1)
+            else:
+                import fcntl
+                fcntl.flock(lock.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except OSError:
+            raise ArtifactError("another export is active; refusing to build") from None
+        try:
+            yield
+        finally:
+            lock.seek(0)
+            if os.name == "nt":
+                msvcrt.locking(lock.fileno(), msvcrt.LK_UNLCK, 1)
+            else:
+                fcntl.flock(lock.fileno(), fcntl.LOCK_UN)
+
+
+def _tree_digest(path: Path) -> str:
+    """Bind every staged file, and reject links before recovery can remove a directory."""
+    if path.resolve() != path.absolute() or not path.is_dir():
+        raise ArtifactError("export directory is not a plain directory")
+    files = []
+    for child in sorted(path.rglob("*")):
+        if child.resolve() != child.absolute():
+            raise ArtifactError("export contains a linked path")
+        if child.is_file():
+            files.append((child.relative_to(path).as_posix(), hashlib.sha256(child.read_bytes()).hexdigest()))
+    return hashlib.sha256(json.dumps(files).encode()).hexdigest()
+
+
+def _recover(out: Path) -> None:
+    """Complete verified promotion or restore the previous tree after an interrupted rename."""
+    journal = out.parent / ".pages-promotion.json"
+    previous = out.parent / ".pages-previous"
+    if not journal.exists():
+        if previous.exists():
+            raise ArtifactError("unrecorded previous export; recovery needs inspection")
+        return
+    record = json.loads(journal.read_text(encoding="utf-8"))
+    if not isinstance(record, dict) or set(record) != {"previous", "candidate"} or not all(
+            value is None or isinstance(value, str) and re.fullmatch(r"[0-9a-f]{64}", value)
+            for value in record.values()) or record["candidate"] is None:
+        raise ArtifactError("invalid export recovery record")
+    if out.exists():
+        current = _tree_digest(out)
+        if current == record["candidate"]:
+            if previous.exists():
+                if _tree_digest(previous) != record["previous"]:
+                    raise ArtifactError("previous export changed; recovery needs inspection")
+                shutil.rmtree(previous)
+        elif current != record["previous"] or previous.exists():
+            raise ArtifactError("export changed during promotion; recovery needs inspection")
+    elif previous.exists() and _tree_digest(previous) == record["previous"]:
+        previous.rename(out)
+    elif record["previous"] is not None:
+        raise ArtifactError("previous export unavailable; recovery needs inspection")
+    journal.unlink()
+
+
+def _promote(stage: Path, out: Path) -> None:
+    """Two renames are recoverable, not an atomic directory swap on Windows."""
+    previous = out.parent / ".pages-previous"
+    journal = out.parent / ".pages-promotion.json"
+    record = {"previous": _tree_digest(out) if out.exists() else None,
+              "candidate": _tree_digest(stage)}
+    with journal.open("x", encoding="utf-8") as f:
+        json.dump(record, f)
+        f.flush()
+        os.fsync(f.fileno())
+    try:
+        if out.exists():
+            out.rename(previous)
+        stage.rename(out)
+    except OSError:
+        _recover(out)
+        raise
+    _recover(out)
+
+
+def _manifest_bytes(res_dir: Path) -> dict[str, bytes | None]:
+    result = {}
+    for name in ("manifest-atni.csv", "manifest-ncai.csv"):
+        try:
+            result[name] = (res_dir / name).read_bytes()
+        except FileNotFoundError:
+            result[name] = None
+    return result
+
+
+def main(res_dir: Path) -> int:
+    netguard.install()  # D-039: no network; the local git child is a recorded bypass
+    if not DATABASE_PATH.exists():
+        print("source database unavailable; refusing to build", file=sys.stderr)
+        return 1
+    out = DATA_DIR / "exchange" / "pages"
+    try:
+        with _export_lock(DATA_DIR / "pages"):
+            _recover(out)
+            with TemporaryDirectory(prefix=".pages-stage-", dir=DATA_DIR) as work:
+                work = Path(work)
+                frozen = work / "policy"
+                frozen.mkdir()
+                inputs = _manifest_bytes(res_dir)
+                for name, content in inputs.items():
+                    if content is not None:
+                        (frozen / name).write_bytes(content)
+                # SQLite's backup API yields a consistent private snapshot without a long-lived source lock.
+                with closing(sqlite3.connect(DATABASE_PATH.resolve().as_uri() + "?mode=ro", uri=True)) as live, \
+                        closing(sqlite3.connect(":memory:")) as snapshot:
+                    live.backup(snapshot)
+                    live.close()
+                    status = _build(frozen, snapshot, work / "site")
+                if status:
+                    return status
+                if _manifest_bytes(res_dir) != inputs:
+                    raise ArtifactError("source policy changed during build; refusing to promote")
+                out.parent.mkdir(parents=True, exist_ok=True)
+                _promote(work / "site", out)
+        print(json.dumps({"out": str(out), **json.loads((out / "build.json").read_text(encoding="utf-8"))}))
+        return 0
+    except (OSError, sqlite3.Error, ValueError, TypeError) as e:
+        raise ArtifactError(f"{type(e).__name__} during export; previous output retained or recoverable") from None
 
 
 if __name__ == "__main__":

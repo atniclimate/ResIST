@@ -10,7 +10,7 @@ from resist.services import capabilities
 from src.main import app
 
 INDEX = {"adapter": "fts5", "version": "1", "tokenizer": FTS5_TOKENIZE}
-KEYS = ["schema", "face", "tier_max", "api", "export", "sentinel", "annotate", "analytics", "index", "components"]
+KEYS = ["schema", "face", "tier_max", "api", "export", "reports", "sentinel", "annotate", "analytics", "index", "components"]
 
 
 @pytest.fixture
@@ -49,6 +49,7 @@ def test_local_document(isolated, client):
     assert d["annotate"] is False
     assert d["api"] == "/api/v1"
     assert d["export"] == {"docx": "client", "pdf": None}
+    assert d["reports"] == {"available": True, "formats": ["json", "md", "docx"]}
     assert d["index"] == INDEX
     assert d["tier_max"] == "T0"  # no pool.yaml: fail closed
 
@@ -82,6 +83,7 @@ def test_static_document(isolated):
     d = capabilities.document("static")
     assert list(d) == KEYS
     assert d["sentinel"] is True and d["api"] is None and d["tier_max"] == "T0" and d["components"] == []
+    assert d["reports"] == {"available": False, "formats": []}
     assert d["index"] == INDEX
 
 
@@ -95,7 +97,7 @@ def test_analytics_reserved(path, client):
     assert client.get(path).status_code == 404  # D-063
 
 
-def test_api_v1_routes_are_exactly_capabilities():
+def test_api_v1_routes_are_declared():
     """The tier hook: a new /api/v1 route must be added here together with a test that it returns nothing above
     config.pool_max_tier()."""
     def paths(routes, prefix=""):  # FastAPI 0.141 nests included routers (original_router, include_context.prefix)
@@ -107,4 +109,6 @@ def test_api_v1_routes_are_exactly_capabilities():
 
     found = set(paths(app.routes))
     assert "/search" in found  # the walk reaches included routers
-    assert {p for p in found if p.startswith("/api/v1")} == {"/api/v1/capabilities"}
+    assert {p for p in found if p.startswith("/api/v1")} == {
+        "/api/v1/capabilities", "/api/v1/reports", "/api/v1/reports/verify", "/api/v1/reports/download",
+    }

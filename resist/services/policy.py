@@ -4,23 +4,24 @@ Rules, in order (never a filename, never the manifest's tsdf_tier column):
 1. NCAI manifest member -> T1, quarantined (D-040, DG-12). Wins over ATNI membership.
 2. ATNI manifest member with status "fetched" -> T0 public-atni (D-052); a media-library-only document whose
    local_path looks like convention material -> T3 (D-064).
-3. Anything else, including absent or unreadable manifests -> T3 unreleased (D-038). Fails closed.
+3. Anything else -> T3 unreleased (D-038). Unreadable or malformed manifests refuse processing.
 """
 
 import csv
+import io
 import re
+from collections.abc import Mapping
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
-from typing import Mapping
 
 from resist import config
-from resist.errors import BadInput, QuarantinedError, TierRefused
+from resist.errors import BadInput, InvalidConfig, QuarantinedError, TierRefused
 from resist.models import DocRef, Tier, tier_rank
 from resist.models import max_tier as max_tier_of  # the parameter name max_tier shadows it
 
 RIGHTS = ("public-atni", "dg12-open", "unreleased")
-CONVENTION_SHAPE = re.compile(r"agenda|schedule|minutes|roster|committee[ _-]?report|slides", re.I)
+CONVENTION_SHAPE = re.compile(r"agenda|schedule|minutes|roster|committee[ _-]?report|slides", re.IGNORECASE)
 _SHA_RE = re.compile(r"^[0-9a-f]{64}$")
 
 
@@ -53,33 +54,58 @@ def default_res_dir() -> Path:
     return config.repo_root() / "docs" / "resolutions"
 
 
-def _rows(path: Path) -> list[dict]:
-    with path.open(encoding="utf-8-sig", newline="") as f:
-        return [{k: v for k, v in row.items() if k != "tsdf_tier"} for row in csv.DictReader(f)]
+def _rows(path: Path, content: bytes) -> list[dict]:
+    with io.StringIO(content.decode("utf-8-sig"), newline="") as f:
+        reader = csv.DictReader(f, strict=True)
+        required = {"sha256", "status", "source", "local_path"} if path.name == "manifest-atni.csv" else {"sha256"}
+        fields = reader.fieldnames or []
+        if not required.issubset(fields) or len(fields) != len(set(fields)):
+            raise csv.Error("invalid-manifest-header")
+        rows = []
+        for row in reader:
+            if None in row or any(row.get(k) is None for k in required):
+                raise csv.Error("invalid-manifest-row")
+            sha = row["sha256"].strip().lower()
+            if (sha and not _SHA_RE.fullmatch(sha)) or (
+                not sha and (row.get("status") or "").strip() == "fetched"
+            ):
+                raise csv.Error("invalid-manifest-sha256")
+            rows.append({k: v for k, v in row.items() if k != "tsdf_tier"})
+        return rows
 
 
 @lru_cache(maxsize=16)
-def _load(dir_key: str, _stamp: tuple) -> Manifests:
+def _load(dir_key: str, contents: tuple) -> Manifests:
     d = Path(dir_key)
     a, n = d / "manifest-atni.csv", d / "manifest-ncai.csv"
-    if not (a.is_file() or n.is_file()):
+    if all(content is None for content in contents):
         return _ABSENT
     try:
         atni: dict[str, list[dict]] = {}
-        for row in _rows(a) if a.is_file() else []:
+        for row in _rows(a, contents[0]) if contents[0] is not None else []:
             if (row.get("status") or "").strip() == "fetched":
                 atni.setdefault((row.get("sha256") or "").strip().lower(), []).append(row)
-        ncai = frozenset((r.get("sha256") or "").strip().lower() for r in (_rows(n) if n.is_file() else []))
+        ncai = frozenset((r.get("sha256") or "").strip().lower()
+                         for r in (_rows(n, contents[1]) if contents[1] is not None else []))
     except (OSError, csv.Error, UnicodeDecodeError):
-        return _ABSENT  # an unreadable manifest admits nothing
+        # Unreadable is not absent: the fresh-clone exception must never bypass quarantine.
+        raise InvalidConfig("manifests-unreadable-or-invalid") from None
     return Manifests({k: tuple(v) for k, v in atni.items() if k}, ncai - {""}, True)
 
 
 def load_manifests(res_dir: Path | None = None) -> Manifests:
     d = Path(res_dir if res_dir is not None else default_res_dir()).resolve()
-    stamp = tuple(p.stat().st_mtime_ns if p.is_file() else None
-                  for p in (d / "manifest-atni.csv", d / "manifest-ncai.csv"))
-    return _load(str(d), stamp)
+    contents = []
+    for p in (d / "manifest-atni.csv", d / "manifest-ncai.csv"):
+        try:
+            p.stat()
+            # Parse these exact bytes; timestamps and sizes do not identify policy.
+            contents.append(p.read_bytes())
+        except FileNotFoundError:
+            contents.append(None)
+        except OSError:
+            raise InvalidConfig("manifests-unreadable-or-invalid") from None
+    return _load(str(d), tuple(contents))
 
 
 def source_policy(sha256: str, res_dir: Path | None = None) -> SourcePolicy:

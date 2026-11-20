@@ -6,7 +6,7 @@ knowledge base. It is built on classical information retrieval (SQLite FTS5 with
 citation graphs), not on language-model generation. The tool directs a reader to what a resolution says.
 It never writes resolution language and never speaks for a Nation.
 
-**Try it:** [atniclimate.github.io/ResIST](https://atniclimate.github.io/ResIST/) searches 1,157 ATNI
+**Try it:** [atniclimate.github.io/ResIST](https://atniclimate.github.io/ResIST/) searches 1,129 ATNI
 resolutions (2007–2026) in your browser. It is a static build of this code, published from the
 `gh-pages` branch. The text is ATNI's own, quoted verbatim from the PDFs it publishes at
 atnitribes.org. Each record links to its source PDF, which is authoritative.
@@ -30,7 +30,11 @@ the PaddleOCR 2.x API; its 3.x replacement is designed but not built yet.
   `resist/refs/` find prior ATNI resolution numbers (and other issuers' numbers, held as cited but absent),
   federal statutes and regulations (`eyecite` and CiteURL), and named instruments such as UNDRIP with its
   articles, IEEE 2890, the CARE Principles and Creative Commons licences. Every hit keeps its exact text span.
-- **Search:** SQLite FTS5 with `bm25()` ranking.
+- **Search:** SQLite FTS5 with `bm25()` ranking. A word of four or more letters also matches longer words that
+  start with it, and the page shows exactly what was searched, with a link to search only the typed words. Typing
+  the name of an issue that [Policy Sentinel](https://atniclimate.github.io/policy-sentinel/) lists, such as
+  "Section 106", also searches the other names and the official references it gives for that issue, from a pinned
+  copy of its reviewed table (`pages/issues.json`). A hit is a text match, never a finding about a resolution.
 - **Topics, timeline, citation graph** (NetworkX), and DOCX evidence-package export.
 - **Static site:** `pages/index.html` runs the same FTS5 index in the browser with the official SQLite
   WASM build, vendored under `pages/vendor/`, so the page loads nothing from a CDN. A resolution's page shows each
@@ -38,8 +42,13 @@ the PaddleOCR 2.x API; its 3.x replacement is designed but not built yet.
   carries a clause, or a single citation, into a draft word for word with a record of where it came from; the
   draft stays in the browser and exports to ATNI's Word template, with the sources listed under Drafting Notes.
   Executive orders, U.S.C., public laws and C.F.R. citations can be looked up in Policy Sentinel, which sends only
-  the search words on a click (the local copy links out instead). The interface is keyboard and screen-reader
-  checked on both faces, but not yet by an automated accessibility scanner.
+  the search words on a click (the local copy links out instead). A Research view collects whole resolutions and
+  single clauses, verbatim with their source, for download as JSON or text; it stays in the browser, and a
+  collected clause reaches a draft only by its own button. The local copy also has a Reports view: for an ATNI
+  resolution number it assembles a local evidence report (the clauses of the resolutions it cites, quoted
+  verbatim with their sources, and what is missing), rechecks it against the local source files, and downloads it
+  as JSON or Markdown, and as Word where the application supports it. The interface is keyboard checked on
+  both faces, but not yet by an automated accessibility scanner or a screen reader.
 
 ## Install and test (Windows, PowerShell, Python 3.11)
 
@@ -76,6 +85,10 @@ executable for scanned pages.
 - **What is public.** Only resolutions ATNI itself publishes on atnitribes.org, classified T0 by the
   project owner. Email addresses and phone numbers are masked in the static site. Committee material
   and other organizations' resolutions are never published.
+- **Corrections are recorded, not silent.** Where ATNI's online table gives a resolution a wrong or garbled title,
+  the site shows the title printed in the PDF, through a recorded corrections ledger applied by
+  `scripts/apply_corrections.py`. A resolution the archive holds twice, as a second copy or as a draft beside its
+  adopted final, is listed once; nothing is deleted.
 - **CARE principles** (Collective Benefit, Authority to Control, Responsibility, Ethics) and ATNI's Tiered
   Sovereign Data Framework (TSDF) govern how records are classified and handled.
 
@@ -87,11 +100,19 @@ src/        api/ (FastAPI routes)  ingestion/ (intake, OCR, parser, citations)  
             analysis/ (graph, similarity, keywords)  export/ (DOCX/PDF)  templates/  static/
 pages/      the one UI: the static in-browser site, also served locally at /app/ (SQLite WASM in pages/vendor/)
 tests/      pytest suite; tests/fixtures/atni/ holds real, public ATNI resolution PDFs
-scripts/    ingest_atni.py, build_pages.py, seed_themes.py, the pre-commit hook and its installer
+scripts/    ingest_atni.py, build_pages.py, apply_corrections.py, pin_issue_names.py, seed_themes.py, the
+            pre-commit hook and its installer
 constraints/  hash-locked dependency pins for Python 3.11
 datapool/   the (empty) data root skeleton
 ```
 
 ## License
 
-GNU Affero General Public License v3.0 or later. See [LICENSE](LICENSE) and [NOTICE](NOTICE).
+PolyForm Noncommercial License 1.0.0, from public cut 8 (2026-11-20). See [LICENSE](LICENSE) and [NOTICE](NOTICE).
+
+Required Notice: Copyright Affiliated Tribes of Northwest Indians (https://atnitribes.org)
+
+Cuts 1 to 7 were published under the GNU Affero General Public License v3.0 or later and stay available under it.
+PyMuPDF, a dependency installed separately, is under the GNU AGPL v3 (or a commercial licence from Artifex) and is
+not covered by this project's licence. The pinned Policy Sentinel issue table (`pages/issues.json`) is Policy
+Sentinel's, under the same PolyForm licence, with its notice inside the file.

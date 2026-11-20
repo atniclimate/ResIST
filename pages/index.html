@@ -4,13 +4,15 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ResIST, ATNI Resolutions</title>
-<meta name="description" content="Search the published resolutions of the Affiliated Tribes of Northwest Indians: verbatim clauses, citations and source PDFs, searched in your browser. Carry clauses into a draft and download it as a Word document.">
+<meta name="description" content="Search the published resolutions of the Affiliated Tribes of Northwest Indians: verbatim clauses, citations and source PDFs, searched in your browser. Collect resolutions and clauses as research, carry clauses into a draft and download it as a Word document.">
 <link rel="icon" href="atni-seal-color.jpg">
 <script>try { if (localStorage.getItem("resist-theme") === "light") document.documentElement.dataset.theme = "light"; } catch (e) { /* dark stays */ }</script>
 <link rel="stylesheet" href="atni.css">
 <link rel="stylesheet" href="site.css">
 <link rel="stylesheet" href="draft.css">
 <link rel="stylesheet" href="sentinel.css">
+<link rel="stylesheet" href="reports.css">
+<link rel="stylesheet" href="research.css">
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -18,8 +20,10 @@
   <a class="brand" href="#/"><img src="atni-seal.png" alt="" width="32" height="32"><span class="brand-words"><b>ResIST</b><span>Resolutions of the Affiliated Tribes of Northwest Indians</span></span></a>
   <nav class="site-nav" aria-label="Main">
     <a href="#/" data-nav="search">Search</a>
+    <a href="#/research" data-nav="research">Research <span class="count" id="research-count"></span><span class="visually-hidden" id="research-count-words"></span></a>
     <a href="#/draft" data-nav="draft">Draft <span class="count" id="draft-count"></span><span class="visually-hidden" id="draft-count-words"></span></a>
     <a href="#/about" data-nav="about">About</a>
+    <a href="#/reports" data-nav="reports">Reports</a>
     <button type="button" class="icon-btn theme-toggle" id="theme-toggle" aria-label="Light theme" title="Light theme"><svg aria-hidden="true" focusable="false" width="20" height="20" viewBox="0 0 20 20"><circle cx="10" cy="10" r="7.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10 2.5a7.5 7.5 0 0 1 0 15z" fill="currentColor"/></svg></button>
   </nav>
 </div></header>
