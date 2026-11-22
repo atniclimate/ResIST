@@ -7,10 +7,18 @@ import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import * as Q from "../../pages/query.js";
+import { verifyDatabase } from "../../pages/db.js";
 import { searchedHTML } from "../../pages/searched.js";
 
 const pinFile = readFileSync(new URL("../../pages/issues.json", import.meta.url), "utf8");
 const issues = Q.issuesFrom(JSON.parse(pinFile));
+
+test("a database must match its publication even when both use the same tokenizer", async () => {
+  const previous = Uint8Array.of(1, 2, 3), current = Uint8Array.of(1, 2, 4);
+  const manifest = { fts_tokenize: "porter", db_sha256: createHash("sha256").update(current).digest("hex") };
+  await verifyDatabase(current, manifest);
+  await assert.rejects(verifyDatabase(previous, manifest), /does not match build.json/);
+});
 const dbFile = process.env.RESIST_QUERY_DB;
 // The published export the Section 106 counts were taken on (datapool/exchange/pages/build.json db_sha256, 2026-11-20).
 const EXPORT_SHA = "41caf84cc4668218404eb428325dce9f5ca9265c7f3ff348107888e5c8ce6645";

@@ -266,6 +266,8 @@ def main(argv: list[str] | None = None) -> int:
         return _refuse("--out exists")
     if report_path.exists():
         return _refuse("report exists")
+    if report_path.is_relative_to(out):
+        return _refuse("report must be outside the migration output")
     if not live.is_file():
         return _refuse("live pool database absent")
     keys = tuple(a.gazetteer_key)
@@ -273,6 +275,10 @@ def main(argv: list[str] | None = None) -> int:
         return _refuse("gazetteer absent")
 
     out_db = out / "db" / "resolutions.db"
+    try:
+        out.mkdir(parents=True)
+    except FileExistsError:
+        return _refuse("--out exists")
     try:
         max_tier = config.pool_max_tier(data)
         _log("copying the live pool (mode=ro, backup API)")
@@ -296,7 +302,11 @@ def main(argv: list[str] | None = None) -> int:
     report = {"swap_ok": swap_ok(report), **report}
     line = json.dumps(report, sort_keys=True)
     report_path.parent.mkdir(parents=True, exist_ok=True)
-    report_path.write_text(line + "\n", encoding="utf-8")
+    try:
+        with report_path.open("x", encoding="utf-8") as receipt:
+            receipt.write(line + "\n")
+    except FileExistsError:
+        return _refuse("report exists; migration copy retained")
     print(line)
     if not report["swap_ok"]:
         _log(f"{report['unexplained']} unexplained differences; do not swap (the copy is kept for inspection)")

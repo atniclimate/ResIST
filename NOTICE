@@ -7,8 +7,9 @@ Required Notice: Copyright Affiliated Tribes of Northwest Indians (https://atnit
 Versions published before that date were offered under the GNU Affero General Public License,
 version 3 or later, and stay available under it.
 
-This repository contains code only. It contains no resolution documents or corpus data; Tribal
-resolutions and anything derived from them stay on ATNI-controlled infrastructure.
+The source repository includes software and a small set of public ATNI resolution PDFs used
+as test fixtures. ATNI controls release of the archive. The software licence does not grant
+additional rights to the source records.
 
 Third-party components (installed as dependencies, not vendored; exact versions are pinned in
 constraints/dev-py311.lock.txt):
@@ -31,9 +32,13 @@ constraints/dev-py311.lock.txt):
 - Pillow -- MIT-CMU (HPND)
 - Optional: PaddleOCR and PaddlePaddle -- Apache-2.0; pytesseract -- Apache-2.0;
   WeasyPrint -- BSD-3-Clause
-- Front end: HTMX 2.x -- 0BSD (loaded from a CDN today; to be vendored locally)
 
 Vendored third-party files (committed in this repository, unmodified):
+
+- src/static/vendor/htmx.org-2.0.4/ -- htmx, Zero-Clause BSD.
+- src/static/vendor/vis-timeline-7.7.3/ -- vis-timeline, Apache-2.0 or MIT.
+- src/static/vendor/fontsource-variable-lexend-5.2.8/ -- Lexend variable font, SIL Open Font License.
+  The corresponding notices accompany each component. The public archive's font notices are in pages/fonts/.
 
 - pages/vendor/sqlite-wasm/ -- SQLite WASM build, npm package @sqlite.org/sqlite-wasm 3.53.0-build1, published by
   the SQLite project (https://sqlite.org). The npm package is Apache-2.0; SQLite itself is in the public domain.

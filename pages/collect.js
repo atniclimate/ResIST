@@ -60,13 +60,13 @@ export function validCollection(value) {
 
 export const collectionJson = items => JSON.stringify({ schema: SCHEMA, items }, null, 2) + "\n";
 
-export function collectionText(items) {
+export function collectionText(items, verified = true) {
   const block = (n, head, body, item) => [`${n}. ${head}`, `   ${body}`,
-    ...(item.url ? [`   Source PDF: ${item.url}`] : []), `   SHA-256: ${item.documentId}`].join("\n");
+    ...(item.url ? [`   Source PDF: ${item.url}`] : [])].join("\n");
   const res = items.filter(i => i.kind === "resolution"), sts = items.filter(i => i.kind === "statement");
   return [
     "ATNI-ResIST research collection\n" +
-    "Text is copied word for word from resolutions published by the Affiliated Tribes of Northwest Indians. The source PDF governs. Nothing here is a summary, a finding or a legal conclusion.",
+    (verified ? "Text is copied word for word from resolutions published by the Affiliated Tribes of Northwest Indians. The source PDF governs. Nothing here is a summary, a finding or a legal conclusion." : "Stored text and source details have not been verified against the resolution database."),
     ...(res.length ? [`RESOLUTIONS (${res.length})`, ...res.map((i, n) =>
       block(n + 1, [`Resolution ${squash(i.number)}`, squash(i.year), squash(i.convention)].filter(Boolean).join(", "),
         squash(i.title), i))] : []),
@@ -83,25 +83,62 @@ function load() {
 }
 
 let items = load(), saved = null;
+let baseline = items, verifier = null, memoryOnly = false;
+function checked(list) {
+  const seen = new Set();
+  return list.map(item => validItem(verifier(item))).filter(item => {
+    if (!item || seen.has(itemKey(item))) return false;
+    seen.add(itemKey(item));
+    return true;
+  });
+}
+function refresh() {
+  const remote = load();
+  if (JSON.stringify(remote) === JSON.stringify(baseline)) return;
+  const latest = new Map(remote.map(item => [itemKey(item), item]));
+  if (saved?.ok === false) {
+    const current = new Map(items.map(item => [itemKey(item), item]));
+    for (const item of baseline) if (!current.has(itemKey(item))) latest.delete(itemKey(item));
+    const before = new Map(baseline.map(item => [itemKey(item), item]));
+    for (const [key, item] of current) {
+      if (JSON.stringify(before.get(key)) !== JSON.stringify(item)) latest.set(key, item);
+    }
+  }
+  baseline = remote;
+  items = [...latest.values()];
+  if (verifier) items = checked(items);
+}
+export function changeCollection(fn) {
+  const locks = globalThis.navigator?.locks;
+  const run = () => { refresh(); return fn(); };
+  const inMemory = () => { memoryOnly = true; return run(); };
+  if (!locks || memoryOnly) return inMemory();
+  return locks.request(KEY, run).catch(error => {
+    if (error.name === "SecurityError") return inMemory();
+    throw error;
+  });
+}
 const subs = new Set();
 const notify = () => { for (const fn of [...subs]) fn(items); };
 // Every change saves at once (there is no typing here, so no debounce). A browser that keeps nothing says so in saved.
 const commit = next => {
   items = next;
-  saved = { ok: local.set(KEY, JSON.stringify({ schema: SCHEMA, items })) };
+  saved = { ok: !memoryOnly && local.set(KEY, JSON.stringify({ schema: SCHEMA, items })) };
+  if (saved.ok) baseline = items;
   notify();
 };
 const indexOf = key => items.findIndex(i => itemKey(i) === key);
 
 // Another tab saved: take its copy, so this tab's next save cannot overwrite it with a stale one.
 globalThis.addEventListener?.("storage", e => {
-  if (e.key !== KEY) return;
-  items = load(); notify();
+  if (e.key !== KEY && e.key !== null) return;
+  refresh(); notify();
 });
 
 export const collection = {
   get items() { return items; },
   get saved() { return saved; },
+  get verified() { return !!verifier; },
   count: () => items.length,
   has: key => indexOf(key) >= 0,
   // "added" | "duplicate" | "full" | "invalid"
@@ -122,7 +159,8 @@ export const collection = {
     return { item, index };
   },
   restore({ item, index } = {}) {
-    const v = validItem(item);
+    const stored = validItem(item);
+    const v = stored && verifier ? validItem(verifier(stored)) : stored;
     if (!v || indexOf(itemKey(v)) >= 0 || items.length >= MAX_ITEMS) return false;
     const at = Math.min(Number.isInteger(index) && index >= 0 ? index : items.length, items.length);
     commit([...items.slice(0, at), v, ...items.slice(at)]);
@@ -132,13 +170,12 @@ export const collection = {
   // lookup(item) -> the database's record or null. Found items take the record (current id, url, page), the rest are
   // removed. Returns how many were removed.
   verifyWith(lookup) {
-    const seen = new Set(), next = [];
-    for (const item of items) {
-      const v = validItem(lookup(item));
-      if (v && !seen.has(itemKey(v))) { seen.add(itemKey(v)); next.push(v); }
-    }
+    const first = !verifier;
+    verifier = lookup;
+    const next = checked(items);
     const dropped = items.length - next.length;
     if (JSON.stringify(next) !== JSON.stringify(items)) commit(next);
+    else if (first) notify();
     return dropped;
   },
 };

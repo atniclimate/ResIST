@@ -11,6 +11,7 @@ from src.models.document import ParseResult
 from src.models.resolution import Citation, Resolution, ResolutionTheme, Sponsor, Statement, Theme
 
 from .database import get_engine
+from .admission import ADMITTED, admitted_ids, admitted_params
 
 
 def sanitize_snippet(snippet: str) -> str:
@@ -38,7 +39,7 @@ def sanitize_snippet(snippet: str) -> str:
 
 
 def save_resolution(session: Session, parse_result: ParseResult, full_text: str,
-                    extraction: DocumentResult | None = None) -> Resolution:
+                    extraction: DocumentResult | None = None, *, commit: bool = True) -> Resolution:
     """
     Save a parsed resolution to the database.
 
@@ -126,24 +127,27 @@ def save_resolution(session: Session, parse_result: ParseResult, full_text: str,
 
     if extraction is not None:
         record_extraction(session.connection().connection.driver_connection, extraction, resolution_id=resolution.id)
-    session.commit()
-    session.refresh(resolution)
+    if commit:
+        session.commit()
+        session.refresh(resolution)
     return resolution
 
 
 def get_resolution(session: Session, resolution_id: int) -> Optional[Resolution]:
     """Get resolution by ID with all relationships loaded."""
-    return session.get(Resolution, resolution_id)
+    return session.get(Resolution, resolution_id) if resolution_id in admitted_ids(session.connection()) else None
 
 
 def get_resolution_by_document_id(session: Session, document_id: str) -> Optional[Resolution]:
     """Get resolution by document_id."""
-    return session.exec(select(Resolution).where(Resolution.document_id == document_id)).first()
+    return session.exec(select(Resolution).where(Resolution.document_id == document_id,
+                        Resolution.id.in_(admitted_ids(session.connection())))).first()
 
 
 def list_resolutions(session: Session, limit: int = 100, offset: int = 0) -> List[Resolution]:
     """List resolutions with pagination."""
-    return list(session.exec(select(Resolution).offset(offset).limit(limit)))
+    return list(session.exec(select(Resolution).where(Resolution.id.in_(admitted_ids(session.connection())))
+                             .offset(offset).limit(limit)))
 
 
 def search_resolutions(
@@ -169,7 +173,7 @@ def search_resolutions(
     engine = get_engine()
 
     # Base FTS5 search query with bm25 ranking
-    sql = """
+    sql = f"""
         SELECT
             r.id,
             r.document_id,
@@ -181,7 +185,7 @@ def search_resolutions(
             bm25(resolution_fts) as score
         FROM resolution_fts
         JOIN resolution r ON r.id = resolution_fts.rowid
-        WHERE resolution_fts MATCH :query
+        WHERE resolution_fts MATCH :query AND r.id IN ({ADMITTED})
     """
     params: Dict[str, Any] = {"query": query, "limit": limit}
 
@@ -199,7 +203,7 @@ def search_resolutions(
     sql += " ORDER BY score LIMIT :limit"
 
     with engine.connect() as conn:
-        result = conn.execute(text(sql), params)
+        result = conn.execute(text(sql), params | admitted_params(conn))
         rows = result.fetchall()
 
     return [
@@ -226,17 +230,17 @@ def get_all_themes(session: Session) -> List[Dict[str, Any]]:
     """
     engine = get_engine()
 
-    sql = """
+    sql = f"""
         SELECT t.id, t.name, t.description, t.icon,
                COUNT(rt.resolution_id) as resolution_count
         FROM theme t
-        LEFT JOIN resolutiontheme rt ON rt.theme_id = t.id
+        LEFT JOIN resolutiontheme rt ON rt.theme_id = t.id AND rt.resolution_id IN ({ADMITTED})
         GROUP BY t.id, t.name, t.description, t.icon
         ORDER BY t.name
     """
 
     with engine.connect() as conn:
-        result = conn.execute(text(sql))
+        result = conn.execute(text(sql), admitted_params(conn))
         rows = result.fetchall()
 
     return [
@@ -271,7 +275,7 @@ def get_resolutions_by_theme(session: Session, theme_id: int) -> List[Resolution
 
     return list(session.exec(
         select(Resolution)
-        .where(Resolution.id.in_(resolution_ids))
+        .where(Resolution.id.in_(set(resolution_ids).intersection(admitted_ids(session.connection()))))
         .order_by(Resolution.convention_year.desc())
     ))
 
@@ -287,6 +291,8 @@ def get_themes_for_resolution(session: Session, resolution_id: int) -> List[Them
     Returns:
         List of Theme objects
     """
+    if resolution_id not in admitted_ids(session.connection()):
+        return []
     theme_ids = session.exec(
         select(ResolutionTheme.theme_id).where(ResolutionTheme.resolution_id == resolution_id)
     ).all()

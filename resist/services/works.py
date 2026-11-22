@@ -26,7 +26,7 @@ _SESSION_LABELS: tuple[tuple[re.Pattern, str], ...] = tuple(  # after " ".join(l
         (r"(\d{4}) winter convention", "winter"), (r"winter convention (\d{4})", "winter"),
         (r"mid ?year (\d{4}) virtual", "midyear"), (r"(?:atni )?annual(?: convention)?", "annual"),
         (r"mid ?year", "midyear"), (r"winter", "winter")))
-_NUMBER_YEAR = re.compile(r"^(\d{2})-\d+$")
+_EXPLICIT_YEAR = re.compile(r"(?<!\d)(\d{4})\s*[-_/–—]\s*\d{1,3}(?!\d)")
 SEED_REVIEW_KINDS = ("duplicate_number", "number_unnormalized", "status_conflict", "status_unrecognized",
                      "session_label_unmapped", "session_year_unknown", "session_conflict", "amended_unresolved",
                      "amended_link")  # every kind seed() writes; committee_label_unmapped belongs to map_labels
@@ -53,6 +53,18 @@ def status_of(passed: Iterable[str]) -> tuple[str, str, str | None, str | None]:
     return _PASSED[key], "source_asserted", ";".join(sorted(labels)), None
 
 
+def number_year(number: str | None) -> int | None:
+    """Prefer the printed century, otherwise use the archive importer's fixed YY pivot."""
+    explicit = _EXPLICIT_YEAR.search(number or "")
+    if explicit:
+        return int(explicit.group(1))
+    normalized = normalize_resolution_number(number)
+    if not normalized:
+        return None
+    yy = int(normalized[:2])
+    return (1900 if yy > 50 else 2000) + yy
+
+
 def session_of(label: str, number: str | None) -> tuple[str, int | None, str] | None:
     """(kind, year, year_source "label" | "number" | "none"); None = label outside the closed table (review)."""
     s = " ".join((label or "").split())
@@ -61,8 +73,8 @@ def session_of(label: str, number: str | None) -> tuple[str, int | None, str] | 
         if m:
             if m.groups():
                 return kind, int(m.group(1)), "label"
-            n = _NUMBER_YEAR.match(normalize_resolution_number(number) or "")
-            return (kind, 2000 + int(n.group(1)), "number") if n else (kind, None, "none")
+            year = number_year(number)
+            return kind, year, "number" if year is not None else "none"
     return None
 
 
@@ -165,6 +177,9 @@ def seed(con: sqlite3.Connection, res_dir: Path | None = None) -> dict[str, obje
     mapped_wdt: set[str] = set()
     row_sha: dict[str, str] = {}  # wdt id -> its admitted document's SHA-256
     for sha, pool_number in con.execute("select document_id, resolution_number from resolution order by id").fetchall():
+        if isinstance(sha, str) and policy.UPLOAD_ID.fullmatch(sha):
+            c["refused"] += 1
+            continue
         p = policy.source_policy(sha, res_dir)
         if p.quarantined or p.org != "atni":
             c["refused"] += 1
@@ -198,8 +213,8 @@ def seed(con: sqlite3.Connection, res_dir: Path | None = None) -> dict[str, obje
                 _review(con, "session_year_unknown", f"wdt:{w}", "atni-table")
                 c["session_year_unknown"] += 1
                 continue
-            n = _NUMBER_YEAR.match(normalize_resolution_number(_v(row, "number")) or "")
-            if _src == "label" and n and 2000 + int(n.group(1)) != year:
+            printed_year = number_year(_v(row, "number"))
+            if _src == "label" and printed_year is not None and printed_year != year:
                 c["label_number_year_mismatch"] += 1
             sid = f"atni:{kind}:{year}"
             con.execute("INSERT OR IGNORE INTO session(session_id, org_id, kind, year, label) VALUES (?, 'atni', ?, ?, ?)",

@@ -13,11 +13,13 @@ from fastapi.responses import JSONResponse, Response
 
 from resist.errors import ArtifactError, BadInput, InvalidConfig, ResistError, TierRefused
 from resist.report import dumps, markdown
-from resist.report.docx import docx as project_docx
+from functools import partial
+from resist.report.docx import docx
 from resist.services import capabilities as caps
 from resist.services import reports
 
 router = APIRouter(prefix="/api/v1")
+project_docx = partial(docx, reader=True)
 NO_STORE = {"Cache-Control": "no-store", "X-Content-Type-Options": "nosniff",
             "Cross-Origin-Resource-Policy": "same-origin"}
 REPORT_BODY_LIMIT = 8 * 1024 * 1024
@@ -42,7 +44,7 @@ def _report_error(status: str, code: int) -> JSONResponse:
     return JSONResponse({"verified": False, "status": status}, status_code=code, headers=NO_STORE)
 
 
-async def _report_body(request: Request, fields: set[str]) -> dict | JSONResponse:
+async def _report_body(request: Request, *field_sets: set[str]) -> dict | JSONResponse:
     if request.headers.get("content-type", "").split(";")[0].strip().lower() != "application/json":
         return _report_error("invalid-request", 415)
     data = bytearray()
@@ -51,10 +53,10 @@ async def _report_body(request: Request, fields: set[str]) -> dict | JSONRespons
             return _report_error("request-too-large", 413)
         data.extend(chunk)
     try:
-        value = json.loads(data)
+        value = await run_in_threadpool(json.loads, data)
     except (ValueError, UnicodeError, RecursionError):
         return _report_error("invalid-request", 400)
-    if not isinstance(value, dict) or set(value) != fields:
+    if not isinstance(value, dict) or set(value) not in field_sets:
         return _report_error("invalid-request", 400)
     return value
 
@@ -64,7 +66,18 @@ async def generate_report(request: Request) -> Response:
     body = await _report_body(request, {"request"})
     if isinstance(body, Response):
         return body
-    identity = body["request"]
+    packet = await _current_packet(body["request"])
+    if isinstance(packet, Response):
+        return packet
+    return await run_in_threadpool(_packet_response, packet)
+
+
+def _packet_response(packet):
+    return JSONResponse({"status": "verified", "packet": packet,
+                         "fingerprint": reports.packet_fingerprint(packet)}, headers=NO_STORE)
+
+
+async def _current_packet(identity):
     if not isinstance(identity, str) or not re.fullmatch(r"atni:res:[0-9]{2}-[0-9]{1,6}", identity):
         return _report_error("invalid-request", 400)
     try:
@@ -75,41 +88,64 @@ async def generate_report(request: Request) -> Response:
         return _report_error("missing", 404)
     except (ResistError, OSError, sqlite3.Error, RecursionError):
         return _report_error("failed", 503)
-    return JSONResponse({"status": "verified", "packet": packet}, headers=NO_STORE)
+    return packet
+
+
+async def _verified_packet(body):
+    if "packet" in body:
+        packet = body["packet"]
+        result = await run_in_threadpool(reports.inspect_packet, packet)
+        return packet if result["verified"] else JSONResponse(result, status_code=409, headers=NO_STORE)
+    fingerprint = body["fingerprint"]
+    if not isinstance(fingerprint, str) or not re.fullmatch("[a-f0-9]{64}", fingerprint):
+        return _report_error("invalid-request", 400)
+    packet = await _current_packet(body["request"])
+    if isinstance(packet, Response):
+        return packet
+    if await run_in_threadpool(reports.packet_fingerprint, packet) != fingerprint:
+        return _report_error("stale-input", 409)
+    return packet
 
 
 @router.post("/reports/verify")
 async def recheck_report(request: Request) -> Response:
-    body = await _report_body(request, {"packet"})
+    body = await _report_body(request, {"packet"}, {"request", "fingerprint"})
     if isinstance(body, Response):
         return body
     try:
-        result = await run_in_threadpool(reports.inspect_packet, body["packet"])
+        if "packet" in body:
+            result = await run_in_threadpool(reports.inspect_packet, body["packet"])
+            return JSONResponse(result, status_code=200 if result["verified"] else 409, headers=NO_STORE)
+        packet = await _verified_packet(body)
     except (ValueError, TypeError, RecursionError):
         return _report_error("invalid-artifact", 400)
-    return JSONResponse(result, status_code=200 if result["verified"] else 409, headers=NO_STORE)
+    return packet if isinstance(packet, Response) else JSONResponse({"verified": True, "status": "verified"}, headers=NO_STORE)
+
+
+def _text_download(packet, fmt):
+    projection = dumps(packet) if fmt == "json" else markdown(packet, reader=True)
+    return projection.encode("utf-8")
 
 
 @router.post("/reports/download")
 async def download_report(request: Request) -> Response:
-    body = await _report_body(request, {"packet", "format"})
+    body = await _report_body(request, {"packet", "format"}, {"request", "fingerprint", "format"})
     if isinstance(body, Response):
         return body
     if body["format"] not in ("json", "md", "docx"):
         return _report_error("format-unavailable", 400)
     try:
-        result = await run_in_threadpool(reports.inspect_packet, body["packet"])
-        if not result["verified"]:
-            return JSONResponse(result, status_code=409, headers=NO_STORE)
+        packet = await _verified_packet(body)
+        if isinstance(packet, Response):
+            return packet
         if body["format"] == "docx":
             try:
-                content = await run_in_threadpool(project_docx, body["packet"])
+                content = await run_in_threadpool(project_docx, packet)
             except (ArtifactError, BadInput):
                 return JSONResponse({"verified": True, "status": "format-unavailable", "format": "docx"},
                                     status_code=422, headers=NO_STORE)
         else:
-            projection = dumps(body["packet"]) if body["format"] == "json" else markdown(body["packet"])
-            content = projection.encode("utf-8")
+            content = await run_in_threadpool(_text_download, packet, body["format"])
     except (ValueError, TypeError, RecursionError):
         return _report_error("invalid-artifact", 400)
     media = {"json": "application/json", "md": "text/markdown",

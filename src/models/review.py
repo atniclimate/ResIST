@@ -1,4 +1,6 @@
 from sqlmodel import SQLModel, Field, create_engine, Session
+from sqlalchemy.pool import NullPool
+from sqlalchemy.schema import CreateTable, CreateIndex
 from typing import Optional
 from datetime import datetime, UTC
 from enum import Enum
@@ -32,13 +34,16 @@ DATABASE_PATH = DATA_DIR / "db" / "review_queue.db"
 
 def get_engine():
     DATABASE_PATH.parent.mkdir(parents=True, exist_ok=True)
-    return create_engine(f"sqlite:///{DATABASE_PATH}")
+    return create_engine(f"sqlite:///{DATABASE_PATH}", poolclass=NullPool)
 
 def init_db():
     engine = get_engine()
-    SQLModel.metadata.create_all(engine)
+    table = ReviewQueue.__table__
+    with engine.begin() as connection:
+        connection.execute(CreateTable(table, if_not_exists=True))
+        for index in table.indexes:
+            connection.execute(CreateIndex(index, if_not_exists=True))
     return engine
 
 def get_session():
-    engine = get_engine()
-    return Session(engine)
+    return Session(init_db())

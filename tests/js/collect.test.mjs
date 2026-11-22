@@ -30,6 +30,24 @@ const RES = C.resolutionItem(ROW, R2651.url);
 const reset = () => { mem.clear(); failSet = false; fire(KEY); };
 const json = x => JSON.stringify(x);
 
+test("independent tabs preserve interleaved additions and removals before storage events arrive", async () => {
+  reset();
+  const a = await import("../../pages/collect.js?tab=a"), b = await import("../../pages/collect.js?tab=b");
+  const previous = Object.getOwnPropertyDescriptor(globalThis, "navigator");
+  let queue = Promise.resolve();
+  const locks = { request: (_key, fn) => (queue = queue.then(fn)) };
+  Object.defineProperty(globalThis, "navigator", { configurable: true, value: { locks } });
+  try {
+    await Promise.all([a.changeCollection(() => a.collection.add(W3)), b.changeCollection(() => b.collection.add(R0))]);
+    await Promise.all([a.changeCollection(() => a.collection.remove(C.itemKey(W3))), b.changeCollection(() => b.collection.add(RES))]);
+    assert.deepEqual(JSON.parse(mem.get(KEY)).items.map(C.itemKey), [R0, RES].map(C.itemKey));
+  } finally {
+    if (previous) Object.defineProperty(globalThis, "navigator", previous);
+    else delete globalThis.navigator;
+    reset();
+  }
+});
+
 test("keys: a resolution is its SHA-256, a statement is the draft's carry key", () => {
   assert.equal(C.itemKey(RES), R2651.documentId);
   assert.equal(C.itemKey(W3), `${R2651.documentId}:whereas:3`);
@@ -154,13 +172,12 @@ test("a storage event for the collection's key reloads and notifies; another key
   const off = collection.subscribe(() => { seen++; });
   mem.set(KEY, JSON.stringify({ schema: SCHEMA, items: [RES, W3] }));
   fire("resist-draft-v1");
-  fire(null);
   assert.deepEqual([collection.count(), seen], [1, 0]);
   fire(KEY);
   assert.deepEqual([collection.count(), seen], [2, 1]);
   assert.ok(collection.has(C.itemKey(RES)));
   mem.set(KEY, "{not json");
-  fire(KEY);
+  fire(null);
   assert.equal(collection.count(), 0, "an unreadable copy is an empty collection");
   off();
   reset();
@@ -204,16 +221,16 @@ test("collectionText is the golden text; collectionJson round-trips", () => {
     "Text is copied word for word from resolutions published by the Affiliated Tribes of Northwest Indians. " +
     "The source PDF governs. Nothing here is a summary, a finding or a legal conclusion.\n\n";
   const golden = head +
-    `RESOLUTIONS (1)\n\n1. Resolution 26-51, 2026, Annual Convention\n   ${R2651.title}\n   Source PDF: ${url}\n   SHA-256: ${sha}\n\n` +
-    `STATEMENTS (1)\n\n1. WHEREAS 4, Resolution 26-51, 2026, page 2\n   ${STATEMENTS[0][2]}\n   Source PDF: ${url}\n   SHA-256: ${sha}\n`;
+    `RESOLUTIONS (1)\n\n1. Resolution 26-51, 2026, Annual Convention\n   ${R2651.title}\n   Source PDF: ${url}\n\n` +
+    `STATEMENTS (1)\n\n1. WHEREAS 4, Resolution 26-51, 2026, page 2\n   ${STATEMENTS[0][2]}\n   Source PDF: ${url}\n`;
   assert.ok(C.collectionText([RES, W3]) === golden, "one resolution and one statement");
   assert.ok(C.collectionText([W3, RES]) === golden, "sections keep their own order, resolutions first");
 
   const bare = { ...W3, page: null, url: "", text: "  two   spaces\nhere  " }, plain = { ...RES, convention: "", url: "", title: "a\n b" };
   assert.ok(C.collectionText([plain, bare, R0]) === head +
-    `RESOLUTIONS (1)\n\n1. Resolution 26-51, 2026\n   a b\n   SHA-256: ${sha}\n\n` +
-    `STATEMENTS (2)\n\n1. WHEREAS 4, Resolution 26-51, 2026, page unknown\n   two spaces here\n   SHA-256: ${sha}\n\n` +
-    `2. RESOLVED 1, Resolution 26-51, 2026, page 2\n   ${STATEMENTS[1][2]}\n   Source PDF: ${url}\n   SHA-256: ${sha}\n`);
+    `RESOLUTIONS (1)\n\n1. Resolution 26-51, 2026\n   a b\n\n` +
+    `STATEMENTS (2)\n\n1. WHEREAS 4, Resolution 26-51, 2026, page unknown\n   two spaces here\n\n` +
+    `2. RESOLVED 1, Resolution 26-51, 2026, page 2\n   ${STATEMENTS[1][2]}\n   Source PDF: ${url}\n`);
   assert.ok(C.collectionText([]) === head.slice(0, -1), "an empty collection is the heading and the notice");
 
   const text = C.collectionJson([RES, W3]);

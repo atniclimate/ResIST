@@ -39,8 +39,7 @@ def _res_dir(tmp_path: Path, atni: list[dict], ncai: list[dict] | None = None) -
     d = tmp_path / "res"
     d.mkdir()
     _write(d / "manifest-atni.csv", ATNI_HEADER, atni)
-    if ncai is not None:
-        _write(d / "manifest-ncai.csv", NCAI_HEADER, ncai)
+    _write(d / "manifest-ncai.csv", NCAI_HEADER, ncai or [])
     return d
 
 

@@ -156,3 +156,12 @@ def test_builder_uses_shared_loader(monkeypatch):
     resolvers = [MarkerResolver("a")]
     monkeypatch.setattr(build_pages, "load_resolvers", lambda: resolvers)
     assert build_pages._resolvers() is resolvers
+
+
+def test_plural_atni_number_marker_preserves_spans():
+    from resist.refs.atni_number import AtniNumberResolver
+
+    text = "ATNI Res. Nos. 23-40 and 23-41"
+    hits = AtniNumberResolver().find(ClauseText("0" * 64, text))
+    assert [(hit.number, hit.issuer, text[hit.span.start:hit.span.end]) for hit in hits] == [
+        ("23-40", "atni", "ATNI Res. Nos. 23-40"), ("23-41", "atni", "23-41")]

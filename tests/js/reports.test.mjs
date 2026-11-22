@@ -5,6 +5,7 @@ import vm from "node:vm";
 import { packetHTML, renderReports, stateMessage } from "../../pages/reports.js";
 
 const packet = {
+  request: "atni:res:00-1",
   completeness: { missing_pages: 1, citation_missing_pages: 0, missing_extraction_records: 1 },
   sources: [{ number: "00-1", title: "Neutral <title>", status: "unknown", status_authority: "none",
     sha256: "a".repeat(64), text_sha256: "b".repeat(64), source_file_state: "hash-verified",
@@ -56,10 +57,12 @@ test("returning to a retained packet hides quotations until current policy is ch
   const before = { document: globalThis.document, fetch: globalThis.fetch };
   globalThis.document = { getElementById: () => null };
   let resolveVerification, checks = 0;
-  globalThis.fetch = async path => {
+  const fingerprint = "f".repeat(64);
+  globalThis.fetch = async (path, options) => {
     if (path === "capabilities.json") return { ok: true, json: async () => ({ face: "local", reports: { available: true } }) };
-    if (path === "/api/v1/reports") return { ok: true, json: async () => ({ status: "verified", packet }) };
+    if (path === "/api/v1/reports") return { ok: true, json: async () => ({ status: "verified", packet, fingerprint }) };
     assert.equal(path, "/api/v1/reports/verify");
+    assert.deepEqual(JSON.parse(options.body), {request: packet.request, fingerprint});
     checks++;
     return new Promise(resolve => { resolveVerification = state => resolve({ ok: false, json: async () => ({ status: state }) }); });
   };
@@ -108,6 +111,7 @@ const appContext = (view, extra = {}) => {
     location: { hash: `#/${view}` }, history: {}, window: { scrollTo() {} }, URLSearchParams,
     setTimeout, clearTimeout, addEventListener() {}, local: { set() {} }, refreshDock() {},
     store: { subscribe() {}, carriedCount: () => 0, citeCount: () => 0, verifyWith() { seen.verified++; } },
+    changeCollection: fn => fn(),
     collection: { subscribe() {}, count: () => 0, has: () => false, verifyWith() { seen.collected++; return 0; } },
     resolutionItem: () => ({}), statementItem: () => ({}), itemLabel: () => "", MAX_ITEMS: 200, searchedHTML: () => "",
     issues: [], issuesOk: false, issuesRefused: false, toast() {},

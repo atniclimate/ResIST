@@ -1,5 +1,6 @@
 from pathlib import Path
 from typing import Tuple, List
+from resist.errors import DependencyError
 
 class PaddleOCREngine:
     """PaddleOCR implementation with lazy initialization"""
@@ -10,12 +11,15 @@ class PaddleOCREngine:
     @property
     def ocr(self):
         if self._ocr is None:
-            from paddleocr import PaddleOCR
-            self._ocr = PaddleOCR(
-                use_angle_cls=True,
-                lang='en',
-                show_log=False
-            )
+            try:
+                from paddleocr import PaddleOCR
+                self._ocr = PaddleOCR(
+                    use_angle_cls=True,
+                    lang='en',
+                    show_log=False
+                )
+            except (ImportError, OSError) as exc:
+                raise DependencyError("paddleocr-unavailable") from exc
         return self._ocr
 
     def extract_text(self, image_path: Path) -> Tuple[str, float, List[float]]:

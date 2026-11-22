@@ -65,7 +65,7 @@ def _source(source: dict, path: str) -> list[dict]:
     return lines
 
 
-def atoms(packet: dict) -> list[dict]:
+def atoms(packet: dict, *, reader=False) -> list[dict]:
     """Ordered, complete display atoms; identities are existing packet field paths."""
     lines = []
     def add(kind, text, identity=""):
@@ -126,14 +126,32 @@ def atoms(packet: dict) -> list[dict]:
     for index, computation in enumerate(packet["computations"]):
         add("h3", "Deterministic computation", f"/computations/{index}")
         add("evidence", dumps(computation).rstrip("\n"), f"/computations/{index}")
+    if reader:
+        lines = [line for line in lines if not line["identity"].endswith("/sha256")]
+        for line in lines:
+            if line["kind"] == "evidence":
+                line["text"] = dumps(_reader_evidence(json.loads(line["text"]))).rstrip("\n")
     return lines
 
 
-def markdown(packet: dict) -> str:
+def _reader_evidence(value):
+    """Hide technical fingerprints in metadata while preserving the quoted source text."""
+    if isinstance(value, dict):
+        return {key: _reader_evidence(item) for key, item in value.items()
+                if "sha256" not in key.lower() and "digest" not in key.lower()
+                and not re.search(r"[0-9a-f]{64}", key)}
+    if isinstance(value, list):
+        return [_reader_evidence(item) for item in value]
+    if isinstance(value, str) and re.search(r"[0-9a-f]{64}", value):
+        return re.sub(r"[0-9a-f]{64}", "(source identifier)", value)
+    return value
+
+
+def markdown(packet: dict, *, reader=False) -> str:
     """Escape display atoms, preserving the supported v1 Markdown projection."""
     lines = []
     previous = None
-    for atom in atoms(packet):
+    for atom in atoms(packet, reader=reader):
         kind, text = atom["kind"], atom["text"]
         if "markdown" in atom:
             rendered = atom["markdown"]

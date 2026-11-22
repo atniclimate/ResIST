@@ -1,6 +1,6 @@
 """TF-IDF keyword extraction for ATNI resolutions."""
-import re
 import math
+import unicodedata
 from collections import Counter
 from sqlmodel import Session, select
 from src.models.resolution import Resolution, Keyword
@@ -28,7 +28,7 @@ ENGLISH_STOPWORDS = {
     "through", "throughout", "to", "toward", "under", "until", "up", "upon",
     "with", "within", "without",
     # Conjunctions
-    "and", "but", "or", "nor", "for", "yet", "so", "because", "although",
+    "and", "but", "or", "nor", "yet", "so", "because", "although",
     "while", "if", "when", "where", "whether", "though", "unless", "since",
     # Other common words
     "all", "also", "any", "both", "each", "either", "every", "few", "how",
@@ -63,8 +63,22 @@ STOPWORDS = ENGLISH_STOPWORDS | RESOLUTION_STOPWORDS
 
 def tokenize(text: str) -> list[str]:
     """Extract words, lowercase, filter by length."""
-    words = re.findall(r'\b[a-zA-Z]{3,}\b', text.lower())
-    return [w for w in words if w not in STOPWORDS]
+    words = []
+    token = []
+    letters = 0
+    for char in unicodedata.normalize("NFC", text.lower()) + " ":
+        if char.isalpha():
+            token.append(char)
+            letters += 1
+        elif token and unicodedata.category(char).startswith("M"):
+            token.append(char)
+        elif token:
+            word = "".join(token)
+            if letters >= 3 and word not in STOPWORDS:
+                words.append(word)
+            token.clear()
+            letters = 0
+    return words
 
 
 def compute_tf(tokens: list[str]) -> dict[str, float]:

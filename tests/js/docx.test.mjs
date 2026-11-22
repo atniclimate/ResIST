@@ -3,7 +3,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { crc32 as zlibCrc32 } from "node:zlib";
-import { compose, newDraft } from "../../pages/compose.js";
+import { compose, newDraft, validDraft } from "../../pages/compose.js";
 import { buildDocx, docxName, crc32, zip } from "../../pages/docx.js";
 import { emptyDraft, fullDraft, seal, CREATED, CITE } from "./docx-fixtures.mjs";
 
@@ -35,6 +35,17 @@ function unzip(bytes) {
 }
 const text = (files, name) => new TextDecoder().decode(files.get(name));
 const build = (draft, opts = {}) => buildDocx(compose(draft), { created: CREATED, ...opts });
+
+test("a saved note cannot supply its own verification for a Word export", () => {
+  const d = newDraft();
+  d.notes.push({ title: "Saved policy", issues: [{ quote: "Recorded quotation" }], receiptSha256: "claimed",
+    unverified: false, comment: "Drafter comment" });
+  const xml = text(unzip(build(validDraft(d))), "word/document.xml");
+  assert.match(xml, /source and quotations are unverified/);
+  assert.doesNotMatch(xml, /Read by Policy Sentinel on/);
+  assert.match(xml, /Drafter comment/);
+  assert.match(xml, /Recorded quotation/);
+});
 
 test("crc32 agrees with zlib, and the zip round-trips", () => {
   const data = new TextEncoder().encode("Affiliated Tribes of Northwest Indians, ĺ 𝓐");
@@ -98,7 +109,7 @@ test("the full draft carries known details, verbatim clauses, checkboxes, the NC
   assert.ok(doc.includes('<w:tag w:val="Why is this resolution emergency in nature?"/>'), "empty emergency text is fillable");
   assert.match(rels, /Target="https:\/\/atnitribes\.org\/wp-content\/uploads\/2026\/09\/20260917_26-51_[^"]+" TargetMode="External"/);
   assert.match(rels, /Target="https:\/\/www\.federalregister\.gov\/d\/2025-23880" TargetMode="External"/);
-  assert.ok(doc.includes("SHA-256 5b62a9708e4081fd"));
+  assert.ok(!doc.includes("5b62a9708e4081fd"));
   // Carried Citations (D-077): one row after the clause sources; the body holds the words as an ordinary clause.
   const at = doc.indexOf(">Carried Citations<");
   assert.ok(at > doc.indexOf(">Sources of Carried Clauses<"), "Carried Citations follows the clause sources");
@@ -109,13 +120,13 @@ test("the full draft carries known details, verbatim clauses, checkboxes, the NC
   for (const head of ["Position", "Citation", "From", "Source"]) assert.ok(table.includes(`>${head}<`), `header ${head}`);
   assert.ok(table.includes(">WHEREAS 5<"), "the draft position of the clause holding it");
   assert.ok(table.includes(`>ATNI ${CITE.number}, WHEREAS ${CITE.position}, page ${CITE.page}<`), "From names the number, clause and page");
-  assert.ok(table.includes(`>SHA-256 ${CITE.documentId.slice(0, 16)}<`), "the source document's SHA-256 prefix");
+  assert.ok(!table.includes(CITE.documentId.slice(0, 16)));
   assert.ok(table.includes(`>${CITE.text}<`), "the citation words");
   assert.match(rels, /Target="https:\/\/atnitribes\.org\/wp-content\/uploads\/2021\/10\/[^"]+" TargetMode="External"/);
   assert.ok(doc.includes(`<w:r><w:rPr><w:b/><w:bCs/></w:rPr><w:t xml:space="preserve">WHEREAS,</w:t></w:r><w:r><w:t xml:space="preserve"> ${CITE.text}; now</w:t></w:r>`),
     "the clause holding the citation is plain text in the body");
   assert.equal(model.citations.length, 1);
-  assert.ok(doc.includes("Read by Policy Sentinel on 10/19/2026; text SHA-256 b3ee0b8f7d68c588"));
+  assert.ok(doc.includes("Read by Policy Sentinel on 10/19/2026"));
   assert.ok(doc.includes("Drafter's note: Check the consultation section"));
   assert.ok(text(files, "word/_rels/header3.xml.rels").includes("media/seal.jpg"));
   for (const [name, data] of files) if (/\.(xml|rels)$/.test(name)) {

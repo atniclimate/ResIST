@@ -6,6 +6,7 @@ import assert from "node:assert/strict";
 import { resolveObjectURL } from "node:buffer";
 
 const mem = new Map();
+Object.defineProperty(globalThis, "navigator", { configurable: true, value: { locks: { request: (_key, fn) => Promise.resolve(fn()) } } });
 globalThis.localStorage = {
   getItem: k => (mem.has(k) ? mem.get(k) : null),
   setItem: (k, v) => { mem.set(k, String(v)); },
@@ -50,7 +51,7 @@ test("one resolution and two statements: counts, verbatim escaped text, full SHA
   matches(html, /<h2 id="research-res">Resolutions <span class="n">1<\/span>/);
   matches(html, /<h2 id="research-st">Statements <span class="n">2<\/span>/);
   assert.ok(html.includes(W3.text) && html.includes(R0.text) && html.includes(RES.title), "text and title appear exactly");
-  assert.equal(html.split(`<code class="sha">${R2651.documentId}</code>`).length - 1, 3, "the full SHA-256 on every row");
+  assert.equal(html.split(`<code class="sha">${R2651.documentId}</code>`).length - 1, 0, "no visible hash row");
   matches(html, /Resolution 26-51<\/a>, 2026, Annual Convention, page 2/);
   matches(html, /Resolution 26-51<\/a>, 2026, Annual Convention, page unknown/);
   matches(html, /WHEREAS 4/);
@@ -203,7 +204,7 @@ test("Remove, Undo, Add to draft, downloads, print and the disposer, as a person
     assert.equal(await blobText(dom.anchors.at(-1)) === C.collectionJson(collection.items), true);
     dom.click(dom.find(b => b.id === "research-text"));
     assert.equal(dom.anchors.at(-1).download, "resist-research.txt");
-    assert.equal(await blobText(dom.anchors.at(-1)) === C.collectionText(collection.items), true);
+    assert.equal(await blobText(dom.anchors.at(-1)) === C.collectionText(collection.items, false), true);
     dom.click(dom.find(b => b.id === "research-print"));
     assert.equal(printed, 1);
 

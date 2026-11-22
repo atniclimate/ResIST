@@ -1,12 +1,13 @@
 """Find related resolutions using graph similarity."""
 from typing import List, Tuple
 
-from src.analysis.graph import ResolutionGraph, GRAPH_PATH
+from src.analysis.graph import ResolutionGraph
 
 
 def find_related_resolutions(
     document_ids: List[str],
     top_n: int = 5,
+    *, allowed: set[str] | None = None,
 ) -> List[Tuple[str, float]]:
     """
     Find resolutions related to the given set using Jaccard similarity.
@@ -53,24 +54,22 @@ def find_related_resolutions(
     for ctype in input_types:
         # Find resolutions that have this citation type
         for pred in G.predecessors(ctype):
+            if allowed is not None and pred not in allowed:
+                continue
             if G.nodes[pred].get('node_type') == 'resolution':
-                if pred not in input_set:
+                if pred not in input_set and pred not in candidates:
                     # Calculate Jaccard similarity
                     pred_types = set(G.successors(pred)) & citation_types
                     intersection = len(pred_types & input_types)
                     union = len(pred_types | input_types)
                     similarity = intersection / union if union > 0 else 0
 
-                    if pred in candidates:
-                        candidates[pred] = max(candidates[pred], similarity)
-                    else:
-                        candidates[pred] = similarity
+                    candidates[pred] = similarity
 
     # Sort by similarity descending
     sorted_candidates = sorted(
         candidates.items(),
-        key=lambda x: x[1],
-        reverse=True
+        key=lambda x: (-x[1], x[0])
     )
 
     return sorted_candidates[:top_n]

@@ -52,6 +52,17 @@ def title_hits(db) -> int:
         return con.execute("""select count(*) from resolution_fts where resolution_fts match 'title:"Sovereign"'""").fetchone()[0]
 
 
+def test_corrupt_backup_blocks_correction(pool, data_root):
+    db, res, write = pool
+    write((sha("Res-26-34"), "title", "Res-26-34", TITLE))
+    backup = data_root / "tmp" / "pre-corrections" / db.name
+    backup.parent.mkdir(parents=True)
+    backup.write_bytes(b"incomplete")
+    assert ac.main(["--res-dir", str(res)]) == 4
+    assert title_hits(db) == 0
+    assert backup.read_bytes() == b"incomplete"
+
+
 def test_applies_once_and_keeps_the_index_in_step(pool, data_root, capsys):
     db, res, write = pool
     write((sha("Res-26-34"), "title", "Res-26-34", TITLE),

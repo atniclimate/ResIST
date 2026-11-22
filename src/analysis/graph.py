@@ -1,5 +1,6 @@
 """NetworkX graph for resolution relationships."""
 import json
+from tempfile import NamedTemporaryFile
 from pathlib import Path
 from typing import Dict, List, Any, Optional
 import networkx as nx
@@ -118,7 +119,13 @@ class ResolutionGraph:
         """Persist graph to JSON file."""
         self.graph_path.parent.mkdir(parents=True, exist_ok=True)
         data = json_graph.node_link_data(self.G, edges="edges")
-        self.graph_path.write_text(json.dumps(data, indent=2, default=str))
+        with NamedTemporaryFile(dir=self.graph_path.parent, delete=False) as tmp:
+            pending = Path(tmp.name)
+        try:
+            pending.write_text(json.dumps(data, indent=2, default=str), encoding="utf-8")
+            pending.replace(self.graph_path)
+        finally:
+            pending.unlink(missing_ok=True)
 
     def load(self):
         """Load graph from JSON file."""

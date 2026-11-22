@@ -5,7 +5,7 @@ import json
 import pytest
 
 from resist import registry
-from resist.models import Availability, DocRef, DocumentResult
+from resist.models import Availability, DocRef, DocumentResult, OcrPage, TextLayer
 from tests import originals as o
 from tests.contracts import h
 
@@ -44,6 +44,18 @@ def test_native_text_matches_legacy(subject, work, name):
     sha, path = o.fixture(name)
     r = subject.extract(o.doc_ref(sha), path, work)
     assert h(r.text) == h(extract_text_from_native_pdf(path)), sha
+
+
+def test_empty_ocr_keeps_short_native_text(subject, work, monkeypatch):
+    sha, path = o.fixture("Res-23-40.pdf")
+    ex = type(subject)(ocr=SpyOcr())
+    short = ex.backend.page_text(path, 0).text.strip()[:15]
+    monkeypatch.setattr(ex.backend, "page_count", lambda _path: 1)
+    monkeypatch.setattr(ex.backend, "page_text", lambda _path, _page: TextLayer("observed", short))
+    monkeypatch.setattr(ex.ocr, "recognize", lambda _page: OcrPage("empty", ""))
+    result = ex.extract(o.doc_ref(sha), path, work)
+    assert result.text == short and result.disposition == "low_confidence"
+    assert result.pages[0].route == "native"
 
 
 def _ocr_unavailable():

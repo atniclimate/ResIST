@@ -80,6 +80,8 @@ def _load(dir_key: str, contents: tuple) -> Manifests:
     a, n = d / "manifest-atni.csv", d / "manifest-ncai.csv"
     if all(content is None for content in contents):
         return _ABSENT
+    if contents[1] is None:
+        raise InvalidConfig("quarantine-manifest-missing")
     try:
         atni: dict[str, list[dict]] = {}
         for row in _rows(a, contents[0]) if contents[0] is not None else []:
@@ -109,9 +111,12 @@ def load_manifests(res_dir: Path | None = None) -> Manifests:
 
 
 def source_policy(sha256: str, res_dir: Path | None = None) -> SourcePolicy:
-    if not isinstance(sha256, str) or not _SHA_RE.match(sha256):
+    if not isinstance(sha256, str) or not _SHA_RE.fullmatch(sha256):
         raise BadInput("bad-sha256")
-    m = load_manifests(res_dir)
+    return _source_policy(sha256, load_manifests(res_dir))
+
+
+def _source_policy(sha256: str, m: Manifests) -> SourcePolicy:
     if sha256 in m.ncai:
         return SourcePolicy(sha256, "ncai", "ncai", "unknown", "T1", "dg12-open", "D-040", True)
     rows = m.atni.get(sha256)
@@ -127,6 +132,59 @@ def source_policy(sha256: str, res_dir: Path | None = None) -> SourcePolicy:
 def admissible(p: SourcePolicy, max_tier: Tier | None = None) -> bool:
     limit = max_tier or config.pool_max_tier()
     return not p.quarantined and tier_rank(p.tier) <= tier_rank(limit)
+
+
+UPLOAD_ID = re.compile(r"upload-([0-9a-f]{64})\.(?:pdf|jpe?g|png|tiff?|txt|docx)")
+_LEGACY_UPLOAD_ID = re.compile(r"[0-9]{8}_[0-9]{6}_[0-9a-f]{8}")
+
+
+def readable_resolution_ids(con) -> list[int]:
+    """Read only row identities under a single snapshot of the current source policy."""
+    manifests = load_manifests()
+    limit = config.pool_max_tier()
+    columns = {row[1] for row in con.execute("PRAGMA table_info(resolution)")}
+    legacy_pool = "parse_confidence" in columns
+    join = ""
+    org = "NULL"
+    stored = "0"
+    if "asserted_tier" in columns:
+        tier = "r.asserted_tier"
+    elif con.execute("SELECT 1 FROM sqlite_master WHERE name='document' AND type='table'").fetchone():
+        join = (" LEFT JOIN document d ON d.sha256=CASE WHEN substr(r.document_id,1,7)='upload-' "
+                "THEN substr(r.document_id,8,64) ELSE r.document_id END")
+        org, tier = "d.org_id", "d.tier"
+        stored = "d.sha256 IS NOT NULL"
+    else:
+        tier = "NULL"
+    ids = []
+    for rid, identity, stored_org, stored_tier, has_record in con.execute(
+            f"SELECT r.id,r.document_id,{org},{tier},{stored} FROM resolution r" + join):
+        if not isinstance(identity, str) or stored_org == "ncai":
+            continue
+        if (has_record or stored_tier is not None) and stored_tier not in ("T0", "T1", "T2", "T3"):
+            continue
+        if stored_tier is not None and tier_rank(stored_tier) > tier_rank(limit):
+            continue
+        upload = UPLOAD_ID.fullmatch(identity) if legacy_pool else None
+        if legacy_pool and _LEGACY_UPLOAD_ID.fullmatch(identity):
+            ids.append(rid)
+            continue
+        sha = upload.group(1) if upload else identity
+        if not _SHA_RE.fullmatch(sha):
+            continue
+        derived = _source_policy(sha, manifests)
+        if derived.quarantined or (stored_org and derived.org not in ("unknown", stored_org)):
+            continue
+        if upload and derived.org == "unknown":
+            ids.append(rid)
+            continue
+        # Older standalone indexes omitted the asserted tier. Only T3 can safely read them.
+        if stored_tier is None and not legacy_pool and limit != "T3":
+            continue
+        if (manifests.present or stored_tier is None) and not admissible(derived, limit):
+            continue
+        ids.append(rid)
+    return ids
 
 
 def require_admissible(doc: DocRef, max_tier: Tier | None = None, res_dir: Path | None = None) -> None:

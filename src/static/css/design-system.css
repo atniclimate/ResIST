@@ -6,6 +6,13 @@
 /* ============================================
    CSS Custom Properties (Design Tokens)
    ============================================ */
+@font-face {
+    font-family: 'Lexend';
+    src: url('/static/vendor/fontsource-variable-lexend-5.2.8/lexend-latin-wght-normal.woff2') format('woff2');
+    font-weight: 100 900;
+    font-display: swap;
+}
+
 :root {
     /* Colors */
     --white: #FFFFFF;

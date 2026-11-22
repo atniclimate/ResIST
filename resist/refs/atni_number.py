@@ -15,7 +15,7 @@ from resist.models import Availability, ClauseText, RefCandidate, Span
 from resist.refs import logical_id
 
 _NUM = r"(?P<y>\d{4}|\d{2})\s*[-–—_/]\s*(?P<n>\d{1,3})(?!\d)"
-NUMBER = re.compile(r"\b(?:ATNI[\s_-]*)?RES(?:OLUTIONS?)?(?![a-z])\.?[\s_-]*(?:NO\b\.?|NUMBER\b|#)?\s*" + _NUM, re.I)
+NUMBER = re.compile(r"\b(?:ATNI[\s_-]*)?RES(?:OLUTIONS?)?(?![a-z])\.?[\s_-]*(?:(?:NOS?\b\.?|NUMBERS?\b)\s*)?#?\s*" + _NUM, re.I)
 CONTINUE = re.compile(r"\s*(?:,\s*and|,|;|&|and)\s*#?\s*" + _NUM, re.I)   # "Resolutions #15-53 and #15-60"
 NCAI_SHAPE = re.compile(r"\b(?!RES-)(?!ATNI-)[A-Z]{2,5}-\d{2}-\d{3}\b")    # report 07 s4, D-030: 17 docs exactly
 SEGMENT = re.compile(r"\b(?:WHEREAS|RESOLVED)\b", re.I)

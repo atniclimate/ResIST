@@ -300,7 +300,7 @@ export function openLookup({ query = "", onAddNote } = {}) {
       <p class="meta">${meta([c.identifier, c.issuingBody, c.kind, usDate(c.date)])}</p>
       <p class="sn-actions">${link(c.officialUrl, "Official source")}${p.receipt ? link(p.receipt.textUrl, "Policy text") : ""}</p>
       <p class="meta">${p.receipt
-        ? `Read by Policy Sentinel on ${esc(usDate(p.receipt.retrievedAt))}; text SHA-256 ${esc(p.receipt.sha256.slice(0, 16))}.`
+        ? `Read by Policy Sentinel on ${esc(usDate(p.receipt.retrievedAt))}.`
         : "Policy Sentinel returns details only for this source, so no policy text was read and there are no flags."}</p>
       ${p.issues.length ? `<fieldset class="sn-flags"><legend>Flags to keep in your drafting notes</legend>
         ${p.issues.map(i => `<label class="check sn-flag"><input type="checkbox" value="${esc(i.id)}"><span>

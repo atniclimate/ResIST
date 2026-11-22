@@ -1,16 +1,18 @@
 """Topic search API with theme-based browsing and citation-type intersection queries."""
-from typing import Annotated, Optional, List, Dict, Any
-from fastapi import APIRouter, Request, Header, Form, Query, HTTPException
+from typing import Optional, List, Dict, Any
+from fastapi import APIRouter, Request, Form, Query, HTTPException
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from sqlmodel import Session
 from sqlalchemy import text
+from resist.config import repo_root
+from src.storage.admission import ADMITTED, admitted_params
 
-from src.storage.database import get_engine, get_session
+from src.storage.database import get_engine
 from src.storage.repository import get_all_themes, get_resolutions_by_theme, get_theme_by_id
 
 router = APIRouter()
-templates = Jinja2Templates(directory="src/templates")
+templates = Jinja2Templates(directory=repo_root() / "src/templates")
 
 
 def get_all_citation_types(engine) -> List[str]:
@@ -18,9 +20,9 @@ def get_all_citation_types(engine) -> List[str]:
     with engine.connect() as conn:
         result = conn.execute(text(
             "SELECT DISTINCT citation_type FROM citation "
-            "WHERE citation_type IS NOT NULL "
+            f"WHERE citation_type IS NOT NULL AND resolution_id IN ({ADMITTED}) "
             "ORDER BY citation_type"
-        ))
+        ), admitted_params(conn))
         return [row[0] for row in result.fetchall()]
 
 
@@ -28,15 +30,11 @@ def count_resolutions_for_topics(engine, topics: List[str]) -> int:
     """
     Count resolutions matching ALL specified topics.
 
-    Uses self-JOIN pattern to find resolutions that have citations
-    of all specified types.
-
-    Security: Limited to max 10 topics to prevent excessive JOINs.
+    Repeated citations of one type count as a single match.
     """
     if not topics:
         return 0
 
-    # Security: Limit maximum number of topics to prevent excessive JOINs
     if len(topics) > 10:
         raise ValueError("Maximum 10 topics allowed")
 
@@ -51,35 +49,34 @@ def count_resolutions_for_topics(engine, topics: List[str]) -> int:
             result = conn.execute(
                 text(
                     "SELECT COUNT(DISTINCT resolution_id) FROM citation "
-                    "WHERE citation_type = :topic"
+                    f"WHERE citation_type = :topic AND resolution_id IN ({ADMITTED})"
                 ),
-                {"topic": topics[0]}
+                {"topic": topics[0], **admitted_params(conn)}
             )
             return result.scalar() or 0
 
-    # Multiple topics: self-JOIN pattern
-    # Build dynamic JOIN clauses
-    joins = ["JOIN citation c0 ON c0.resolution_id = r.id AND c0.citation_type = :topic_0"]
-    params = {"topic_0": topics[0]}
-
-    for i, topic in enumerate(topics[1:], start=1):
-        joins.append(f"JOIN citation c{i} ON c{i}.resolution_id = r.id AND c{i}.citation_type = :topic_{i}")
-        params[f"topic_{i}"] = topic
-
-    sql = f"""
-        SELECT COUNT(DISTINCT r.id) FROM resolution r
-        {' '.join(joins)}
-    """
+    matching, params = _matching_topics(topics)
+    sql = f"SELECT COUNT(*) FROM resolution WHERE id IN ({matching}) AND id IN ({ADMITTED})"
 
     with engine.connect() as conn:
-        result = conn.execute(text(sql), params)
+        result = conn.execute(text(sql), params | admitted_params(conn))
         return result.scalar() or 0
+
+
+def _matching_topics(topics: List[str]):
+    params = {f"topic_{i}": topic for i, topic in enumerate(dict.fromkeys(topics))}
+    placeholders = ", ".join(f":{key}" for key in params)
+    params["topic_count"] = len(params)
+    return f"""
+        SELECT resolution_id FROM citation WHERE citation_type IN ({placeholders})
+        GROUP BY resolution_id HAVING COUNT(DISTINCT citation_type) = :topic_count
+    """, params
 
 
 def find_resolutions_by_all_topics(
     engine,
     topics: List[str],
-    limit: int = 50
+    limit: int | None = 50
 ) -> List[Dict[str, Any]]:
     """
     Find resolutions matching ALL specified topics.
@@ -87,12 +84,10 @@ def find_resolutions_by_all_topics(
     Returns list of resolution dicts with id, document_id, resolution_number,
     title, convention_year, and summary.
 
-    Security: Limited to max 10 topics to prevent excessive JOINs.
     """
     if not topics:
         return []
 
-    # Security: Limit maximum number of topics to prevent excessive JOINs
     if len(topics) > 10:
         raise ValueError("Maximum 10 topics allowed")
 
@@ -102,41 +97,37 @@ def find_resolutions_by_all_topics(
             raise ValueError("Invalid topic value")
 
     # Security: Validate limit is reasonable
-    if not isinstance(limit, int) or limit < 1 or limit > 1000:
+    if limit is not None and (not isinstance(limit, int) or limit < 1 or limit > 1000):
         raise ValueError("Invalid limit value (must be 1-1000)")
+    if limit is None:
+        limit = -1  # SQLite's unlimited result set for a complete export.
 
     if len(topics) == 1:
         # Simple case: single topic
-        sql = """
+        sql = f"""
             SELECT DISTINCT r.id, r.document_id, r.resolution_number,
                    r.title, r.convention_year, r.summary
             FROM resolution r
             JOIN citation c ON c.resolution_id = r.id
-            WHERE c.citation_type = :topic
+            WHERE c.citation_type = :topic AND r.id IN ({ADMITTED})
             ORDER BY r.convention_year DESC
             LIMIT :limit
         """
         params = {"topic": topics[0], "limit": limit}
     else:
-        # Multiple topics: self-JOIN pattern
-        joins = ["JOIN citation c0 ON c0.resolution_id = r.id AND c0.citation_type = :topic_0"]
-        params = {"topic_0": topics[0], "limit": limit}
-
-        for i, topic in enumerate(topics[1:], start=1):
-            joins.append(f"JOIN citation c{i} ON c{i}.resolution_id = r.id AND c{i}.citation_type = :topic_{i}")
-            params[f"topic_{i}"] = topic
-
+        matching, params = _matching_topics(topics)
+        params["limit"] = limit
         sql = f"""
             SELECT DISTINCT r.id, r.document_id, r.resolution_number,
                    r.title, r.convention_year, r.summary
             FROM resolution r
-            {' '.join(joins)}
+            WHERE r.id IN ({matching}) AND r.id IN ({ADMITTED})
             ORDER BY r.convention_year DESC
             LIMIT :limit
         """
 
     with engine.connect() as conn:
-        result = conn.execute(text(sql), params)
+        result = conn.execute(text(sql), params | admitted_params(conn))
         rows = result.fetchall()
 
     return [

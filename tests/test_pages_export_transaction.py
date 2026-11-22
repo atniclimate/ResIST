@@ -23,6 +23,7 @@ def candidate(tmp_path, monkeypatch):
     (root / "pages" / "index.html").write_text("<title>Metadata candidate</title>")
     source = tmp_path / "sources"
     source.mkdir()
+    (source / "manifest-ncai.csv").write_text("sha256\n", encoding="utf-8")
     sha = "a" * 64
     with (source / "manifest-atni.csv").open("w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=["sha256", "status", "source", "local_path", "url"])
@@ -46,6 +47,21 @@ def candidate(tmp_path, monkeypatch):
     out.mkdir(parents=True)
     (out / "last-good").write_bytes(b"0")
     return source, database, out
+
+
+def test_invalid_policy_manifest_refuses_with_config_status(candidate):
+    source, _, out = candidate
+    (source / "manifest-ncai.csv").unlink()
+    assert bp.main(source) == 2
+    assert (out / "last-good").exists()
+
+
+def test_null_stored_tier_refuses_publication(candidate):
+    source, database, out = candidate
+    with sqlite3.connect(database) as con:
+        con.execute("update document set tier = null")
+    assert bp.main(source) == 1
+    assert (out / "last-good").exists()
 
 
 def test_failed_build_keeps_last_good(candidate, monkeypatch):
@@ -73,10 +89,9 @@ def test_copy_uses_the_validated_snapshot(candidate, monkeypatch):
         original(src, dst)
 
     monkeypatch.setattr(bp, "_copy", mutate)
-    assert bp.main(source) == 0
-    with sqlite3.connect(out / "resolutions.db") as con:
-        assert con.execute("select needs_review from resolution").fetchone()[0] == 0
-    assert not (out / "last-good").exists()
+    with pytest.raises(ArtifactError, match="source database changed"):
+        bp.main(source)
+    assert (out / "last-good").exists()
 
 
 def test_manifest_mutation_refuses_promotion(candidate, monkeypatch):

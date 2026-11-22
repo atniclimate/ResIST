@@ -6,6 +6,7 @@ Spans come from highlight() markers, so each quote is a verbatim slice of the st
 """
 
 import hashlib
+import json
 import sqlite3
 from pathlib import Path
 from typing import Iterable
@@ -92,11 +93,12 @@ class Fts5Index:
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
         con = sqlite3.connect(self.db_path)
         try:
+            con.execute("BEGIN IMMEDIATE")
             con.execute("CREATE TABLE resolution(id INTEGER PRIMARY KEY, document_id TEXT NOT NULL UNIQUE, "
-                        "resolution_number TEXT, title TEXT, full_text TEXT NOT NULL)")
+                        "resolution_number TEXT, title TEXT, full_text TEXT NOT NULL, asserted_tier TEXT NOT NULL)")
             con.execute(resolution_fts_ddl())
-            con.executemany("INSERT INTO resolution(document_id, resolution_number, title, full_text) "
-                            "VALUES (?, ?, ?, ?)", [(d.sha256, d.number, d.title, d.text) for d in docs])
+            con.executemany("INSERT INTO resolution(document_id, resolution_number, title, full_text, asserted_tier) "
+                            "VALUES (?, ?, ?, ?, ?)", [(d.sha256, d.number, d.title, d.text, d.tier) for d in docs])
             con.execute("INSERT INTO resolution_fts(resolution_fts) VALUES('rebuild')")
             con.execute("INSERT INTO resolution_fts(resolution_fts, rank) VALUES('integrity-check', 1)")
             con.commit()
@@ -117,11 +119,14 @@ class Fts5Index:
             return SearchResult(req.query, ())
         con = _ro(self.db_path)
         try:
+            con.execute("BEGIN")
+            admitted = json.dumps(policy.readable_resolution_ids(con))
             rows = con.execute(
                 "SELECT r.document_id, bm25(resolution_fts, 10.0, 5.0, 1.0) AS s, r.full_text, "
                 "highlight(resolution_fts, 2, char(2), char(3)) FROM resolution_fts "
                 "JOIN resolution r ON r.id = resolution_fts.rowid WHERE resolution_fts MATCH ? "
-                "ORDER BY s, r.document_id LIMIT ?", (q, req.limit)).fetchall()
+                "AND r.id IN (SELECT value FROM json_each(?)) "
+                "ORDER BY s, r.document_id LIMIT ?", (q, admitted, req.limit)).fetchall()
         finally:
             con.close()
         hits = tuple(Hit(sha, i + 1, s, "fts5", _spans(sha, text or "", marked or ""))

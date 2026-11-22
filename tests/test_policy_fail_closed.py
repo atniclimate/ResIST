@@ -10,6 +10,13 @@ SHA = "a" * 64
 ATNI = f"sha256,status,source,local_path\n{SHA},fetched,atni-table,x.pdf\n"
 
 
+def test_sha_with_trailing_newline_is_invalid(tmp_path):
+    from resist.errors import BadInput
+
+    with pytest.raises(BadInput, match="bad-sha256"):
+        policy.source_policy(SHA + "\n", tmp_path)
+
+
 @pytest.mark.parametrize("bad", [
     b"\xff",
     b"",
@@ -45,6 +52,7 @@ def test_manifest_directory_is_not_absent(tmp_path):
 
 
 def test_incomplete_atni_policy_columns_refused(tmp_path):
+    (tmp_path / "manifest-ncai.csv").write_text("sha256\n", encoding="utf-8")
     (tmp_path / "manifest-atni.csv").write_text(
         f"sha256,status,source,local_path\n{SHA},fetched,atni-media-library\n", encoding="utf-8")
     with pytest.raises(InvalidConfig):
@@ -65,6 +73,7 @@ def test_truly_absent_manifests_keep_fresh_clone_contract(tmp_path):
     ("  ", " fetched "),
 ])
 def test_invalid_row_hash_refuses_admission(tmp_path, manifest, sha, status):
+    (tmp_path / "manifest-ncai.csv").write_text("sha256\n", encoding="utf-8")
     (tmp_path / "manifest-atni.csv").write_text(ATNI, encoding="utf-8")
     (tmp_path / f"manifest-{manifest}.csv").write_text(
         f"sha256,status,source,local_path\n{sha},{status},atni-table,x.pdf\n", encoding="utf-8")
@@ -80,6 +89,17 @@ def test_normalized_hash_and_unfetched_blank_preserve_quarantine(tmp_path):
 
 
 def test_unfetched_blank_atni_hash_is_not_a_member(tmp_path):
+    (tmp_path / "manifest-ncai.csv").write_text("sha256\n", encoding="utf-8")
     (tmp_path / "manifest-atni.csv").write_text(
         "sha256,status,source,local_path\n ,pending,atni-table,x.pdf\n", encoding="utf-8")
     assert policy.load_manifests(tmp_path).atni == {}
+
+
+def test_lost_quarantine_manifest_cannot_release_a_document(tmp_path):
+    (tmp_path / "manifest-atni.csv").write_text(ATNI, encoding="utf-8")
+    ncai = tmp_path / "manifest-ncai.csv"
+    ncai.write_text("sha256\n" + SHA + "\n", encoding="utf-8")
+    assert policy.source_policy(SHA, tmp_path).quarantined
+    ncai.unlink()
+    with pytest.raises(InvalidConfig, match="quarantine-manifest-missing"):
+        policy.source_policy(SHA, tmp_path)

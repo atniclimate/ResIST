@@ -1,4 +1,8 @@
-<input type="hidden" name="selected" value="{{ selected_topics|join(',') }}">
+<input type="hidden" name="selected" form="export-controls" value="{{ selected_topics|join(',') }}">
+{% if result_count > 50 %}
+<input type="hidden" name="confirmed" value="true" form="export-controls"
+       data-message="Generate an evidence package with {{ result_count }} resolutions?">
+{% endif %}
 
 <div class="tag-group mb-16">
     {% for topic in selected_topics %}
@@ -33,6 +37,7 @@
 </div>
 <script>var ec = document.getElementById('export-controls'); if (ec) ec.style.display = 'block';</script>
 {% else %}
+{% if request.headers.get('HX-Request') %}<div id="results" hx-swap-oob="innerHTML"></div>{% endif %}
 <p class="text-tertiary mt-16" style="font-size: 13px;">Select topics to search</p>
 <script>var ec = document.getElementById('export-controls'); if (ec) ec.style.display = 'none';</script>
 {% endif %}

@@ -85,7 +85,7 @@
         <ul class="citation-list">
             {% for citation in citations %}
             <li>
-                {% if citation.linked_resolution_id %}
+                {% if citation.linked_resolution_id in admitted_ids %}
                 <a href="/resolution/{{ citation.linked_resolution_id }}" class="citation-text" hx-boost="true">
                     {{ citation.text }}
                 </a>

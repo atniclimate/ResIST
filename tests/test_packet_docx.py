@@ -31,6 +31,15 @@ def test_docx_preserves_complete_atom_sequence_and_characters():
     assert result == {"verified": True, "atoms": len(atoms(packet)), "quotes": 3}
 
 
+def test_web_outputs_hide_fingerprints_and_keep_evidence():
+    packet = neutral_packet()
+    packet["config_digest"] = "b" * 64
+    output = markdown(packet, reader=True)
+    assert "a" * 64 not in output and "b" * 64 not in output and "SHA-256" not in output
+    assert "neutral-count/1" in output
+    assert verify_docx(docx(packet, reader=True), packet, reader=True)["quotes"] == 3
+
+
 @pytest.mark.parametrize("character", ["\x00", "\x08", "\x0b", "\x0c", "\x1f", "\ud800", "\ufffe", "\uffff"])
 def test_illegal_xml_refuses_instead_of_substituting(character):
     with pytest.raises(ArtifactError, match="^packet-docx-xml-character-refused$"):

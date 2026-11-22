@@ -8,7 +8,7 @@ import { esc, local, toast, say, refreshDock } from "./ui.js";
 import { isStandard, hasPageHeader, resolvedLead, usDate, squash, segments } from "./compose.js";
 import { store, renderDraft, refreshLookupLabel } from "./draft.js";
 import { renderReports } from "./reports.js";
-import { collection, resolutionItem, statementItem, itemLabel, MAX_ITEMS } from "./collect.js";
+import { collection, changeCollection, resolutionItem, statementItem, itemLabel, MAX_ITEMS } from "./collect.js";
 import { renderResearch } from "./research.js";
 import { searchedHTML } from "./searched.js";
 import { openLookup, allowLookup, lookupWords, FEDERAL_TYPES, SENTINEL_HOME, isLookupLive, wordsHTML, copyText } from "./sentinel.js";
@@ -186,7 +186,11 @@ main.addEventListener("click", e => {
     return;
   }
   const collect = e.target.closest("button.collect");
-  if (collect) { collectItem(collect); return; }
+  if (collect) {
+    const removing = collection.has(collect.dataset.rkey);
+    changeCollection(() => collectItem(collect, removing));
+    return;
+  }
   const mark = e.target.closest("button[data-mark]");
   if (mark) { togglePop(Number(mark.dataset.mark)); return; }
   const close = e.target.closest("button[data-close-pop]");
@@ -250,8 +254,8 @@ function lookCite(b) {
 
 // Collect (D-078): one click adds the item to the Research collection, the next removes it. The item is built from the
 // database, never from the button's attributes; the button only names which one. Focus stays on the button.
-function collectItem(b) {
-  if (collection.has(b.dataset.rkey)) {
+function collectItem(b, removing) {
+  if (removing) {
     const gone = collection.remove(b.dataset.rkey);
     if (gone) toast(`Removed ${itemLabel(gone.item)} from your research.`);
     return;
@@ -594,7 +598,6 @@ function detailView(id) {
           ${fact("Adopted", esc(usDate(r.date_adopted)))}
           ${fact("Clause pages", unknown ? `Page unknown for ${num(unknown)} of ${plural(statements.length, "clause")}` : "")}
           ${fact("Source PDF", urls.map(u => `<a href="${esc(u)}" target="_blank" rel="noopener noreferrer">${esc(fileName(u))}${newTab}</a>`).join("<br>") || "Not recorded")}
-          ${fact("SHA-256", `<code class="sha">${esc(r.document_id)}</code>`)}
         </dl>
         ${cites.length ? `<h2 class="aside-h" id="h-cites" tabindex="-1">Citations <span class="n">${distinct.size}</span></h2>
           ${federal ? `<p class="meta">${live ? "Look up opens a Policy Sentinel panel. A search there sends only the words shown in its box, never your draft."
@@ -628,13 +631,13 @@ function aboutView() {
     <p class="lead measure">ResIST makes the resolutions of the Affiliated Tribes of Northwest Indians searchable: what ATNI resolved, when, through which committee, and on what cited authority.</p>
     <div class="about-grid">
       <section><h2>ATNI's Own Words</h2>
-        <p>Every word shown is ATNI's published text, quoted verbatim. Clauses are separated by fixed rules from the PDFs ATNI publishes at <a href="https://atnitribes.org/resolutions/" rel="noopener">atnitribes.org</a>. Each record links its PDF and shows the file's SHA-256. The PDF is authoritative.</p>
+        <p>Every word shown is ATNI's published text, quoted verbatim. Clauses are separated by fixed rules from the PDFs ATNI publishes at <a href="https://atnitribes.org/resolutions/" rel="noopener">atnitribes.org</a>. Each record links its source PDF. The PDF is authoritative.</p>
         <p>Nothing on this site is generated, summarized or paraphrased by AI.</p></section>
       <section><h2>Search in This Browser</h2>
         <p>The whole collection (${num(build.resolutions)} documents, ${build.year_min} to ${build.year_max}) downloads once and is searched here with SQLite full-text search, best matches first. Every word you type must appear in a resolution, and a word of four or more letters also matches longer words that start with it.${issuesOk ? " Typing the name of an issue that Policy Sentinel lists also searches the names and references it gives for that issue." : ""} The page shows exactly what was searched and links to a search of only your words. Nothing you type is sent anywhere.</p></section>
       <section><h2>Research</h2>
         <ul class="squares">
-          <li>“Collect” on a result, a resolution or a single WHEREAS or RESOLVED clause keeps it in your research, word for word, with its source PDF link, the file's SHA-256 and the clause's page when ATNI's PDF gives it.</li>
+          <li>“Collect” on a result, a resolution or a single WHEREAS or RESOLVED clause keeps it in your research, word for word, with its source PDF link and the clause's page when ATNI's PDF gives it.</li>
           <li>Open Research to review what you collected, remove an item and undo, download it as JSON or text, or print it. “Add to draft” there carries a clause into your draft.</li>
           <li>Your research stays in this browser, apart from your draft. It is never sent anywhere. Nothing is summarized or rewritten.</li>
         </ul></section>
@@ -663,7 +666,7 @@ function aboutView() {
       <section><h2>Data and Code</h2>
         <p>Under the <a href="${TSDF}" rel="noopener">Tiered Sovereign Data Framework</a>, ATNI's web-published resolutions are T0: public. This site carries no other material.</p>
         <p>Code: <a href="${CODE}" rel="noopener">github.com/atniclimate/ResIST</a>, under the <a href="https://polyformproject.org/licenses/noncommercial/1.0.0" rel="noopener">PolyForm Noncommercial License 1.0.0</a>. Required Notice: Copyright Affiliated Tribes of Northwest Indians (https://atnitribes.org)</p>
-        <p class="meta">Built ${esc(usDate(build.built) || build.built)} from commit <code>${esc(build.commit)}</code>; database SHA-256 <code>${esc(String(build.db_sha256).slice(0, 16))}</code>.</p></section>
+        <p class="meta">Built ${esc(usDate(build.built) || build.built)}.</p></section>
     </div>
   </div>`;
 }
@@ -685,8 +688,8 @@ try {
   allowLookup(caps?.sentinel === true); // the local face links out instead (D-059 item 5)
   refreshLookupLabel(); // an open draft rendered before this point shows the pre-load label (D12)
   ready = true;
-  store.verifyWith(storedSource, storedCiteSource);
-  const dropped = collection.verifyWith(storedItem);
+  store.verifyWith(storedSource, build?.refs?.version === 1 ? storedCiteSource : null);
+  const dropped = await changeCollection(() => collection.verifyWith(storedItem));
   if (dropped) toast(`${plural(dropped, "collected item")} ${dropped === 1 ? "is" : "are"} not in this version of the data and ${dropped === 1 ? "was" : "were"} removed from your research.`);
 } catch (e) {
   loadError = `The resolution database did not load (${e.message}). Reload the page to try again.`;

@@ -27,7 +27,7 @@
         <p><strong>Key Statements:</strong></p>
         <ul class="statements">
             {% for stmt in res.statements[:5] %}
-            <li><strong>{{ stmt.statement_type|upper }}:</strong> {{ stmt.text[:300] }}...</li>
+            <li><strong>{{ stmt.statement_type|upper }}:</strong> {{ stmt.text|excerpt(300) }}</li>
             {% endfor %}
         </ul>
         {% endif %}
@@ -47,7 +47,7 @@
         <ul>
             {% for rel in related[:5] %}
             <li><strong>{{ rel.resolution_number or 'Resolution ' ~ rel.id }}</strong>
-                {% if rel.summary %} - {{ rel.summary[:100] }}...{% endif %}</li>
+                {% if rel.summary %} - {{ rel.summary|excerpt(100) }}{% endif %}</li>
             {% endfor %}
         </ul>
     </div>

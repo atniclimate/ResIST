@@ -107,6 +107,15 @@ def test_build_pin_is_deterministic_and_pure():
             build_pin(bad, src, "2026-11-20")
 
 
+def test_misspelled_check_refuses_to_write(tmp_path, monkeypatch):
+    from scripts import pin_issue_names
+
+    target = tmp_path / "pin.json"
+    monkeypatch.setattr(pin_issue_names, "PIN", target)
+    assert pin_issue_names.main([str(tmp_path), "--chek"]) == 1
+    assert not target.exists()
+
+
 def test_drifted():
     assert drifted(PIN, b"x")
     assert not drifted({"source": {"file_sha256": hashlib.sha256(b"x").hexdigest()}}, b"x")

@@ -73,7 +73,7 @@ def test_original_mutation_cannot_change_backend_bytes(source, route):
     backend = Backend(path)
     result = extractor(backend, route).extract(doc, path, work)
     assert result.sha256 == doc.sha256
-    assert result.provenance.component_version == "2"
+    assert result.provenance.component_version == PdfInProcess.version
     assert result.provenance.run_id == work.name
     assert result.processing_contract_version == "resist-extract/1"
     assert path.read_bytes() == b"1"

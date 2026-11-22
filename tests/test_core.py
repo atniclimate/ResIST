@@ -120,18 +120,26 @@ def test_pool_max_tier_absent_is_T0(tmp_path, monkeypatch):
     assert config.pool_max_tier() == "T0"
 
 
-@pytest.mark.parametrize("line,tier", [("pool_max_tier: T1  # note", "T1"), ('  pool_max_tier: "T2"', "T2"),
-                                       ("pool_max_tier: 'T0'", "T0")])
+@pytest.mark.parametrize("line,tier", [("pool_max_tier: T1  # note", "T1"), ('pool_max_tier: "T2"', "T2"),
+                                       ("pool_max_tier: 'T0'", "T0"),
+                                       ("pool:\n  tsdf:\n    pool_max_tier: T1", "T1"),
+                                       ("tsdf:\n  pool_max_tier: T2", "T2")])
 def test_pool_max_tier_parsed(tmp_path, line, tier):
     (tmp_path / "pool.yaml").write_text(f"schema: 1\n{line}\nother: x\n", encoding="utf-8")
     assert config.pool_max_tier(tmp_path) == tier
 
 
-@pytest.mark.parametrize("text", ["pool_max_tier: T9\n", "schema: 1\n", "pool_max_tier: T1 extra\n"])
+@pytest.mark.parametrize("text", ["pool_max_tier: T9\n", "schema: 1\n", "pool_max_tier: T1 extra\n",
+                                  "pool_max_tier: 'T3\n", "pool_max_tier: T3\npool_max_tier: T0\n"])
 def test_pool_max_tier_invalid_raises(tmp_path, text):
     (tmp_path / "pool.yaml").write_text(text, encoding="utf-8")
     with pytest.raises(InvalidConfig):
         config.pool_max_tier(tmp_path)
+
+
+def test_top_level_tier_wins_over_nested_example(tmp_path):
+    (tmp_path / "pool.yaml").write_text("notes:\n  pool_max_tier: T3\npool_max_tier: T0\n", encoding="utf-8")
+    assert config.pool_max_tier(tmp_path) == "T0"
 
 
 # ---- registry -------------------------------------------------------------------------------

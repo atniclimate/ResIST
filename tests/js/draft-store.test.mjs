@@ -4,6 +4,8 @@ import test from "node:test";
 import assert from "node:assert/strict";
 
 const mem = new Map();
+const immediateLocks = { request: (_key, callback) => Promise.resolve(callback()) };
+Object.defineProperty(globalThis, "navigator", { configurable: true, value: { locks: immediateLocks } });
 globalThis.localStorage = {
   getItem: k => (mem.has(k) ? mem.get(k) : null),
   setItem: (k, v) => { mem.set(k, String(v)); },
@@ -98,6 +100,83 @@ test("replace validates; addNote and reset", () => {
   store.reset();
   assert.equal(store.draft.title, "");
   assert.equal(store.draft.notes.length, 0);
+});
+
+test("two tabs merge pending edits and keep a downloadable version of a conflicting field", async () => {
+  store.reset();
+  const listeners = [];
+  const original = globalThis.addEventListener;
+  globalThis.addEventListener = (type, fn) => { if (type === "storage") listeners.push(fn); };
+  try {
+    const a = (await import("../../pages/draft.js?tab=a")).store;
+    const b = (await import("../../pages/draft.js?tab=b")).store;
+    a.type(d => { d.title = "Local title"; });
+    b.update(d => { d.header.location = "Remote location"; });
+    listeners[0]({ key: KEY });
+    assert.equal(a.draft.title, "Local title");
+    assert.equal(a.draft.header.location, "Remote location");
+    listeners[1]({ key: KEY });
+    a.type(d => { d.title = "First version"; });
+    b.update(d => { d.title = "Second version"; });
+    listeners[0]({ key: KEY });
+    const recovery = [...mem.keys()].find(k => k.startsWith(KEY + "-conflict-"));
+    assert.equal(JSON.parse(mem.get(recovery)).title, "Second version");
+    assert.equal(JSON.parse(mem.get(KEY)).title, "First version");
+    mem.clear();
+    listeners[0]({ key: null });
+    assert.equal(a.draft.title, "", "an idle tab adopts a clear");
+    b.type(d => { d.meta.sponsor = "Pending edit"; });
+    listeners[1]({ key: null });
+    assert.equal(b.draft.title, "", "a pending edit does not resurrect cleared fields");
+    assert.equal(JSON.parse(mem.get(KEY)).meta.sponsor, "Pending edit");
+  } finally {
+    if (original) globalThis.addEventListener = original;
+    else delete globalThis.addEventListener;
+  }
+});
+
+test("download snapshot waits for a pending merge and retains edits when storage fails", async () => {
+  store.reset();
+  const a = (await import("../../pages/draft.js?snapshot")).store;
+  a.type(d => { d.title = "local title"; });
+  store.update(d => { d.header.location = "remote location"; });
+  let release;
+  navigator.locks = { request: (_key, write) => new Promise(resolve => {
+    release = () => { write(); resolve(); };
+  }) };
+  const set = localStorage.setItem;
+  try {
+    const download = a.snapshot();
+    localStorage.setItem = () => { throw new Error("quota"); };
+    release();
+    const copy = await download;
+    assert.equal(copy.title, "local title");
+    assert.equal(copy.header.location, "remote location");
+  } finally { localStorage.setItem = set; navigator.locks = immediateLocks; }
+});
+
+test("queued tab saves preserve a clause addition and an independent edit in either order", async () => {
+  for (const addFirst of [true, false]) {
+    store.reset();
+    const a = (await import(`../../pages/draft.js?add=${addFirst}`)).store;
+    const b = (await import(`../../pages/draft.js?edit=${addFirst}`)).store;
+    const queue = [];
+    navigator.locks = { request(key, callback) {
+      assert.equal(key, KEY);
+      queue.push(callback);
+      return Promise.resolve();
+    } };
+    try {
+      const add = () => a.update(d => d.whereas.push(newClause("Inserted", "typed")));
+      const edit = () => b.update(d => { d.whereas[0].text = "Edited"; });
+      for (const action of addFirst ? [add, edit] : [edit, add]) action();
+      assert.equal(queue.length, 2);
+      queue.forEach(write => write());
+      const clauses = JSON.parse(mem.get(KEY)).whereas;
+      assert.equal(clauses[0].text, "Edited");
+      assert.equal(clauses.at(-1).text, "Inserted");
+    } finally { navigator.locks = immediateLocks; }
+  }
 });
 
 test("own toString/valueOf keys in a stored draft cannot break the draft view", async () => {

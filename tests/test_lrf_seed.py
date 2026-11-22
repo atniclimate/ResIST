@@ -57,6 +57,8 @@ def test_status_of_rules():
 
 
 def test_session_of_shapes():
+    assert works.session_of("Annual", "98-07") == ("annual", 1998, "number")
+    assert works.session_of("Annual", "2001-07") == ("annual", 2001, "number")
     y = 2019
     n = f"{y % 100:02d}-07"
     cases = {
@@ -101,6 +103,20 @@ def test_seed_fixture_documents(data_root):
         rows = _counts(con)
         assert works.seed(con, REAL_RES) == first
         assert _counts(con) == rows
+    finally:
+        con.close()
+
+
+def test_seed_skips_uploads_and_keeps_admissible_documents(tmp_path, data_root):
+    source = sha("Res-23-40")
+    res = _res_dir(tmp_path, [_atni_row("Res-23-40.pdf", source)])
+    store("Res-23-40", "Res-26-34")
+    con = _con(data_root)
+    try:
+        con.execute("UPDATE resolution SET document_id=? WHERE document_id=?",
+                    ("upload-" + "a" * 64 + ".pdf", sha("Res-26-34")))
+        result = works.seed(con, res)
+        assert (result["documents"], result["refused"]) == (1, 1)
     finally:
         con.close()
 

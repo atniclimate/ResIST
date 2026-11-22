@@ -157,7 +157,7 @@
 {% endif %}
 
 <!-- Results Section -->
-<section id="results">
+<section id="results" hx-on::before-swap="if (event.detail.xhr.status === 503) event.detail.shouldSwap = true">
     {% include "search/partials/result_list.html" %}
 </section>
 {% endblock %}

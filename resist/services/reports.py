@@ -33,6 +33,11 @@ def _digest(value) -> str:
     return _hash(json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":")))
 
 
+def packet_fingerprint(packet: dict) -> str:
+    """Identify one generated packet for bounded local verify/download requests."""
+    return _digest(packet)
+
+
 def _policy_digest(res_dir: Path) -> str:
     paths = (res_dir / "manifest-atni.csv", res_dir / "manifest-ncai.csv",
              res_dir / "csv/atni/resolution-table.csv")

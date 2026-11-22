@@ -35,7 +35,9 @@
         </div>
     </section>
 
-    <section id="export-controls" {% if not selected_topics %}style="display:none"{% endif %} class="mt-16">
+    <form id="export-controls" action="/export/package" method="get"
+          onsubmit="return !this.elements.confirmed || confirm(this.elements.confirmed.dataset.message)"
+          {% if not selected_topics %}style="display:none"{% endif %} class="mt-16">
         <div class="panel-grid-2" style="gap: 16px;">
             <div class="filter-group">
                 <label>Export Format</label>
@@ -49,16 +51,12 @@
                 </div>
             </div>
             <div style="display: flex; align-items: flex-end;">
-                <button type="button" id="export-btn" class="btn btn-primary"
-                        hx-get="/export/package"
-                        hx-include="[name='selected'], [name='format']"
-                        hx-indicator="#export-spinner">
+                <button type="submit" id="export-btn" class="btn btn-primary">
                     Generate Evidence Package
                 </button>
-                <span id="export-spinner" class="htmx-indicator" style="margin-left: 12px;">Generating...</span>
             </div>
         </div>
-    </section>
+    </form>
 
     <section id="results" class="mt-24">
         {% if selected_topics %}

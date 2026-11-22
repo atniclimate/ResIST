@@ -62,6 +62,7 @@ def _res_dir(tmp: Path) -> tuple[Path, set[str]]:
         shas.add(sha)
     assert len(shas) == 4
     _write_csv(tmp / "manifest-atni.csv", MANIFEST_HEADER, rows)
+    _write_csv(tmp / "manifest-ncai.csv", ["sha256"], [])
     _write_csv(tmp / "csv" / "atni" / "resolution-table.csv", TABLE_HEADER, [])
     _write_csv(tmp / "csv" / "atni" / "wp-media-pdfs.csv", MEDIA_HEADER, [])
     return tmp, shas
@@ -103,6 +104,94 @@ def test_ingest_fixtures_reports_ocr_unavailable(data_root, tmp_path, monkeypatc
     assert not tmp.exists() or not any(tmp.iterdir()), "run folder left behind"
 
 
+def test_cli_and_web_upload_share_graph_writer(data_root, tmp_path, monkeypatch):
+    import os
+    import sys
+    from concurrent.futures import ThreadPoolExecutor
+    from threading import Event
+    from fastapi.testclient import TestClient
+    from src.api import upload
+    from src.main import app
+
+    res_dir, shas = _res_dir(tmp_path / "res")
+    entered, release = Event(), Event()
+    save = upload.ResolutionGraph.save
+    def pause(graph):
+        entered.set()
+        assert release.wait(40)
+        save(graph)
+
+    monkeypatch.setattr(upload.ResolutionGraph, "save", pause)
+    child = """
+import sys
+from pathlib import Path
+from scripts import ingest_atni
+from contextlib import contextmanager
+writer = ingest_atni.archive_writer
+@contextmanager
+def announce():
+    print("waiting for archive", flush=True)
+    with writer():
+        print("acquired archive", flush=True)
+        yield
+ingest_atni.archive_writer = announce
+sys.exit(ingest_atni.main(Path(sys.argv[1])))
+"""
+    env = dict(os.environ, RESIST_DATA_DIR=str(data_root), RESIST_CONFIG=str(tmp_path / "absent.toml"))
+    with TestClient(app, base_url="http://127.0.0.1") as web, ThreadPoolExecutor(2) as workers:
+        result = workers.submit(web.post, "/api/upload", files={"file": ("heading.txt", b"CERTIFICATION")})
+        try:
+            assert entered.wait(10)
+            with subprocess.Popen([sys.executable, "-c", child, str(res_dir)], cwd=ROOT, env=env,
+                                  stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True) as proc:
+                try:
+                    assert workers.submit(proc.stdout.readline).result(timeout=20).strip() == "waiting for archive"
+                    acquired = workers.submit(proc.stdout.readline)
+                    with pytest.raises(TimeoutError):
+                        acquired.result(timeout=0.3)
+                    release.set()
+                    assert acquired.result(timeout=10).strip() == "acquired archive"
+                    _, errors = proc.communicate(timeout=30)
+                    assert proc.returncode == 2, errors  # The scan needs optional OCR.
+                finally:
+                    release.set()
+                    if proc.poll() is None:
+                        proc.kill()
+        finally:
+            release.set()
+        response = result.result()
+    assert response.status_code == 200
+    nodes = upload.ResolutionGraph().load().G.nodes
+    assert response.json()["document_id"] in nodes
+    assert (shas - {IMAGE_ONLY}).issubset(nodes)
+
+
+def test_retry_finishes_review_after_interrupted_delivery(data_root, tmp_path, monkeypatch):
+    from src.models.review import ReviewQueue, get_session
+    from sqlmodel import select
+
+    res_dir, shas = _res_dir(tmp_path / "res")
+    monkeypatch.setenv("RESIST_DATA_DIR", str(data_root))
+    monkeypatch.setenv("RESIST_CONFIG", str(tmp_path / "absent.toml"))
+    ingest = _load_ingest()
+    target = sorted(shas)[0]
+    stored = {sha: ("WHEREAS, fixture text", 1, int(sha == target)) for sha in shas}
+    deliver = ingest.flag_for_review
+
+    def interrupt_after_delivery(*args, **kwargs):
+        deliver(*args, **kwargs)
+        raise OSError("interrupted")
+
+    with monkeypatch.context() as context:
+        context.setattr(ingest, "flag_for_review", interrupt_after_delivery)
+        assert ingest.main(res_dir, stored=stored) == 3
+    assert ingest.main(res_dir, stored=stored) == 0
+    with get_session() as session:
+        assert [row.document_id for row in session.exec(select(ReviewQueue))] == [target]
+    with sqlite3.connect(data_root / "db" / "resolutions.db") as con:
+        assert con.execute("SELECT count(*) FROM pending_ingest_review").fetchone() == (0,)
+
+
 def test_ingest_bad_config_exits_2(data_root, tmp_path, monkeypatch, capsys):
     """D-060: an unparseable resist.toml is exit 2 with a reason code on stderr, not a traceback."""
     res_dir, _ = _res_dir(tmp_path / "res")
@@ -115,8 +204,24 @@ def test_ingest_bad_config_exits_2(data_root, tmp_path, monkeypatch, capsys):
     assert "InvalidConfig" in capsys.readouterr().err
 
 
-def test_ingest_bad_manifest_sha_fails_one_row(data_root, tmp_path, monkeypatch, capsys):
-    """A malformed manifest sha256 fails that row only; the other documents still ingest."""
+def test_invalid_table_id_fails_one_document(data_root, tmp_path, monkeypatch, capsys):
+    res_dir, shas = _res_dir(tmp_path / "res")
+    manifest = res_dir / "manifest-atni.csv"
+    with manifest.open(encoding="utf-8", newline="") as stream:
+        rows = list(csv.DictReader(stream))
+    first = min(shas)
+    next(row for row in rows if row["sha256"] == first)["table_wdt_ids"] = "17;unknown"
+    _write_csv(manifest, MANIFEST_HEADER, rows)
+    monkeypatch.setenv("RESIST_DATA_DIR", str(data_root))
+    monkeypatch.setenv("RESIST_CONFIG", str(tmp_path / "absent.toml"))
+    assert _load_ingest().main(res_dir, stored={sha: ("fixture text", 1, 0) for sha in shas}) == 3
+    records = [json.loads(line) for line in capsys.readouterr().out.splitlines() if line.startswith("{")]
+    assert [r["error"] for r in records if r["status"] == "failed"] == ["invalid-table-id"]
+    assert {r["sha256"] for r in records if r["status"] == "ingested"} == shas - {first}
+
+
+def test_ingest_bad_manifest_sha_refuses_admission(data_root, tmp_path, monkeypatch, capsys):
+    """A malformed manifest prevents admission of every document it would authorize."""
     res_dir, shas = _res_dir(tmp_path / "res")
     with (res_dir / "manifest-atni.csv").open("a", encoding="utf-8", newline="") as f:
         csv.DictWriter(f, fieldnames=MANIFEST_HEADER).writerow(
@@ -128,8 +233,9 @@ def test_ingest_bad_manifest_sha_fails_one_row(data_root, tmp_path, monkeypatch,
 
     lines = [json.loads(x) for x in capsys.readouterr().out.splitlines() if x.startswith("{")]
     assert code == 3
-    assert [(x["sha256"], x["error"]) for x in lines if x["status"] == "failed"] == [("NOT-A-SHA", "BadInput")]
-    assert {x["sha256"] for x in lines if x["status"] == "ingested"} == shas - {IMAGE_ONLY}
+    failures = {x["sha256"]: x["error"] for x in lines if x["status"] == "failed"}
+    assert failures == {**dict.fromkeys(shas, "InvalidConfig"), "NOT-A-SHA": "BadInput"}
+    assert not any(x["status"] == "ingested" for x in lines)
 
 
 def test_ingest_refuses_quarantined_sha(data_root, tmp_path, monkeypatch, capsys):
@@ -202,3 +308,17 @@ def test_stored_text_is_reparsed_not_extracted(data_root, tmp_path, monkeypatch,
     assert mine and all(p is None for _, _, p in mine)
     assert all(review == 1 for _, review, _ in mine)
     assert others and all(isinstance(p, int) for _, _, p in others)
+
+
+def test_theme_seed_links_normalized_resolution(data_root):
+    from sqlmodel import Session, select
+
+    from scripts.seed_themes import ResolutionTheme, Theme, seed_themes
+    from src.storage import get_engine
+    from tests.test_build_pages_guard import store
+
+    store("Res-23-40")
+    seed_themes()
+    seed_themes()
+    with Session(get_engine()) as session:
+        assert session.exec(select(Theme.name).join(ResolutionTheme)).all() == ["Climate & Environment"]

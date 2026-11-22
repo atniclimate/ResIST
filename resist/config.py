@@ -15,6 +15,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Mapping
 
+import yaml
+
 from resist.errors import InvalidConfig
 from resist.models import Tier
 
@@ -28,7 +30,6 @@ DEFAULTS: dict = {
     "tools": {"enabled": []},  # fail closed: no tool is enabled without resist.toml
 }
 NAME_RE = re.compile(r"^[a-z][a-z0-9-]{0,39}$")  # rejects paths, dotted imports, versions and 64-hex hashes
-_POOL_TIER_RE = re.compile(r"^\s*pool_max_tier:\s*[\"']?(T[0-3])[\"']?\s*(#.*)?$", re.MULTILINE)
 _PASSTHROUGH_ENV = {"RESIST_OCR_BACKEND", "RESIST_DATA_DIR", "RESIST_CONFIG"}
 
 
@@ -47,14 +48,28 @@ def config_path() -> Path:
 
 
 def pool_max_tier(root: Path | None = None) -> Tier:
-    """Line-parse pool.yaml (no yaml import). Absent file -> "T0" (fail closed); present but invalid -> InvalidConfig."""
+    """Read one tier from the supported pool layouts. Only absent YAML defaults to T0."""
     p = (root if root is not None else data_dir()) / "pool.yaml"
-    if not p.is_file():
+    try:
+        node = yaml.compose(p.read_text(encoding="utf-8"), Loader=yaml.SafeLoader)
+    except FileNotFoundError:
         return "T0"
-    m = _POOL_TIER_RE.search(p.read_text(encoding="utf-8"))
-    if not m:
+    except (OSError, UnicodeError, yaml.YAMLError, RecursionError):
+        raise InvalidConfig("pool.yaml: unreadable-or-invalid") from None
+
+    def values(mapping, key):
+        if not isinstance(mapping, yaml.MappingNode):
+            return []
+        return [value for name, value in mapping.value if isinstance(name, yaml.ScalarNode) and name.value == key]
+
+    tiers = values(node, "pool_max_tier")
+    for parent in [node, *values(node, "pool")]:
+        for tsdf in values(parent, "tsdf"):
+            tiers.extend(values(tsdf, "pool_max_tier"))
+    if (len(tiers) != 1 or not isinstance(tiers[0], yaml.ScalarNode)
+            or tiers[0].tag != "tag:yaml.org,2002:str" or tiers[0].value not in ("T0", "T1", "T2", "T3")):
         raise InvalidConfig("pool.yaml: pool_max_tier: missing-or-invalid")
-    return m.group(1)  # type: ignore[return-value]
+    return tiers[0].value
 
 
 @dataclass(frozen=True)

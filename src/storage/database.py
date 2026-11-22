@@ -1,5 +1,7 @@
 """Database engine and session management."""
 import os
+import sqlite3
+from contextlib import closing, contextmanager
 from sqlmodel import SQLModel, Session, create_engine
 from pathlib import Path
 from typing import Generator
@@ -11,6 +13,16 @@ DATA_DIR = Path(os.environ.get("RESIST_DATA_DIR") or Path(__file__).parent.paren
 DATABASE_PATH = DATA_DIR / "db" / "resolutions.db"
 
 _engine = None
+
+
+@contextmanager
+def archive_writer():
+    """Serialize archive writers across processes without locking archive readers."""
+    lock_path = DATABASE_PATH.with_suffix(".writer.sqlite")
+    lock_path.parent.mkdir(parents=True, exist_ok=True)
+    with closing(sqlite3.connect(lock_path, timeout=86400)) as lock:
+        lock.execute("BEGIN IMMEDIATE")
+        yield
 
 
 def get_engine():

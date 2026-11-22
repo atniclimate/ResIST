@@ -45,6 +45,10 @@ def test_res_26_34_excerpts_are_verbatim():
 class TestTokenize:
     """Test tokenization."""
 
+    def test_names_with_diacritics(self):
+        assert tokenize("Séliš Se\u0301lis\u030c") == ["séliš", "séliš"]
+        assert tokenize("q̓ʷə́l") == ["q̓ʷə́l"]
+
     def test_basic_tokenization(self):
         """Should extract words, lowercase, filter short words."""
         text = RES_26_34_TITLE

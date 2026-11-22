@@ -7,6 +7,7 @@ from typing import List, Dict, Any, Optional
 from docx import Document
 from docx.shared import Inches, Pt
 from docx.enum.text import WD_ALIGN_PARAGRAPH
+from .excerpts import excerpt
 
 
 def build_evidence_package_docx(
@@ -65,8 +66,8 @@ def build_evidence_package_docx(
             p.add_run('Key Statements:').bold = True
             for stmt in res['statements'][:5]:  # Limit to 5 key statements
                 stmt_type = stmt.get('statement_type', '').upper()
-                text = stmt.get('text', '')[:300]
-                doc.add_paragraph(f"{stmt_type}: {text}...", style='List Bullet')
+                text = excerpt(stmt.get('text', ''), 300)
+                doc.add_paragraph(f"{stmt_type}: {text}", style='List Bullet')
 
         # Citations (inline)
         if res.get('citations'):
@@ -88,7 +89,7 @@ def build_evidence_package_docx(
             p = doc.add_paragraph(style='List Bullet')
             p.add_run(rel.get('resolution_number') or f"Resolution {rel.get('id')}").bold = True
             if rel.get('summary'):
-                p.add_run(f" - {rel['summary'][:100]}...")
+                p.add_run(f" - {excerpt(rel['summary'], 100)}")
 
     # Save or return bytes
     if output_path:

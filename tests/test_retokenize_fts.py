@@ -82,6 +82,40 @@ def test_digest_is_typed_rowid_and_schema_aware():
     assert "resolution_fts_notes" in rt._digests(base)
     assert rt._schema(base) == rt._schema(db(b"\x01"))
     assert rt._schema(base) != rt._schema(db(b"\x01", trigger="select 2"))
+    base.execute('create table "archive""notes"(id integer)')
+    assert rt._digests(base)['archive"notes'][0] == 0
+
+
+def test_snapshot_fingerprint_includes_uncheckpointed_commits(pool, capsys):
+    rt = load_script("retokenize_fts")
+    src = porter_db(pool)
+    writer = sqlite3.connect(src)
+    try:
+        writer.execute("pragma journal_mode=wal")
+        writer.execute("pragma wal_autocheckpoint=0")
+        receipts = []
+        for i in range(2):
+            writer.execute("create table if not exists extra(value)")
+            writer.execute("insert into extra values (?)", (i,))
+            writer.commit()
+            assert rt.main(["--src", str(src), "--dst", str(pool / "tmp" / f"{i}.db")]) == 0
+            receipts.append(json.loads(capsys.readouterr().out))
+        assert receipts[0]["src_sha256"] == receipts[1]["src_sha256"]
+        assert receipts[0]["input_snapshot_sha256"] != receipts[1]["input_snapshot_sha256"]
+    finally:
+        writer.close()
+
+
+def test_destination_claimed_after_preflight_is_preserved(pool, monkeypatch):
+    rt = load_script("retokenize_fts")
+    dst = pool / "tmp" / "contested.db"
+    touch = Path.touch
+    def raced_touch(path, **kwargs):
+        path.write_bytes(b"other invocation")
+        touch(path, **kwargs)
+    monkeypatch.setattr(Path, "touch", raced_touch)
+    assert rt.main(["--src", str(pool / "db" / "resolutions.db"), "--dst", str(dst)]) == 1
+    assert dst.read_bytes() == b"other invocation"
 
 
 def test_retokenize_porter_copy(pool, capsys):

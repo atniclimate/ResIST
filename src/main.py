@@ -1,12 +1,14 @@
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import RedirectResponse
+from fastapi.responses import JSONResponse, RedirectResponse
 from src.api.upload import router as upload_router
 from src.api.search import router as search_router
 from src.api.topics import router as topics_router
 from src.api.export import router as export_router
 from resist.web import api_v1, pages
 from resist.web.guard import LoopbackGuard
+from resist.config import repo_root
+from resist.errors import InvalidConfig
 
 app = FastAPI(
     title="ATNI-ResIST",
@@ -15,9 +17,15 @@ app = FastAPI(
 )
 app.add_middleware(LoopbackGuard)  # ahead of every route and mount, POST /api/upload included (D-059 item 5)
 
+
+@app.exception_handler(InvalidConfig)
+async def policy_unavailable(request, exc):
+    return JSONResponse({"detail": "Local policy is unavailable"}, status_code=503,
+                        headers={"Cache-Control": "no-store"})
+
 # Mount static files
-app.mount("/static", StaticFiles(directory="src/static"), name="static")
-app.mount("/assets", StaticFiles(directory="assets"), name="assets")
+app.mount("/static", StaticFiles(directory=repo_root() / "src/static"), name="static")
+app.mount("/assets", StaticFiles(directory=repo_root() / "assets"), name="assets")
 
 # Include routers
 app.include_router(upload_router)

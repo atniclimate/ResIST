@@ -16,6 +16,26 @@ const source = text => ({ resolutionId: 1, number: "26-51", title: "Supporting R
   convention: "Annual Convention", documentId: "a".repeat(64), statementType: "resolved", index: 0, text,
   url: "https://atnitribes.org/wp-content/uploads/2026/09/26-51.pdf" });
 
+test("fresh drafts share standard clause identities and imports repair repeated identities across sections", () => {
+  const d = newDraft();
+  assert.deepEqual(d.whereas.map(c => c.id), newDraft().whereas.map(c => c.id));
+  d.resolved[0].id = d.whereas[0].id;
+  const read = validDraft(d);
+  assert.notEqual(read.resolved[0].id, read.whereas[0].id);
+  assert.equal(read.resolved[0].text, d.resolved[0].text);
+});
+
+test("offline draft output distinguishes unchecked sources and citations", () => {
+  const d = newDraft(), clause = newClause(URGE, "carried", source(URGE));
+  insertCite(clause, 0, { id: "cite", text: CITE.text, source: CITE_SOURCE });
+  d.resolved.push(clause);
+  const m = compose(d, { sourcesChecked: false, citationsChecked: false });
+  assert.equal(m.sources[0].state, "unverified");
+  assert.equal(m.sources[0].url, "");
+  assert.equal(citeFrom(m.citations[0]), "Source unverified");
+  assert.equal(m.citations[0].url, "");
+});
+
 test("body strips lead words and joiners but keeps abbreviations", () => {
   assert.equal(body("WHEREAS, the Affiliated Tribes of Northwest Indians (ATNI) are the representatives; and"),
     "the Affiliated Tribes of Northwest Indians (ATNI) are the representatives");

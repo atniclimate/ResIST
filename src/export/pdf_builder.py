@@ -3,10 +3,9 @@ from datetime import datetime
 from pathlib import Path
 from typing import List, Dict, Any, Optional
 
-from jinja2 import Environment, FileSystemLoader
+from .excerpts import render_evidence_html
 from weasyprint import HTML, CSS
 
-TEMPLATE_DIR = Path(__file__).parent / "templates"
 
 
 def build_evidence_package_pdf(
@@ -27,15 +26,11 @@ def build_evidence_package_pdf(
     Returns:
         PDF bytes if output_path is None
     """
-    # Load Jinja2 template
-    env = Environment(loader=FileSystemLoader(str(TEMPLATE_DIR)))
-    template = env.get_template("evidence.html")
-
     # Format topics for display
     topic_display = [t.replace('_', ' ').title() for t in topics]
 
     # Render HTML
-    html_content = template.render(
+    html_content = render_evidence_html(
         topics=topic_display,
         topic_count=len(topics),
         resolutions=resolutions,

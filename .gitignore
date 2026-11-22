@@ -23,11 +23,8 @@ Thumbs.db
 *.db
 !data/.gitkeep
 
-# Uploads: runtime scratch for the upload endpoint (src/ingestion/intake.py).
-# Real PDFs moved to datapool/inbox/ and fixtures to tests/fixtures/adversarial/ at R0.4;
-# the directory itself is deleted at R2b when the datapool separation lands.
-uploads/*
-!uploads/.gitkeep
+# Legacy upload directory. Current uploads go to the configured data pool's inbox.
+uploads/
 
 # Logs
 *.log

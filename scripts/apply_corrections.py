@@ -9,10 +9,9 @@ correction on top of it, and every `new` value is copied from ATNI's table or th
 composed. A rebuilt pool gets the same values by running this script again after ingest and migrate_lrf.
 
 Every row is checked before anything is written: the stored value must equal `old` (to apply) or `new` (already
-applied); anything else refuses the whole run. The database file is copied first, byte for byte, so its recorded
-SHA-256 still has a file (an existing backup is kept: the first one is the original); the rows are applied in one
-transaction, and the FTS index is integrity-checked before the commit (the pool's update trigger keeps it in step
-with a changed title). Run it with the app stopped: the byte copy assumes no other writer.
+applied); anything else refuses the whole run. The first backup is validated and kept. A standalone database
+is copied byte for byte. An active write-ahead log is included using SQLite's snapshot backup. A write reservation
+covers ledger validation, backup and corrections. The FTS index is integrity-checked before commit.
 
 Output: one JSON line of counts; no title text. Exit codes (D-060): 0 done or already done, 1 refused (nothing
 written), 4 verify failed (rolled back).
@@ -20,11 +19,13 @@ written), 4 verify failed (rolled back).
 import argparse
 import csv
 import json
+import os
 import shutil
 import sqlite3
 import sys
 from contextlib import closing
 from pathlib import Path
+from tempfile import NamedTemporaryFile
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
@@ -71,6 +72,36 @@ def apply(con: sqlite3.Connection, todo: list[tuple[str, str, str, str, str]]) -
         con.execute("insert into resolution_fts(resolution_fts, rank) values('integrity-check', 1)")
 
 
+def _check_backup(path: Path) -> None:
+    with closing(sqlite3.connect(path.resolve().as_uri() + "?mode=ro", uri=True)) as saved:
+        if not saved.execute("select 1 from sqlite_master where type='table' and name='resolution'").fetchone():
+            raise BadInput("backup lacks the resolution table")
+        if saved.execute("pragma integrity_check").fetchall() != [("ok",)]:
+            raise BadInput("backup failed integrity check")
+
+
+def _backup(db: Path, folder: Path) -> None:
+    destination = folder / db.name
+    if destination.exists():
+        _check_backup(destination)
+        return
+    folder.mkdir(parents=True, exist_ok=True)
+    with NamedTemporaryFile(dir=folder, delete=False) as handle:
+        stage = Path(handle.name)
+    try:
+        wal = db.with_name(db.name + "-wal")
+        if wal.is_file() and wal.stat().st_size:
+            with closing(sqlite3.connect(db.resolve().as_uri() + "?mode=ro", uri=True)) as src, \
+                    closing(sqlite3.connect(stage)) as dst:
+                src.backup(dst)
+        else:
+            shutil.copyfile(db, stage)
+        _check_backup(stage)
+        os.link(stage, destination)  # Atomic publication of a complete first backup.
+    finally:
+        stage.unlink(missing_ok=True)
+
+
 def main(argv: list[str] | None = None) -> int:
     netguard.install()  # D-039: no network in this process
     data = config.data_dir()
@@ -89,16 +120,15 @@ def main(argv: list[str] | None = None) -> int:
         with open(a.res_dir / LEDGER, encoding="utf-8", newline="") as f:
             rows = list(csv.DictReader(f))
         with closing(sqlite3.connect(db)) as con:
+            con.execute("begin immediate")
             todo = plan(con, rows)
             if todo:
-                backup.mkdir(parents=True, exist_ok=True)
-                if not (backup / db.name).exists():
-                    shutil.copy2(db, backup / db.name)  # bytes, not the backup API: that rewrites the file layout
+                _backup(db, backup)
                 apply(con, todo)
     except BadInput as e:
         print(f"refused: {e}", file=sys.stderr)
         return 1
-    except sqlite3.DatabaseError as e:  # the type name only: the message can quote a stored value
+    except (sqlite3.DatabaseError, OSError) as e:  # the type name only: the message can quote a stored value
         print(f"verify failed, nothing changed: {type(e).__name__}", file=sys.stderr)
         return 4
     print(json.dumps({"rows": len(rows), "applied": len(todo), "already": len(rows) - len(todo),

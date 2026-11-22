@@ -38,6 +38,21 @@ class TestParser:
         assert result.convention["year"] == "2023"
         assert "Grand Mound" in result.convention["location"]
 
+    def test_clause_boundary_and_sponsor_roles(self):
+        unnumbered = parse_resolution("WHEREAS ATNI Resolution No. 98-03 applies.", "unnumbered")
+        assert unnumbered.resolution_number is None
+        assert any(c["normalized"] == "ATNI-RES-98-03" for c in unnumbered.citations)
+        text = ("Co-Sponsored by Example Council\n"
+                "Sponsor organizations may participate.\n"
+                "Co-sponsor organizations may participate.\n"
+                "BE IT RESOLVED that the adopted policy and certification remain effective.\n"
+                "CERTIFICATION\nAdopted: March 5, 2023")
+        result = parse_resolution(text, "parser-boundary")
+        assert [row["text"] for row in result.resolved_statements] == [
+            "that the adopted policy and certification remain effective"]
+        assert result.sponsors["primary"] == []
+        assert result.sponsors["co_sponsor"] == ["Example Council"]
+
     def test_extract_whereas_statements(self):
         text = atni_text("Res-23-40.pdf")
         result = parse_resolution(text, "res-23-40")
@@ -52,6 +67,33 @@ class TestParser:
         # ATNI's published form carries no sponsor/committee block, so nothing may be invented.
         result = parse_resolution(atni_text("Res-23-40.pdf"), "res-23-40")
         assert result.sponsors == {"primary": [], "co_sponsor": [], "committee": None}
+
+    def test_short_decision_and_repeated_sponsor_metadata(self):
+        text = ("WHEREAS the committee recommends adoption.\n"
+                "BE IT RESOLVED:\nBE IT FURTHER RESOLVED: To adjourn.\n"
+                "Sponsor: A Council\nPresented by: B Council\n"
+                "Co-sponsored by: C Council\nCo-sponsor: D Council\n"
+                "Standing Committee: Fisheries")
+        result = parse_resolution(text, "short-decision")
+        assert result.sponsors == {"primary": ["A Council", "B Council"],
+                                   "co_sponsor": ["C Council", "D Council"],
+                                   "committee": "Fisheries"}
+        clause, = result.resolved_statements
+        assert clause["text"] == "To adjourn"
+        assert clause["index"] == 0
+        assert text[clause["start"]:clause["end"]] == "To adjourn."
+        assert not parse_resolution("BE IT RESOLVED:\nCommittee: Finance", "empty").resolved_statements
+
+    def test_wrapped_body_text_does_not_become_sponsor_or_adoption_metadata(self):
+        text = ("WHEREAS the information was\nsubmitted by members of the organization;\n"
+                "BE IT RESOLVED that the rules\nadopted by the Council shall apply and assistance is\n"
+                "presented by the Council to members.\nPresented by Example Council\nAdopted by vote.")
+        result = parse_resolution(text, "wrapped-metadata")
+        clause, = result.resolved_statements
+        assert clause["text"] == ("that the rules adopted by the Council shall apply and assistance is "
+                                  "presented by the Council to members")
+        assert text[clause["start"]:clause["end"]].endswith("members.")
+        assert result.sponsors["primary"] == ["Example Council"]
 
     def test_extract_signatories(self):
         result = parse_resolution(atni_text("Res-23-40.pdf"), "res-23-40")
@@ -83,6 +125,14 @@ class TestCitations:
     def test_normalize_cfr(self):
         assert normalize_citation("25 CFR 83") == "25 C.F.R. 83"
 
+    def test_issuer_and_complete_regulatory_locators(self):
+        records = extract_citations("NCAI Resolution No. 23-40")
+        assert all(c["type"] != "prior_atni_resolution" for c in records)
+        assert [c["normalized"] for c in extract_citations("ATNI Res. Nos. 23-40 and 23-41")] == [
+            "ATNI-RES-23-40", "ATNI-RES-23-41"]
+        assert {c["normalized"] for c in extract_citations("25 C.F.R. 83.1(a) and 25 C.F.R. 83.2")} == {
+            "25 C.F.R. 83.1(a)", "25 C.F.R. 83.2"}
+
     def test_normalize_executive_order(self):
         assert normalize_citation("Executive Order 13175") == "E.O. 13175"
         assert normalize_citation("E.O. 13175") == "E.O. 13175"
@@ -108,12 +158,13 @@ class TestCitations:
         # Should find at least the patterns we can match
         assert len(citations) >= 1
 
-    def test_extract_atni_resolution_reference(self):
+    def test_unattributed_resolution_reference(self):
         # verbatim from Res-26-34.pdf, WHEREAS 4
         text = "prior resolutions, including, but not limited to: Resolution #25-41"
         assert text in " ".join(atni_text("Res-26-34.pdf").split())
-        atni_cites = [c for c in extract_citations(text) if c["type"] == "prior_atni_resolution"]
-        assert "ATNI-RES-25-41" in [c["normalized"] for c in atni_cites]
+        assert ("resolution_reference", "25-41") in [
+            (citation["type"], citation["normalized"]) for citation in extract_citations(text)
+        ]
 
 
 class TestClassifier:
@@ -196,6 +247,18 @@ def test_res_12_41_has_no_text_layer():
     pdf = ATNI / "Res-12-41.pdf"
     assert detect_pdf_type(pdf) == "pdf-scanned"
     assert atni_text("Res-12-41.pdf").strip() == ""
+
+
+def test_full_page_scan_with_text_layer_remains_image_dominant(tmp_path):
+    import pymupdf
+
+    target = tmp_path / "scan-with-text.pdf"
+    with pymupdf.open(ATNI / "Res-12-41.pdf") as doc:
+        for page in doc:
+            page.insert_text((36, 48), "Affiliated Tribes of Northwest Indians Resolution Archive", fontsize=8)
+            assert len(page.get_text().strip()) > 50
+        doc.save(target)
+    assert detect_pdf_type(target) == "pdf-scanned"
 
 
 def test_res_2021_20_two_issuer_numbers():

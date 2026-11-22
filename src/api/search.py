@@ -1,19 +1,23 @@
 """Search API with HTMX fragment responses and timeline visualization."""
-import re
+import logging
 from typing import Annotated, Optional, List, Dict, Any
 from fastapi import APIRouter, Request, Header, Query
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 from sqlmodel import Session, select
 from sqlalchemy import text
+from sqlalchemy.exc import SQLAlchemyError
 
 from resist.index import fts_match
+from resist.config import repo_root
+from resist.errors import InvalidConfig
+from src.storage.admission import ADMITTED, admitted_ids, admitted_params
 from src.storage.database import get_engine
-from src.storage.repository import search_resolutions, get_resolution, sanitize_snippet
+from src.storage.repository import sanitize_snippet
 from src.models.resolution import Resolution, Citation, Sponsor
 
 router = APIRouter()
-templates = Jinja2Templates(directory="src/templates")
+templates = Jinja2Templates(directory=repo_root() / "src/templates")
 
 
 def escape_like_pattern(value: str) -> str:
@@ -46,9 +50,9 @@ def get_available_years(engine) -> List[int]:
     with engine.connect() as conn:
         result = conn.execute(text(
             "SELECT DISTINCT convention_year FROM resolution "
-            "WHERE convention_year IS NOT NULL "
+            f"WHERE convention_year IS NOT NULL AND id IN ({ADMITTED}) "
             "ORDER BY convention_year DESC"
-        ))
+        ), admitted_params(conn))
         return [row[0] for row in result.fetchall()]
 
 
@@ -57,9 +61,9 @@ def get_all_sponsors(engine) -> List[str]:
     with engine.connect() as conn:
         result = conn.execute(text(
             "SELECT DISTINCT name FROM sponsor "
-            "WHERE sponsor_type = 'primary' "
+            f"WHERE sponsor_type = 'primary' AND resolution_id IN ({ADMITTED}) "
             "ORDER BY name"
-        ))
+        ), admitted_params(conn))
         return [row[0] for row in result.fetchall()]
 
 
@@ -68,9 +72,9 @@ def get_all_committees(engine) -> List[str]:
     with engine.connect() as conn:
         result = conn.execute(text(
             "SELECT DISTINCT name FROM sponsor "
-            "WHERE sponsor_type = 'committee' "
+            f"WHERE sponsor_type = 'committee' AND resolution_id IN ({ADMITTED}) "
             "ORDER BY name"
-        ))
+        ), admitted_params(conn))
         return [row[0] for row in result.fetchall()]
 
 
@@ -83,7 +87,9 @@ def search_with_filters(
     committee: Optional[str] = None,
     limit: int = 20,
     offset: int = 0,
-) -> List[Dict[str, Any]]:
+    *,
+    with_total: bool = False,
+) -> list[dict] | tuple[list[dict], int]:
     """
     Full-text search with extended filtering options.
 
@@ -99,26 +105,28 @@ def search_with_filters(
             r.date_adopted,
             r.convention_year,
             r.summary,
-            highlight(resolution_fts, 2, '<mark>', '</mark>') as snippet,
+            snippet(resolution_fts, 2, '<mark>', '</mark>', '...', 36) as snippet,
             bm25(resolution_fts) as score
+    """
+    filters = f"""
         FROM resolution_fts
         JOIN resolution r ON r.id = resolution_fts.rowid
-        WHERE resolution_fts MATCH :query
+        WHERE resolution_fts MATCH :query AND r.id IN ({ADMITTED})
     """
     params: Dict[str, Any] = {"query": query, "limit": limit, "offset": offset}
 
     # Year range filters
     if year_start:
-        sql += " AND r.convention_year >= :year_start"
+        filters += " AND r.convention_year >= :year_start"
         params["year_start"] = year_start
 
     if year_end:
-        sql += " AND r.convention_year <= :year_end"
+        filters += " AND r.convention_year <= :year_end"
         params["year_end"] = year_end
 
     # Sponsor filter
     if sponsor:
-        sql += """ AND r.id IN (
+        filters += """ AND r.id IN (
             SELECT resolution_id FROM sponsor
             WHERE sponsor_type = 'primary' AND name LIKE :sponsor ESCAPE '\\'
         )"""
@@ -126,15 +134,18 @@ def search_with_filters(
 
     # Committee filter
     if committee:
-        sql += """ AND r.id IN (
+        filters += """ AND r.id IN (
             SELECT resolution_id FROM sponsor
             WHERE sponsor_type = 'committee' AND name LIKE :committee ESCAPE '\\'
         )"""
         params["committee"] = f"%{escape_like_pattern(committee)}%"
 
-    sql += " ORDER BY score LIMIT :limit OFFSET :offset"
+    sql += filters + " ORDER BY score, r.id LIMIT :limit OFFSET :offset"
 
     with engine.connect() as conn:
+        params.update(admitted_params(conn))
+        if with_total:
+            total = conn.execute(text("SELECT count(*) " + filters), params).scalar_one()
         result = conn.execute(text(sql), params)
         rows = result.fetchall()
 
@@ -142,14 +153,6 @@ def search_with_filters(
     for row in rows:
         summary = row[6]
         snippet = sanitize_snippet(row[7]) if row[7] else ""
-
-        # Truncate snippet to ~300 chars if no summary, preserving HTML tags
-        if not summary and snippet and len(snippet) > 350:
-            # Find a good break point near 300 chars
-            truncate_at = snippet.rfind(' ', 250, 350)
-            if truncate_at == -1:
-                truncate_at = 300
-            snippet = snippet[:truncate_at] + "..."
 
         results.append({
             "id": row[0],
@@ -162,7 +165,7 @@ def search_with_filters(
             "snippet": snippet,
             "score": row[8],
         })
-    return results
+    return (results, total) if with_total else results
 
 
 def parse_optional_int(value: Optional[str]) -> Optional[int]:
@@ -196,30 +199,27 @@ async def search_page(
     year_start_int = parse_optional_int(year_start)
     year_end_int = parse_optional_int(year_end)
 
-    engine = get_engine()
     results = []
     result_count = 0
+    search_error = False
+    available_years, sponsors, committees = [], [], []
 
     # Perform search if query provided
-    if q and q.strip():
-        safe_query = safe_fts_query(q)
+    try:
+        engine = get_engine()
+        safe_query = safe_fts_query(q) if q and q.strip() else ""
         if safe_query:
-            try:
-                results = search_with_filters(
-                    engine=engine,
-                    query=safe_query,
-                    year_start=year_start_int,
-                    year_end=year_end_int,
-                    sponsor=sponsor,
-                    committee=committee,
-                    limit=limit,
-                    offset=offset,
-                )
-                result_count = len(results)
-            except Exception as e:
-                # Log error but don't crash - return empty results
-                print(f"Search error: {e}")
-                results = []
+            results, result_count = search_with_filters(
+                engine, safe_query, year_start_int, year_end_int, sponsor, committee, limit, offset,
+                with_total=True,
+            )
+        if not hx_request:
+            available_years = get_available_years(engine)
+            sponsors = get_all_sponsors(engine)
+            committees = get_all_committees(engine)
+    except (SQLAlchemyError, InvalidConfig) as exc:
+        logging.getLogger(__name__).error("Search database unavailable (%s)", type(exc).__name__)
+        search_error = True
 
     # If HTMX request, return only the results fragment
     if hx_request:
@@ -231,13 +231,10 @@ async def search_page(
                 "results": results,
                 "result_count": result_count,
                 "query": q,
-            }
+                "search_error": search_error,
+                "offset": offset,
+            }, status_code=503 if search_error else 200,
         )
-
-    # Full page request - include filter options
-    available_years = get_available_years(engine)
-    sponsors = get_all_sponsors(engine)
-    committees = get_all_committees(engine)
 
     return templates.TemplateResponse(
         request,
@@ -255,7 +252,9 @@ async def search_page(
             "sponsors": sponsors,
             "committees": committees,
             "active_page": "search",
-        }
+            "search_error": search_error,
+            "offset": offset,
+        }, status_code=503 if search_error else 200,
     )
 
 
@@ -277,7 +276,8 @@ async def resolution_detail(
     engine = get_engine()
 
     with Session(engine) as session:
-        resolution = get_resolution(session, resolution_id)
+        admitted = set(admitted_ids(session.connection()))
+        resolution = session.get(Resolution, resolution_id) if resolution_id in admitted else None
 
         if not resolution:
             return templates.TemplateResponse(
@@ -304,6 +304,7 @@ async def resolution_detail(
             "resolution": resolution,
             "statements": statements,
             "citations": citations,
+            "admitted_ids": admitted,
             "sponsors": sponsors,
             "themes": themes,
             "highlight_query": highlight_query,
@@ -346,7 +347,7 @@ async def timeline_data(
 
     with Session(engine) as session:
         # Build query with filters
-        stmt = select(Resolution)
+        stmt = select(Resolution).where(Resolution.id.in_(admitted_ids(session.connection())))
 
         if year_start_int:
             stmt = stmt.where(Resolution.convention_year >= year_start_int)
@@ -357,7 +358,7 @@ async def timeline_data(
         if sponsor:
             stmt = stmt.join(Sponsor, Sponsor.resolution_id == Resolution.id).where(
                 Sponsor.sponsor_type == "primary",
-                Sponsor.name.contains(sponsor)
+                Sponsor.name.contains(sponsor, autoescape=True)
             )
 
         # Committee filter - join with Sponsor table where type is committee
@@ -370,7 +371,7 @@ async def timeline_data(
                 CommitteeSponsor.resolution_id == Resolution.id
             ).where(
                 CommitteeSponsor.sponsor_type == "committee",
-                CommitteeSponsor.name.contains(committee)
+                CommitteeSponsor.name.contains(committee, autoescape=True)
             )
 
         resolutions = session.exec(stmt.distinct()).all()
@@ -488,6 +489,7 @@ async def theme_search(
             select(Resolution)
             .join(Citation, Citation.resolution_id == Resolution.id)
             .where(Citation.citation_type == citation_type)
+            .where(Resolution.id.in_(admitted_ids(session.connection())))
             .distinct()
         )
         resolutions = session.exec(stmt).all()

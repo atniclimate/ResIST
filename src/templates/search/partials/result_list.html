@@ -1,4 +1,6 @@
-{% if not query %}
+{% if search_error %}
+<p role="alert">Search is temporarily unavailable. Please try again.</p>
+{% elif not query %}
 <div class="empty-state">
     <h3>Start Searching</h3>
     <p>Enter a search term to find resolutions.</p>
@@ -10,6 +12,9 @@
 </div>
 {% else %}
 <p class="results-count">{{ result_count }} resolution{% if result_count != 1 %}s{% endif %} found</p>
+{% if offset is defined and result_count > results|length %}
+<p>{% if results %}Showing {{ offset + 1 }}–{{ offset + results|length }} of {{ result_count }}.{% else %}No results on this page.{% endif %}</p>
+{% endif %}
 <div class="results-list">
 {% for result in results %}
 {% include "search/partials/result_card.html" %}

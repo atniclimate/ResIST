@@ -27,6 +27,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 from resist import config, netguard  # noqa: E402
 from resist.errors import ArtifactError, BadInput  # noqa: E402
+from src.storage.database import archive_writer  # noqa: E402
 
 COLUMN = "correction"
 CORRECTIONS = {
@@ -108,12 +109,17 @@ def _apply(plan: dict) -> dict[str, object]:
         raise ArtifactError(f"{path.name}: backup does not match the original")
     part = path.with_name(path.name + ".part")
     part.write_bytes(plan["new"])
+    if path.read_bytes() != plan["old"]:
+        part.unlink()
+        raise ArtifactError(f"{path.name}: manifest changed during correction")
     os.replace(part, path)
     try:
         ok = _verify(plan)
     except (OSError, csv.Error, UnicodeDecodeError, KeyError):
         ok = False
     if not ok:
+        if path.read_bytes() != plan["new"]:
+            raise ArtifactError(f"{path.name}: manifest changed during verification")
         shutil.copy2(backup, path)
         raise ArtifactError(f"{path.name}: verify failed; the backup was restored")
     return {"rows": plan["rows"], "appended": plan["rows"], "already": False}
@@ -121,7 +127,8 @@ def _apply(plan: dict) -> dict[str, object]:
 
 def correct(path: Path, value: str, backup_dir: Path) -> dict[str, object]:
     """One file: check, back up, append the column, verify (restore on failure). Counts only."""
-    return _apply(_plan(path, value, backup_dir))
+    with archive_writer():
+        return _apply(_plan(path, value, backup_dir))
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -135,8 +142,13 @@ def main(argv: list[str] | None = None) -> int:
     if not backup.is_relative_to((data / "tmp").resolve()):
         print("refused: --backup must be under RESIST_DATA_DIR/tmp", file=sys.stderr)
         return 1
+    with archive_writer():
+        return _correct_manifests(a.res_dir, backup)
+
+
+def _correct_manifests(res_dir: Path, backup: Path) -> int:
     try:
-        plans = [_plan(a.res_dir / name, value, backup) for name, value in CORRECTIONS.items()]  # both first
+        plans = [_plan(res_dir / name, value, backup) for name, value in CORRECTIONS.items()]  # both first
     except BadInput as e:
         print(f"refused: {e}", file=sys.stderr)
         return 1

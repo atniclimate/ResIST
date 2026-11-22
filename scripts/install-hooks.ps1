@@ -19,10 +19,13 @@ param(
 
 $ErrorActionPreference = 'Stop'
 $repoRoot = (git rev-parse --show-toplevel)
-if (-not $repoRoot) { throw 'Not inside a git repository.' }
+if ($LASTEXITCODE -ne 0 -or -not $repoRoot) { throw 'Not inside a git repository.' }
 Set-Location $repoRoot
 
 $expected = 'scripts/hooks'
+if (-not (Test-Path -LiteralPath "$expected/pre-commit" -PathType Leaf)) {
+    throw 'Repository pre-commit hook is missing.'
+}
 $current  = (git config --local --get core.hooksPath)
 
 if ($Verify) {
@@ -36,6 +39,7 @@ if ($Verify) {
 }
 
 git config --local core.hooksPath $expected
+if ($LASTEXITCODE -ne 0) { throw 'Git could not install the pre-commit hook configuration.' }
 Write-Host "Installed: core.hooksPath = $expected" -ForegroundColor Green
 Write-Host 'Guarded: staged .db files, Python bytecode, datetime.utcnow(), CRLF in text blobs, contact details.'
 Write-Host 'Bypass a single commit with: git commit --no-verify'

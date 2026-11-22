@@ -67,6 +67,21 @@ class TestResolutionGraph:
         assert graph2.G.has_node("tribe-a")
         assert graph2.G.has_edge("doc-001", "tribe-a")
 
+    def test_failed_graph_replace_preserves_saved_graph(self, tmp_path, monkeypatch):
+        graph = ResolutionGraph(tmp_path / "graph.json")
+        graph.save()
+        saved = graph.graph_path.read_bytes()
+        graph.add_resolution("doc-001", {"resolution_number": "23-40"})
+
+        def fail_replace(self, target):
+            raise PermissionError("destination locked")
+
+        monkeypatch.setattr(Path, "replace", fail_replace)
+        with pytest.raises(PermissionError):
+            graph.save()
+        assert graph.graph_path.read_bytes() == saved
+        assert list(tmp_path.glob("tmp*")) == []
+
     def test_get_stats(self, tmp_path):
         """Test graph statistics."""
         graph = ResolutionGraph(tmp_path / "test_graph.json")
@@ -139,6 +154,38 @@ class TestSummarizer:
 
 class TestLinker:
     """Test ATNI reference linking."""
+
+    def test_reconcile_requires_one_complete_number(self):
+        from sqlmodel import Session
+        from src.analysis.linker import add_citation_edges_to_graph, link_all_references
+        from src.models.resolution import Resolution, Citation
+        from src.storage.database import get_engine
+
+        def row(doc_id, number):
+            return Resolution(document_id=doc_id, resolution_number=number, full_text="", parse_confidence=1)
+
+        with Session(get_engine()) as session:
+            source = row("source", "23-40")
+            prefix_match = row("prefix", "23-10")
+            session.add_all([source, prefix_match])
+            session.flush()
+            citation = Citation(resolution_id=source.id, normalized="ATNI-RES-23-1", text="23-1",
+                                citation_type="prior_atni_resolution", linked_resolution_id=prefix_match.id)
+            session.add(citation)
+            link_all_references(session)
+            assert citation.linked_resolution_id is None
+            exact = row("exact", "2023-01")
+            session.add(exact)
+            link_all_references(session)
+            assert citation.linked_resolution_id == exact.id
+            graph = ResolutionGraph()
+            add_citation_edges_to_graph(session, graph)
+            assert graph.G.has_edge("source", "exact")
+            session.add(row("ambiguous", "23-01"))
+            link_all_references(session)
+            assert citation.linked_resolution_id is None
+            add_citation_edges_to_graph(session, graph)
+            assert not graph.G.has_edge("source", "exact")
 
     def test_link_atni_references_pattern_extraction(self):
         """Test pattern matching for ATNI resolution numbers."""

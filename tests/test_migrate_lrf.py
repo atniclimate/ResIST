@@ -221,6 +221,8 @@ def test_migrate_refusals(data_root, monkeypatch, tmp_path):
     assert not elsewhere.exists() and not report.exists()
 
     existing = data_root / "tmp" / "taken"
+    assert mig.main(["--out", str(existing), "--report", str(existing / "resolutions.db")]) == 1
+    assert not existing.exists()
     existing.mkdir(parents=True)
     assert mig.main(["--out", str(existing)]) == 1
     assert list(existing.iterdir()) == [] and not report.exists()
@@ -239,6 +241,23 @@ def test_migrate_refusals(data_root, monkeypatch, tmp_path):
     monkeypatch.setenv("RESIST_DATA_DIR", str(empty))
     assert mig.main([]) == 1  # no live database
     assert list(empty.iterdir()) == []
+
+
+def test_migration_preserves_concurrently_claimed_output(data_root, monkeypatch):
+    live_pool(data_root, monkeypatch)
+    out = data_root / "tmp" / STAMP
+    marker = out / "owner"
+    mkdir = Path.mkdir
+
+    def claim_first(path, *args, **kwargs):
+        if path == out and not path.exists():
+            mkdir(path, parents=True)
+            marker.touch()
+        return mkdir(path, *args, **kwargs)
+
+    monkeypatch.setattr(Path, "mkdir", claim_first)
+    assert load().main(["--out", str(out)]) == 1
+    assert marker.exists()
 
 
 def test_migrate_unexplained_change_exit_4(data_root, monkeypatch, capsys):

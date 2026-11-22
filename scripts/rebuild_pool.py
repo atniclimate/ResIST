@@ -29,6 +29,7 @@ REPO = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO))
 from resist import netguard  # noqa: E402
 from resist.index import has_d013_tokenizer  # noqa: E402  (imports unicodedata only)
+from scripts.retokenize_fts import _digests  # noqa: E402
 
 NUM = re.compile(r"^\d{2}-\d{2,3}$")
 # Deliberately looser than the parser's RUNNING_HEADER and independent of it: proves only header-shaped runs went.
@@ -105,6 +106,7 @@ def snapshot(db: Path) -> dict:
     Statement text is held in memory only; every other text column is reduced to its SHA-256."""
     con = ro(db)
     try:
+        con.execute("begin")
         ids, docs = {}, {}
         for row in con.execute("select id, document_id, " + ", ".join(RES_COLS) + " from resolution"):
             vals = dict(zip(RES_COLS, row[2:]))
@@ -127,7 +129,8 @@ def snapshot(db: Path) -> dict:
             d["cites"].sort(key=repr)
             d["sponsors"].sort()
         fts_sql = con.execute("select sql from sqlite_master where name = 'resolution_fts'").fetchone()
-        return {"docs": docs,
+        extra = _digests(con, exclude={"resolution", "statement", "sponsor", "citation"})
+        return {"docs": docs, "other_table_digests": extra,
                 "keyword_rows": con.execute("select count(*) from keyword").fetchone()[0],
                 "integrity": con.execute("pragma integrity_check").fetchone()[0],
                 "fts_rows_equal_resolutions": con.execute(
@@ -194,11 +197,15 @@ def diff(old: dict, new: dict, stored: set[str]) -> dict:
         cd["number_fixed"] += fixed
         cd["unexplained"] += bad
     docs = rep["documents"]
+    old_tables = old.get("other_table_digests", {})
+    new_tables = new.get("other_table_digests", {})
+    ot["changed_or_missing_tables"] = sum(
+        new_tables.get(table) != digest for table, digest in old_tables.items())
     rep["swap_ok"] = bool(
         docs["only_old"] == docs["only_new"] == 0 and cs["unexplained"] == 0 and cd["unexplained"] == 0
         and pn["native_docs_not_fully_paged"] == 0 and pn["stored_docs_with_page"] == 0
         and ot["citation_docs_changed"] == ot["sponsor_docs_changed"] == 0
-        and old["keyword_rows"] == new["keyword_rows"]
+        and old["keyword_rows"] == new["keyword_rows"] and ot["changed_or_missing_tables"] == 0
         and new["integrity"] == "ok" and new["fts_rows_equal_resolutions"] and new["tokenizer_d013"])
     return rep
 
@@ -217,6 +224,8 @@ def _refusal(a, live: Path) -> str | None:
         return "manifest-absent"
     if Path(a.report).exists():
         return "report-exists"
+    if Path(a.report).resolve().is_relative_to(out):
+        return "report-inside-output"
     if "src.storage.database" in sys.modules:  # RESIST_DATA_DIR must be set before that import
         return "database-module-already-imported"
     return None
@@ -248,7 +257,11 @@ def main(argv: list[str] | None = None) -> int:
     fetched = {r["sha256"] for r in csv.DictReader(open(res_dir / "manifest-atni.csv", encoding="utf-8"))
                if r["status"] == "fetched" and r["sha256"]}
 
-    out.mkdir(parents=True)
+    try:
+        out.mkdir(parents=True)
+    except FileExistsError:
+        print("refused: out-exists", file=sys.stderr)
+        return 1
     if (live / "pool.yaml").is_file():
         shutil.copyfile(live / "pool.yaml", out / "pool.yaml")  # same tier ceiling as the live pool
     os.environ["RESIST_DATA_DIR"] = str(out)
@@ -282,7 +295,12 @@ def main(argv: list[str] | None = None) -> int:
     report["swap_ok"] = bool(report["swap_ok"] and clean)
     report["ingest"] = {"exit": rc, "statuses": statuses, "fetched": len(fetched)}
     Path(a.report).parent.mkdir(parents=True, exist_ok=True)
-    Path(a.report).write_text(json.dumps(report, indent=1, sort_keys=True) + "\n", encoding="utf-8")
+    try:
+        with Path(a.report).open("x", encoding="utf-8") as receipt:
+            receipt.write(json.dumps(report, indent=1, sort_keys=True) + "\n")
+    except FileExistsError:
+        print("refused: report-exists; rebuild retained", file=sys.stderr)
+        return 1
     print(json.dumps(report, sort_keys=True))
     if report["swap_ok"]:
         return 0

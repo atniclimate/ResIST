@@ -15,6 +15,19 @@ from src.models.document import ParseResult
 from src.ingestion.citations import ATNI_RESOLUTION_PATTERN, extract_citations
 from src.ingestion.classifier import classify_whereas_function, classify_resolved_action
 
+SPONSOR_FIELD = r'(?:Sponsor(?:ed)?[ \t]*:|(?:Sponsor(?:ed)?|Submitted|Presented)[ \t]+by\b[: \t]*)'
+CO_SPONSOR_FIELD = r'Co[- ]?Sponsor(?:ed)?(?:[ \t]*:|[ \t]+by\b[: \t]*)'
+COMMITTEE_FIELD = r'(?:Standing[ \t]+)?Committee[ \t]*:'
+METADATA_FIELD = rf'(?:{SPONSOR_FIELD}|{CO_SPONSOR_FIELD}|{COMMITTEE_FIELD})'
+# A colon labels a field even after an unpunctuated decision. Plain "presented by"
+# and "adopted by" also occur mid-sentence at PDF line wraps.
+LABELED_FIELD = r'(?:(?:Co[- ]?)?Sponsor(?:ed)?(?:[ \t]+by)?|(?:Submitted|Presented)[ \t]+by|(?:Standing[ \t]+)?Committee)[ \t]*:'
+METADATA_BOUNDARY = (
+    r'\n[ \t]*(?:CERTIFICATION[ \t]*:?[ \t]*(?:\n|$)'
+    rf'|ADOPTED\b[ \t]*(?::|[A-Z]+[ \t]+\d|(?:\n|$))|{LABELED_FIELD})'
+    rf'|(?<=[.;:\n])[ \t]*\n[ \t]*(?:ADOPTED[ \t]+(?:by|on)\b|{METADATA_FIELD})'
+)
+
 # Compiled regex patterns
 PATTERNS = {
     # alt 1: a dash or slash, spaces allowed on the same line only ("#2023 – 40", "# 2026 - 034", "18-38");
@@ -24,11 +37,12 @@ PATTERNS = {
         re.IGNORECASE
     ),
     'whereas': re.compile(
-        r'WHEREAS[,:]?\s*(.+?)(?=WHEREAS|NOW,?\s*THEREFORE|BE\s*IT\s*(?:FURTHER\s*|FINALLY\s*)?RESOLVED|$)',
+        rf'WHEREAS[,:]?\s*(.+?)(?=WHEREAS|NOW,?\s*THEREFORE|BE\s*IT\s*(?:FURTHER\s*|FINALLY\s*)?RESOLVED|{METADATA_BOUNDARY}|$)',
         re.IGNORECASE | re.DOTALL
     ),
     'resolved': re.compile(
-        r'(?:NOW,?\s*THEREFORE,?\s*)?BE\s*IT\s*(?:FURTHER\s*|FINALLY\s*)?RESOLVED[,:]?\s*(.+?)(?=BE\s*IT\s*(?:FURTHER\s*|FINALLY\s*)?RESOLVED|CERTIFICATION|ADOPTED|$)',
+        r'(?:NOW,?\s*THEREFORE,?\s*)?BE\s*IT\s*(?:FURTHER\s*|FINALLY\s*)?RESOLVED[,:]?[ \t]*(.*?)'
+        rf'(?=BE\s*IT\s*(?:FURTHER\s*|FINALLY\s*)?RESOLVED|{METADATA_BOUNDARY}|$)',
         re.IGNORECASE | re.DOTALL
     ),
     'convention': re.compile(
@@ -40,15 +54,15 @@ PATTERNS = {
         re.IGNORECASE
     ),
     'sponsor': re.compile(
-        r'(?:Sponsor(?:ed)?(?:\s*by)?|Submitted\s*by|Presented\s*by)[:\s]*([^\n]+)',
+        rf'(?m)^[ \t]*{SPONSOR_FIELD}[ \t]*([^\n]+)',
         re.IGNORECASE
     ),
     'co_sponsor': re.compile(
-        r'(?:Co-?Sponsor(?:ed)?(?:\s*by)?)[:\s]*([^\n]+)',
+        rf'(?m)^[ \t]*{CO_SPONSOR_FIELD}[ \t]*([^\n]+)',
         re.IGNORECASE
     ),
     'committee': re.compile(
-        r'(?:Committee|Standing\s*Committee)[:\s]*([^\n]+)',
+        rf'(?m)^[ \t]*{COMMITTEE_FIELD}[ \t]*([^\n]+)',
         re.IGNORECASE
     ),
     'signatory': re.compile(
@@ -105,10 +119,11 @@ def parse_resolution(text: str, document_id: str, pages: Optional[Sequence[str]]
     carries page_number (1-based page where its marker begins). None: page_number is None.
     """
     # Resolution number
-    res_num_match = PATTERNS['resolution_number'].search(text)
+    header = re.split(r'\b(?:WHEREAS|BE\s+IT)\b', text, maxsplit=1, flags=re.I)[0]
+    res_num_match = PATTERNS['resolution_number'].search(header)
     raw = res_num_match.group(1) if res_num_match else None
     # Unnormalizable ("2023 - 2024"): keep the pre-R1.13 capture, which is the citation pattern's group, not raw
-    legacy = ATNI_RESOLUTION_PATTERN.search(text)
+    legacy = ATNI_RESOLUTION_PATTERN.search(header)
     resolution_number = normalize_resolution_number(raw) or (legacy.group(1) if legacy else None)
 
     # Page starts (offsets into text) for page_number
@@ -129,7 +144,7 @@ def parse_resolution(text: str, document_id: str, pages: Optional[Sequence[str]]
     if conv_match:
         convention = {
             "year": conv_match.group(1),
-            "type": conv_match.group(2) or "Annual",
+            "name": conv_match.group(2) or "Annual",
             "location": clean_text(conv_match.group(3))
         }
 
@@ -155,11 +170,11 @@ def parse_resolution(text: str, document_id: str, pages: Optional[Sequence[str]]
 
     # Resolved statements with classification
     resolved_statements = []
-    for i, m in enumerate(PATTERNS['resolved'].finditer(body)):
+    for m in PATTERNS['resolved'].finditer(body):
         cleaned = clean_text(m.group(1))
-        if len(cleaned) > 10:  # Skip very short matches
+        if cleaned:
             resolved_statements.append({
-                "index": i,
+                "index": len(resolved_statements),
                 "text": cleaned,
                 "action_type": classify_resolved_action(cleaned),
                 "page_number": page_of(m),
@@ -168,13 +183,17 @@ def parse_resolution(text: str, document_id: str, pages: Optional[Sequence[str]]
             })
 
     # Sponsors
-    sponsor_match = PATTERNS['sponsor'].search(text)
-    co_sponsor_match = PATTERNS['co_sponsor'].search(text)
     committee_match = PATTERNS['committee'].search(text)
+    clauses = whereas_statements + resolved_statements
+
+    def sponsor_names(field):
+        return [name for match in PATTERNS[field].finditer(text)
+                if not any(row["start"] <= match.start() < row["end"] for row in clauses)
+                if (name := clean_text(match.group(1)))]
 
     sponsors = {
-        "primary": [clean_text(sponsor_match.group(1))] if sponsor_match else [],
-        "co_sponsor": [clean_text(co_sponsor_match.group(1))] if co_sponsor_match else [],
+        "primary": sponsor_names("sponsor"),
+        "co_sponsor": sponsor_names("co_sponsor"),
         "committee": clean_text(committee_match.group(1)) if committee_match else None
     }
 
@@ -185,10 +204,7 @@ def parse_resolution(text: str, document_id: str, pages: Optional[Sequence[str]]
         for name, role in sig_matches
     ]
 
-    # Citations; the document's own header number is not a citation of itself
-    # shortcut: the self-filter matches the citation extractor's own (year-only) reading; S05/R1.26 replace it
-    own = f"ATNI-RES-{legacy.group(1)}" if legacy else None
-    citations = [c for c in extract_citations(text) if c["normalized"] != own]
+    citations = extract_citations(text, own=resolution_number)
 
     # Calculate parse confidence based on completeness
     required_fields = [resolution_number, whereas_statements, resolved_statements]

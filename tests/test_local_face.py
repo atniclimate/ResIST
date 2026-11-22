@@ -1,4 +1,5 @@
 """pages/ served on the local face at /app/ (design A4); the database comes from the export, never the raw pool."""
+import hashlib
 import json
 import sqlite3
 from contextlib import closing
@@ -55,18 +56,63 @@ def test_no_export_is_503(isolated, client):
     assert client.get("/app/build.json").status_code == 503
 
 
-def test_export_files_served(isolated, client):
+@pytest.fixture
+def local_export(isolated, tmp_path, monkeypatch):
+    from resist.services import policy
+
+    sha = "a" * 64
+    (tmp_path / "manifest-atni.csv").write_text(
+        f"sha256,status,source,local_path\n{sha},fetched,atni-table,\n", encoding="utf-8")
+    (tmp_path / "manifest-ncai.csv").write_text("sha256\n", encoding="utf-8")
+    monkeypatch.setattr(policy, "default_res_dir", lambda: tmp_path)
     out = isolated / "exchange" / "pages"
     out.mkdir(parents=True)
-    with closing(sqlite3.connect(out / "resolutions.db")) as con:
-        con.execute("create table t (x integer)")  # no rows, no text
-        con.commit()
-    (out / "build.json").write_text(json.dumps({}), encoding="utf-8")
+    (isolated / "db").mkdir()
+    for path in (out, isolated / "db"):
+        with closing(sqlite3.connect(path / "resolutions.db")) as con:
+            con.execute("create table resolution(document_id text)")
+            con.execute("insert into resolution values (?)", (sha,))
+            con.commit()
+    digest = hashlib.sha256((out / "resolutions.db").read_bytes()).hexdigest()
+    (out / "build.json").write_text(json.dumps({"db_sha256": digest}), encoding="utf-8")
+    return out
+
+
+def test_export_files_served(local_export, client):
     for name in ("resolutions.db", "build.json"):
         r = client.get(f"/app/{name}")
         assert r.status_code == 200
-        assert r.content == (out / name).read_bytes()
+        assert r.content == (local_export / name).read_bytes()
         assert r.headers["cache-control"] == "no-store"
+
+
+@pytest.mark.parametrize("change", ["quarantine", "stored-tier", "removed", "receipt-mismatch"])
+def test_old_export_withdrawn_on_both_local_faces(local_export, isolated, client, tmp_path, monkeypatch, change):
+    from scripts import serve_pages
+
+    sha = "a" * 64
+    if change == "quarantine":
+        (tmp_path / "manifest-ncai.csv").write_text(f"sha256\n{sha}\n", encoding="utf-8")
+    elif change == "receipt-mismatch":
+        (local_export / "build.json").write_text("{}", encoding="utf-8")
+    else:
+        with closing(sqlite3.connect(isolated / "db" / "resolutions.db")) as con:
+            if change == "removed":
+                con.execute("delete from resolution")
+            else:
+                con.execute("create table document(sha256 text, tier text)")
+                con.execute("insert into document values (?, 'T3')", (sha,))
+            con.commit()
+
+    monkeypatch.setattr(serve_pages, "DATA_DIR", isolated)
+    preview = object.__new__(serve_pages.Handler)
+    errors = []
+    preview.send_error = lambda status, message: errors.append(status)
+    for name in ("resolutions.db", "build.json"):
+        assert client.get(f"/app/{name}").status_code == 503
+        preview.path = "/" + name
+        assert preview.send_head() is None
+    assert errors == [503, 503]
 
 
 def test_capabilities_json_matches_api(isolated, client):

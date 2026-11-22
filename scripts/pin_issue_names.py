@@ -9,6 +9,7 @@ drift, 2 git missing. JSON-lines on stdout, progress on stderr.
 """
 
 import datetime
+import argparse
 import hashlib
 import json
 import subprocess
@@ -43,25 +44,24 @@ def _source(ps: Path, raw: bytes) -> dict:
 
 
 def main(argv: list[str]) -> int:
-    args = [a for a in argv if not a.startswith("--")]
-    pinned_on = datetime.date.today().isoformat()
-    if "--pinned-on" in argv:
-        i = argv.index("--pinned-on")
-        pinned_on = argv[i + 1] if i + 1 < len(argv) else ""
-        args = [a for a in args if a != pinned_on]
-    if len(args) != 1:
-        print("usage: pin_issue_names.py <PS_ROOT> [--check] [--pinned-on YYYY-MM-DD]", file=sys.stderr)
-        return 1
-    ps = Path(args[0])
+    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0], allow_abbrev=False)
+    parser.add_argument("ps", type=Path, metavar="PS_ROOT")
+    parser.add_argument("--check", action="store_true")
+    parser.add_argument("--pinned-on", default=datetime.date.today().isoformat())
+    try:
+        args = parser.parse_args(argv)
+    except SystemExit as exc:
+        return 1 if exc.code else 0
+    ps = args.ps
     try:
         raw = (ps / REL).read_bytes()
-        if "--check" in argv:
+        if args.check:
             pin = json.loads(PIN.read_text(encoding="utf-8"))
             check_pin(pin)
             moved = drifted(pin, raw)
             print(json.dumps({"disposition": "drift" if moved else "current", "pinned": pin["source"]["file_sha256"]}))
             return 1 if moved else 0
-        pin = build_pin(json.loads(raw), _source(ps, raw), pinned_on)
+        pin = build_pin(json.loads(raw), _source(ps, raw), args.pinned_on)
         PIN.write_bytes((json.dumps(pin, indent=2, ensure_ascii=False) + "\n").encode("utf-8"))
     except FileNotFoundError as e:
         if e.filename is None or Path(str(e.filename)).name == "git":

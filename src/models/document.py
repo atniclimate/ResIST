@@ -8,7 +8,7 @@ class IntakeResult:
     """Output from intake stage"""
     document_id: str
     file_path: Path
-    format: Literal["pdf-native", "pdf-scanned", "image", "text", "docx"]
+    format: Literal["pdf-native", "pdf-scanned", "pdf-mixed", "image", "text", "docx"]
     original_filename: str
     file_size_bytes: int
 
@@ -20,6 +20,7 @@ class OCRResult:
     confidence_score: float  # 0.0 to 1.0, overall document
     per_region_scores: List[float]  # Individual text region confidences
     ocr_tool_used: str  # "paddleocr", "tesseract"
+    pages: List[str] | None = None
 
 
 @dataclass

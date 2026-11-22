@@ -39,7 +39,7 @@ def test_sponsor_filter_with_wildcards(test_engine):
     with Session(engine) as session:
         # Create test resolution with "50%" in sponsor name
         parse1 = ParseResult(
-            document_id="TEST-001",
+            document_id="20261001_120000_00000001",
             resolution_number="R-001",
             sponsors={"primary": ["50% Coalition"], "co_sponsor": [], "committee": ""},
             confidence_score=0.9,
@@ -48,7 +48,7 @@ def test_sponsor_filter_with_wildcards(test_engine):
 
         # Create test resolution with normal sponsor
         parse2 = ParseResult(
-            document_id="TEST-002",
+            document_id="20261001_120000_00000002",
             resolution_number="R-002",
             sponsors={"primary": ["Test Committee"], "co_sponsor": [], "committee": ""},
             confidence_score=0.9,
@@ -71,7 +71,7 @@ def test_sponsor_filter_with_wildcards(test_engine):
     # Test underscore wildcard
     with Session(engine) as session:
         parse3 = ParseResult(
-            document_id="TEST-003",
+            document_id="20261001_120000_00000003",
             resolution_number="R-003",
             sponsors={"primary": ["Test_Sponsor"], "co_sponsor": [], "committee": ""},
             confidence_score=0.9,
@@ -100,7 +100,7 @@ def test_committee_filter_with_wildcards(test_engine):
     with Session(engine) as session:
         # Create test resolution with "100%" in committee name
         parse1 = ParseResult(
-            document_id="TEST-004",
+            document_id="20261001_120000_00000004",
             resolution_number="R-004",
             sponsors={"primary": [], "co_sponsor": [], "committee": "Energy 100% Committee"},
             confidence_score=0.9,
@@ -109,7 +109,7 @@ def test_committee_filter_with_wildcards(test_engine):
 
         # Create test resolution with normal committee
         parse2 = ParseResult(
-            document_id="TEST-005",
+            document_id="20261001_120000_00000005",
             resolution_number="R-005",
             sponsors={"primary": [], "co_sponsor": [], "committee": "Energy Committee"},
             confidence_score=0.9,
@@ -128,6 +128,30 @@ def test_committee_filter_with_wildcards(test_engine):
     # Should find only the committee with "100%" in name
     assert len(results) == 1
     assert results[0]["resolution_number"] == "R-004"
+
+
+def test_timeline_literal_sponsor_and_committee_filters(test_engine):
+    from fastapi.testclient import TestClient
+    from sqlmodel import Session
+    from src.main import app
+    from src.models.document import ParseResult
+
+    with Session(test_engine) as session:
+        for number, sponsor, committee in [
+            ("25-01", "50% Coalition", "Energy_A"),
+            ("25-02", "500 Coalition", "EnergyXA"),
+        ]:
+            parsed = ParseResult(document_id=f"20261001_120000_000000{number[-2:]}", resolution_number=number,
+                                 convention={"year": 2025},
+                                 sponsors={"primary": [sponsor], "committee": committee},
+                                 confidence_score=1)
+            save_resolution(session, parsed, number)
+        session.commit()
+    client = TestClient(app, base_url="http://127.0.0.1")
+    for params in [{"sponsor": "50%"}, {"committee": "Energy_"}]:
+        response = client.get("/api/timeline", params=params)
+        assert response.status_code == 200
+        assert [item["content"] for item in response.json()["items"]] == ["25-01"]
 
 
 if __name__ == "__main__":

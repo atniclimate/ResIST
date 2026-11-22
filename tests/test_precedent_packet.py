@@ -52,8 +52,7 @@ def test_failed_identity_withholds_text(changes):
 def manifest_dir(tmp_path, ncai=False):
     (tmp_path / "manifest-atni.csv").write_text(
         "sha256,status,source,local_path\n" + SHA + ",fetched,atni-table,marker.bin\n", encoding="utf-8")
-    if ncai:
-        (tmp_path / "manifest-ncai.csv").write_text("sha256\n" + SHA + "\n", encoding="utf-8")
+    (tmp_path / "manifest-ncai.csv").write_text("sha256\n" + (SHA + "\n" if ncai else ""), encoding="utf-8")
     return tmp_path
 
 

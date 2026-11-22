@@ -1,5 +1,7 @@
 """Local route boundary checks with neutral metadata and no source pool reads."""
 
+import asyncio
+
 import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
@@ -34,6 +36,45 @@ def test_generate_uses_authoritative_service_v2(client, monkeypatch):
     assert response.headers["cache-control"] == "no-store"
     assert response.headers["cross-origin-resource-policy"] == "same-origin"
     assert response.headers["x-content-type-options"] == "nosniff"
+
+
+def test_large_packet_can_be_rechecked_and_downloaded(client, monkeypatch):
+    monkeypatch.setattr(api_v1, "REPORT_BODY_LIMIT", 256)
+    identity = "atni:res:00-1"
+    packet = {"request": identity, "text": "x" * 512}
+    monkeypatch.setattr(api_v1.reports, "build_packet", lambda *args, **kwargs: packet)
+    generated = client.post("/api/v1/reports", json={"request": identity}).json()
+    receipt = {"request": identity, "fingerprint": generated["fingerprint"]}
+    assert client.post("/api/v1/reports/verify", json=receipt).status_code == 200
+    assert client.post("/api/v1/reports/download", json={**receipt, "format": "json"}).json() == packet
+    packet["text"] += "y"
+    assert client.post("/api/v1/reports/verify", json=receipt).json()["status"] == "stale-input"
+
+
+def test_report_rendering_runs_off_request_loop(client, monkeypatch):
+    def assert_worker():
+        with pytest.raises(RuntimeError, match="no running event loop"):
+            asyncio.get_running_loop()
+
+    render_json = api_v1.JSONResponse.render
+
+    def render_envelope(response, content):
+        if "packet" in content:
+            assert_worker()
+        return render_json(response, content)
+
+    def render_text(*args, **kwargs):
+        assert_worker()
+        return "rendered"
+
+    monkeypatch.setattr(api_v1.JSONResponse, "render", render_envelope)
+    monkeypatch.setattr(api_v1.reports, "build_packet", lambda *args, **kwargs: {})
+    monkeypatch.setattr(api_v1.reports, "inspect_packet", lambda packet: {"verified": True})
+    monkeypatch.setattr(api_v1, "dumps", render_text)
+    monkeypatch.setattr(api_v1, "markdown", render_text)
+    assert client.post("/api/v1/reports", json={"request": "atni:res:00-1"}).status_code == 200
+    for fmt in ("md", "json"):
+        assert client.post("/api/v1/reports/download", json={"packet": {}, "format": fmt}).content == b"rendered"
 
 
 @pytest.mark.parametrize(("error", "code", "state"), [(TierRefused, 403, "refused"), (BadInput, 404, "missing"),

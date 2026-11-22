@@ -1,5 +1,6 @@
 """Tests for storage layer, on real ATNI resolutions (D-052, tests/fixtures/atni/)."""
 import sqlite3
+import hashlib
 from pathlib import Path
 
 import pymupdf
@@ -13,16 +14,19 @@ from src.models.resolution import Statement
 
 ATNI = Path(__file__).parent / "fixtures" / "atni"
 
+def _upload_id(name):
+    return "upload-" + hashlib.sha256((ATNI / f"{name}.pdf").read_bytes()).hexdigest() + ".pdf"
+
 
 def _real(name: str, paged: bool = False):
-    """Extracted text and parse of a real ATNI fixture PDF, document_id from the file stem. paged: the parse gets
+    """Extracted text and parse of a real ATNI fixture PDF with an upload identity. paged: the parse gets
     the page texts extract_text_from_native_pdf joins, so each clause carries page_number (R1.21)."""
     text = extract_text_from_native_pdf(ATNI / f"{name}.pdf")
     if not paged:
-        return text, parse_resolution(text, name.lower())
+        return text, parse_resolution(text, _upload_id(name))
     with pymupdf.open(str(ATNI / f"{name}.pdf")) as doc:
         pages = [p.get_text() for p in doc]
-    return text, parse_resolution(text, name.lower(), pages)
+    return text, parse_resolution(text, _upload_id(name), pages)
 
 
 def _page_numbers(session, resolution) -> list:
@@ -53,11 +57,12 @@ def test_save_resolution(session):
     resolution = save_resolution(session, parse_result, text)
 
     assert resolution.id is not None
-    assert resolution.document_id == "res-26-34"
+    assert resolution.document_id == _upload_id("Res-26-34")
     # The PDF prints "RESOLUTION # 2026 - 034"; the parser normalizes it (R1.13) and that is what gets stored.
     assert parse_result.resolution_number == "26-34"
     assert resolution.resolution_number == parse_result.resolution_number
     assert resolution.convention_year == 2026
+    assert resolution.convention_name == "Annual"
     assert resolution.convention_location == "Snoqualmie"
     assert resolution.full_text == text
     assert len(resolution.statements) == 22
@@ -74,7 +79,7 @@ def test_get_resolution(session):
     from src.storage import get_resolution, save_resolution
 
     parse_result = ParseResult(
-        document_id="test-doc-get-001",
+        document_id="20261001_120000_00000001",
         resolution_number="24-GET",
         confidence_score=0.9,
     )
@@ -82,7 +87,7 @@ def test_get_resolution(session):
 
     retrieved = get_resolution(session, saved.id)
     assert retrieved is not None
-    assert retrieved.document_id == "test-doc-get-001"
+    assert retrieved.document_id == "20261001_120000_00000001"
 
 
 def test_list_resolutions(session):
@@ -90,7 +95,7 @@ def test_list_resolutions(session):
     from src.storage import list_resolutions, save_resolution
 
     # Each test gets a fresh data_root database, so seed one row rather than relying on test order
-    save_resolution(session, ParseResult(document_id="test-doc-list-001", resolution_number="24-LIST"), "List me.")
+    save_resolution(session, ParseResult(document_id="20261001_120000_00000002", resolution_number="24-LIST"), "List me.")
     results = list_resolutions(session, limit=10)
     assert isinstance(results, list)
     assert len(results) >= 1
@@ -105,7 +110,7 @@ def test_search_resolutions(session):
 
     results = search_resolutions(session, "climate tribal")
     assert len(results) > 0
-    assert results[0]["document_id"] == "res-23-40"
+    assert results[0]["document_id"] == _upload_id("Res-23-40")
     # Check result structure
     assert "id" in results[0]
     assert "snippet" in results[0]
@@ -121,10 +126,10 @@ def test_search_with_year_filter(session):
         text, parse_result = _real(name)
         save_resolution(session, parse_result, text)
 
-    assert {r["document_id"] for r in search_resolutions(session, "sovereignty")} == {"res-23-40", "res-26-34"}
+    assert {r["document_id"] for r in search_resolutions(session, "sovereignty")} == {_upload_id("Res-23-40"), _upload_id("Res-26-34")}
 
     results_2026 = search_resolutions(session, "sovereignty", year=2026)
-    assert [r["document_id"] for r in results_2026] == ["res-26-34"]
+    assert [r["document_id"] for r in results_2026] == [_upload_id("Res-26-34")]
     assert all(r["convention_year"] == 2026 for r in results_2026)
 
 

@@ -20,11 +20,11 @@ _STYLES = {"title": "Title", "h2": "Heading 1", "h3": "Heading 2", "h4": "Headin
 _NS = {"w": "http://schemas.openxmlformats.org/wordprocessingml/2006/main"}
 
 
-def _inventory(packet: dict) -> list[dict]:
+def _inventory(packet: dict, *, reader=False) -> list[dict]:
     if not isinstance(packet, dict) or packet.get("schema") not in {"resist-precedent/1", "resist-precedent/2"}:
         raise BadInput("packet-docx-schema-unsupported")
     try:
-        inventory = atoms(packet)
+        inventory = atoms(packet, reader=reader)
         for atom in inventory:
             if atom["kind"] not in _STYLES or not isinstance(atom["text"], str):
                 raise BadInput("packet-docx-atom-invalid")
@@ -58,9 +58,9 @@ def _paragraph_text(paragraph) -> str:
     return "".join(values)
 
 
-def verify_docx(data: bytes, packet: dict) -> dict:
+def verify_docx(data: bytes, packet: dict, *, reader=False) -> dict:
     """Compare every visible atom in order, not nondeterministic ZIP bytes."""
-    expected = _inventory(packet)
+    expected = _inventory(packet, reader=reader)
     try:
         with ZipFile(io.BytesIO(data)) as archive:
             root = ElementTree.fromstring(archive.read("word/document.xml"))
@@ -73,9 +73,9 @@ def verify_docx(data: bytes, packet: dict) -> dict:
     return {"verified": True, "atoms": len(expected), "quotes": sum(a["kind"] == "quote" for a in expected)}
 
 
-def docx(packet: dict) -> bytes:
+def docx(packet: dict, *, reader=False) -> bytes:
     """Render complete validated atoms in memory; no paths, network or partial files."""
-    inventory = _inventory(packet)
+    inventory = _inventory(packet, reader=reader)
     document = Document()
     section = document.sections[0]
     section.page_width, section.page_height = Inches(8.5), Inches(11)
@@ -119,5 +119,5 @@ def docx(packet: dict) -> bytes:
     buffer = io.BytesIO()
     document.save(buffer)
     data = buffer.getvalue()
-    verify_docx(data, packet)
+    verify_docx(data, packet, reader=reader)
     return data

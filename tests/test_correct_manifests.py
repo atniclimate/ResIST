@@ -150,3 +150,17 @@ def test_failed_verify_restores_the_backup(res, monkeypatch):
     monkeypatch.setattr(cm, "_quoted", lambda v: "different")  # the written value no longer equals CORRECTIONS
     assert cm.main(["--res-dir", str(res)]) == 4
     assert files(res)["manifest-atni.csv"] == before["manifest-atni.csv"]  # restored from the backup
+
+
+def test_edit_after_backup_survives(res, monkeypatch):
+    cm = load()
+    path = res / "manifest-atni.csv"
+    changed = path.read_bytes() + b"another writer\n"
+    write = Path.write_bytes
+    def edit_during_staging(target, data):
+        if target.name == path.name + ".part":
+            write(path, changed)
+        return write(target, data)
+    monkeypatch.setattr(Path, "write_bytes", edit_during_staging)
+    assert cm.main(["--res-dir", str(res)]) == 4
+    assert path.read_bytes() == changed

@@ -15,16 +15,17 @@ ATNI_RESOLUTION_PATTERN = re.compile(
 )
 
 # Citation type patterns for classification
+CFR = re.compile(r'(\d+)\s*C\.?\s*F\.?\s*R\.?\s*§?\s*(\d+(?:\.\d+)*(?:\([a-z0-9]+\))*)', re.I)
 CITATION_PATTERNS = {
     'public_law': re.compile(r'P\.?\s*L\.?\s*\d+[-–]\d+|Public\s+Law\s+\d+[-–]\d+', re.IGNORECASE),
     'usc': re.compile(r'\d+\s*U\.?\s*S\.?\s*C\.?\s*§?\s*\d+', re.IGNORECASE),
-    'cfr': re.compile(r'\d+\s*C\.?\s*F\.?\s*R\.?\s*§?\s*\d+', re.IGNORECASE),
+    'cfr': CFR,
     'treaty': re.compile(r'Treaty\s+of\s+\d{4}|Treaty\s+with', re.IGNORECASE),
     'executive_order': re.compile(r'E\.?\s*O\.?\s*\d+|Executive\s+Order\s+\d+', re.IGNORECASE),
 }
 
 
-def extract_citations(text: str) -> List[Dict]:
+def extract_citations(text: str, *, own: str | None = None) -> List[Dict]:
     """
     Extract and normalize citations using eyecite + custom patterns.
 
@@ -65,16 +66,22 @@ def extract_citations(text: str) -> List[Dict]:
                 })
                 seen_normalized.add(normalized)
 
-    # ATNI resolution cross-references (custom pattern)
-    for match in ATNI_RESOLUTION_PATTERN.finditer(text):
-        res_num = match.group(1)
-        normalized = f"ATNI-RES-{res_num}"
+    from resist.models import ClauseText
+    from resist.refs.atni_number import AtniNumberResolver
 
+    source = ClauseText("", text, own=(f"atni:res:{own}",) if own else ())
+    for ref in AtniNumberResolver().find(source):
+        if ref.issuer == "atni":
+            kind, normalized = "prior_atni_resolution", f"ATNI-RES-{ref.number}"
+        elif ref.issuer == "ncai":
+            kind, normalized = "ncai_resolution", f"NCAI-RES-{ref.number}"
+        else:
+            kind, normalized = "resolution_reference", ref.number
         if normalized not in seen_normalized:
             citations.append({
-                "text": match.group(0),
+                "text": ref.span.quote,
                 "normalized": normalized,
-                "type": "prior_atni_resolution"
+                "type": kind
             })
             seen_normalized.add(normalized)
 
@@ -96,7 +103,7 @@ def normalize_citation(text: str) -> str:
         return f"{usc_match.group(1)} U.S.C. {usc_match.group(2)}"
 
     # CFR normalization
-    cfr_match = re.search(r'(\d+)\s*C\.?\s*F\.?\s*R\.?\s*§?\s*(\d+)', text_upper)
+    cfr_match = CFR.search(text)
     if cfr_match:
         return f"{cfr_match.group(1)} C.F.R. {cfr_match.group(2)}"
 

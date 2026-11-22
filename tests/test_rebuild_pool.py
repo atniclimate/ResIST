@@ -256,6 +256,12 @@ def test_snapshot_reads_a_saved_resolution(data_root):
     assert not rp.diff(paged, nulled, set())["swap_ok"]
     assert rp.diff(paged, nulled, {"res-26-34"})["swap_ok"]
 
+    with sqlite3.connect(db) as con:
+        con.execute("create table curator_review(resolution_id integer)")
+        con.execute("insert into curator_review select id from resolution")
+    reviewed = rp.snapshot(db)
+    assert not rp.diff(reviewed, nulled, {"res-26-34"})["swap_ok"]
+
 
 def _tree(tmp_path: Path, missing: str) -> tuple[Path, list[str]]:
     """A tmp live pool with every input present except `missing`; returns (live, argv)."""
@@ -270,6 +276,8 @@ def _tree(tmp_path: Path, missing: str) -> tuple[Path, list[str]]:
         if k != missing:
             p.write_bytes(b"")
     report = live / "logs" / "report.json"
+    if missing == "report-in-output":
+        report = live / "tmp" / "rebuild" / "db" / "resolutions.db"
     if missing == "report-exists":
         report.write_bytes(b"")
     out = {"out-exists": live / "tmp" / "taken", "out-outside-pool-tmp": tmp_path / "elsewhere"}.get(
@@ -283,6 +291,7 @@ def _tree(tmp_path: Path, missing: str) -> tuple[Path, list[str]]:
     ("ingest-log-absent", "log"), ("manifest-absent", "manifest"), ("report-exists", "report-exists"),
     # conftest has imported src.storage.database, so with every input present the last check refuses
     ("database-module-already-imported", "nothing"),
+    ("report-inside-output", "report-in-output"),
 ])
 def test_refuses_bad_arguments(tmp_path, capsys, code, missing):
     live, argv = _tree(tmp_path, missing)

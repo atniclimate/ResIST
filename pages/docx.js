@@ -238,12 +238,11 @@ function ncaiForm(m, w) {
 }
 
 // ---- section 3: Drafting Notes ----------------------------------------------------------------------------------
-const TEXT_STATE = { verbatim: "Verbatim", cleaned: "Verbatim, page header removed", edited: "Edited by the drafter" };
-const sha16 = s => String(s ?? "").slice(0, 16);
+const TEXT_STATE = { unverified: "Source unverified", verbatim: "Verbatim", cleaned: "Verbatim, page header removed", edited: "Edited by the drafter" };
 function notes(m, w) {
   const S = { sz: 20 }, grey = { sz: 20, color: "595959" };
-  const out = [para(run("Prepared with ResIST. These notes record where carried clauses and citations came from and what " +
-    "Policy Sentinel found. Delete this section before submitting if it is not wanted.", { i: true }))];
+  const out = [para(run("Prepared with ResIST. These notes list source details for carried clauses and citations, along with " +
+    "saved policy notes. Delete this section before submitting if it is not wanted.", { i: true }))];
   const H = { b: true, sz: 20 };
   const table = (heading, cols, head, rows) => {
     const cell = (content, width) => `<w:tc><w:tcPr><w:tcW w:w="${width}" w:type="dxa"/></w:tcPr>${para(content, { after: 40 })}</w:tc>`;
@@ -254,23 +253,23 @@ function notes(m, w) {
       `<w:tblGrid>${cols.map(c => `<w:gridCol w:w="${c}"/>`).join("")}</w:tblGrid>` +
       row(head.map(t => run(t, H)), true) + rows.map(r => row(r)).join("") + "</w:tbl>", blank({ after: 160 }));
   };
-  const source = (url, documentId) => w.link(url, S) + `<w:r><w:br/></w:r>` + run(`SHA-256 ${sha16(documentId)}`, grey);
+  const source = url => w.link(url, S);
   if (m.sources.length) table("Sources of Carried Clauses", [1500, 3400, 1500, 2960], ["Position", "ATNI resolution", "Text", "Source"],
     m.sources.map(s => [
       run(s.position, S),
       run([s.number, s.title, s.year].map(x => String(x ?? "")).filter(Boolean).join(", "), S),
-      run(TEXT_STATE[s.state] || "Verbatim", S),
-      source(s.url, s.documentId),
+      run(TEXT_STATE[s.state] || "Source unverified", S),
+      source(s.url),
     ]));
   if (m.citations?.length) table("Carried Citations", [1500, 3100, 2300, 2460], ["Position", "Citation", "From", "Source"],
-    m.citations.map(c => [run(c.position, S), run(String(c.text ?? ""), S), run(citeFrom(c), S), source(c.url, c.documentId)]));
+    m.citations.map(c => [run(c.position, S), run(String(c.text ?? ""), S), run(citeFrom(c), S), source(c.url)]));
   for (const n of m.notes) {
     const meta = [n.issuingBody, n.kind, usDate(n.date)].map(x => String(x ?? "")).filter(Boolean).join(", ");
     out.push(para(run(String(n.title ?? ""), { b: true }), { keep: true, after: 40 }));
     if (meta) out.push(para(run(meta), { after: 40 }));
     if (n.officialUrl) out.push(para(w.link(n.officialUrl), { after: 40 }));
     const on = usDate(n.retrievedAt) || "an unrecorded date";
-    out.push(para(run(n.receiptSha256 ? `Read by Policy Sentinel on ${on}; text SHA-256 ${sha16(n.receiptSha256)}`
+    out.push(para(run(n.unverified ? "Saved policy note. Its source and quotations are unverified." : n.receiptSha256 ? `Read by Policy Sentinel on ${on}`
       : `Details from Policy Sentinel on ${on}; no policy text was read.`), { after: 120 }));
     for (const i of (Array.isArray(n.issues) ? n.issues : []).filter(x => x && typeof x === "object")) {
       out.push(para(run(`${String(i.label ?? "")}: “${String(i.quote ?? "")}”`) + (i.locator ? run(` (${String(i.locator)})`) : ""), { after: 0, ind: 360, keep: true }));
@@ -279,7 +278,7 @@ function notes(m, w) {
     if (String(n.comment ?? "").trim()) out.push(para(run(`Drafter's note: ${String(n.comment).trim()}`), { after: 120 }));
     out.push(blank({ after: 120 }));
   }
-  if (m.notes.length) out.push(para(run("Policy Sentinel's flags come from automated demo rules. They quote the policy text and are not legal conclusions.", { sz: 20, i: true })));
+  if (m.notes.some(n => !n.unverified)) out.push(para(run("Policy Sentinel's flags come from automated demo rules. They quote the policy text and are not legal conclusions.", { sz: 20, i: true })));
   return out.join("");
 }
 

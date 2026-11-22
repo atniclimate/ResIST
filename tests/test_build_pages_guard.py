@@ -69,6 +69,7 @@ def manifest(res_dir: Path, *names: str, real_urls: bool = False) -> Path:
     """A manifest derived at test time from the fixture files: fetched atni-table rows, url = fixture path (which the
     export refuses as a source), or with real_urls the fixture's own atnitribes.org address (which it admits)."""
     res_dir.mkdir()
+    (res_dir / "manifest-ncai.csv").write_text("sha256\n", encoding="utf-8")
     with open(res_dir / "manifest-atni.csv", "w", encoding="utf-8", newline="") as f:
         w = csv.DictWriter(f, fieldnames=MANIFEST_HEADER)
         w.writeheader()

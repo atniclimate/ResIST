@@ -37,7 +37,7 @@ def _png_size(path: Path) -> tuple[int, int]:
 
 class PdfInProcess:
     name = "pdf-inprocess"
-    version = "2"
+    version = "3"
     media_types = frozenset({"application/pdf"})
 
     def __init__(self, backend=None, router=None, ocr=None, config: _config.Config | None = None):
@@ -127,15 +127,18 @@ class PdfInProcess:
                 o = self.ocr.recognize(PageImage(doc.sha256, i, str(png), DPI, w, h))
             finally:
                 png.unlink(missing_ok=True)
+            if o.status == "empty" and layer.text.strip():
+                pages.append(PageResult(i, "native", "low_confidence", layer.text, error="ocr-empty-native-retained"))
+                continue
             pages.append(PageResult(i, "ocr", _STATUS[o.status], o.text, error=o.error,
                                     score=o.score, score_scale=o.score_scale))
         dispositions = {p.disposition for p in pages}
         if "failed" in dispositions:
             disp = "failed"
-        elif "extracted" not in dispositions:
-            disp = "empty"
         elif "low_confidence" in dispositions:
             disp = "low_confidence"
+        elif "extracted" not in dispositions:
+            disp = "empty"
         else:
             disp = "extracted"
         return DocumentResult(doc.sha256, doc.media_type, disp, n, tuple(pages),

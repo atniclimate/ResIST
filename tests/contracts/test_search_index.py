@@ -5,6 +5,7 @@ in an assertion message (rowids and counts only).
 """
 
 import unicodedata
+import sqlite3
 from itertools import groupby
 
 import pytest
@@ -36,6 +37,62 @@ def test_hit_spans_verbatim(subject):
         full = texts[s.sha256]
         assert s.text_sha256 == h(full) and 0 <= s.start < s.end <= len(full), s.sha256
         assert h(s.quote) == h(full[s.start:s.end]), (s.sha256, s.start, s.end)
+
+
+def test_failed_build_can_retry(tmp_path, monkeypatch):
+    from resist.index.fts5 import Fts5Index
+    from resist.models import IndexDoc
+    from resist.services import policy
+
+    monkeypatch.setenv("RESIST_DATA_DIR", str(tmp_path))
+    monkeypatch.setattr(policy, "default_res_dir", lambda: tmp_path)
+    index = Fts5Index(tmp_path / "search.sqlite")
+    doc = IndexDoc("a" * 64, None, None, "fixture", "T0")
+    with pytest.raises(sqlite3.IntegrityError):
+        index.build([doc, doc])
+    assert not index.available().ok
+    index.build([doc])
+    assert index.available().ok
+
+
+def test_search_rechecks_current_tier_and_quarantine_before_limit(tmp_path, monkeypatch):
+    from resist.index.fts5 import Fts5Index
+    from resist.models import IndexDoc
+    from resist.services import policy
+
+    monkeypatch.setenv("RESIST_DATA_DIR", str(tmp_path))
+    monkeypatch.setattr(policy, "default_res_dir", lambda: tmp_path)
+    tier_file = tmp_path / "pool.yaml"
+    tier_file.write_text("pool_max_tier: T1", encoding="utf-8")
+    a, b = "a" * 64, "b" * 64
+    index = Fts5Index(tmp_path / "index.db")
+    index.build([IndexDoc(a, None, None, "river", "T1"), IndexDoc(b, None, None, "river", "T0")])
+    query = SearchRequest("river", limit=1)
+    assert index.search(query).hits[0].sha256 == a
+    tier_file.write_text("pool_max_tier: T0", encoding="utf-8")
+    assert index.search(query).hits[0].sha256 == b
+    (tmp_path / "manifest-ncai.csv").write_text(f"sha256\n{b}\n", encoding="utf-8")
+    assert index.search(query).hits == ()
+
+
+def test_legacy_standalone_missing_asserted_tier(tmp_path, monkeypatch):
+    from resist.index.fts5 import Fts5Index
+    from resist.models import IndexDoc
+    from resist.services import policy
+
+    monkeypatch.setenv("RESIST_DATA_DIR", str(tmp_path))
+    monkeypatch.setattr(policy, "default_res_dir", lambda: tmp_path)
+    index = Fts5Index(tmp_path / "index.db")
+    index.build([IndexDoc("a" * 64, None, None, "river", "T0")])
+    con = sqlite3.connect(index.db_path)
+    try:
+        con.execute("ALTER TABLE resolution DROP COLUMN asserted_tier")
+        con.commit()
+    finally:
+        con.close()
+    assert index.search(SearchRequest("river")).hits == ()
+    (tmp_path / "pool.yaml").write_text("pool_max_tier: T3", encoding="utf-8")
+    assert len(index.search(SearchRequest("river")).hits) == 1
 
 
 def test_pool_index_complete():

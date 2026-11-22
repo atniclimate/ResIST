@@ -29,14 +29,14 @@ from tempfile import TemporaryDirectory
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 from resist import netguard
-from resist.errors import ArtifactError, BadInput, DependencyError
+from resist.errors import ArtifactError, BadInput, DependencyError, InvalidConfig
 from resist.index import FTS5_TOKENIZE, has_d013_tokenizer, resolution_fts_ddl
 from resist.models import ClauseText, RefCandidate, max_tier
 from resist.refs import find_with, load_resolvers
 from resist.services import capabilities, edges, policy
 from resist.services.reports import SOURCE_URL
 from src.ingestion.parser import normalize_resolution_number
-from src.storage.database import DATA_DIR, DATABASE_PATH
+from src.storage.database import DATA_DIR, DATABASE_PATH, archive_writer
 
 # (table, column) pairs that must point at an existing resolution.id (ownership closure, Codex LR-A 5)
 OWNED = (("statement", "resolution_id"), ("citation", "resolution_id"), ("citation", "linked_resolution_id"),
@@ -369,7 +369,7 @@ def _build(res_dir: Path, live: sqlite3.Connection, out: Path) -> int:
         print("live index tokenizer is not D-013; run scripts/retokenize_fts.py", file=sys.stderr)
         return 1
     # Public site: T0 only, never quarantined, tier = max(source_policy, stored document.tier) (counts only)
-    refused = sum(not _public(d, res_dir, stored.get(d)) for d in doc_ids)
+    refused = sum((d in stored and stored[d] is None) or not _public(d, res_dir, stored.get(d)) for d in doc_ids)
     if refused:
         print(f"{refused} of {len(doc_ids)} documents are not T0 or are quarantined; refusing to build",
               file=sys.stderr)
@@ -574,19 +574,26 @@ def main(res_dir: Path) -> int:
                     if content is not None:
                         (frozen / name).write_bytes(content)
                 # SQLite's backup API yields a consistent private snapshot without a long-lived source lock.
-                with closing(sqlite3.connect(DATABASE_PATH.resolve().as_uri() + "?mode=ro", uri=True)) as live, \
+                with closing(sqlite3.connect(DATABASE_PATH.resolve().as_uri() + "?mode=rw", uri=True)) as live, \
                         closing(sqlite3.connect(":memory:")) as snapshot:
+                    source_version = live.execute("pragma data_version").fetchone()
                     live.backup(snapshot)
-                    live.close()
                     status = _build(frozen, snapshot, work / "site")
-                if status:
-                    return status
-                if _manifest_bytes(res_dir) != inputs:
-                    raise ArtifactError("source policy changed during build; refusing to promote")
-                out.parent.mkdir(parents=True, exist_ok=True)
-                _promote(work / "site", out)
+                    if status:
+                        return status
+                    with archive_writer():
+                        live.execute("begin immediate")
+                        if live.execute("pragma data_version").fetchone() != source_version:
+                            raise ArtifactError("source database changed during build; retry before promotion")
+                        if _manifest_bytes(res_dir) != inputs:
+                            raise ArtifactError("source policy changed during build; refusing to promote")
+                        out.parent.mkdir(parents=True, exist_ok=True)
+                        _promote(work / "site", out)
         print(json.dumps({"out": str(out), **json.loads((out / "build.json").read_text(encoding="utf-8"))}))
         return 0
+    except InvalidConfig as e:
+        print(f"invalid source policy: {e}; refusing to build", file=sys.stderr)
+        return e.exit_code
     except (OSError, sqlite3.Error, ValueError, TypeError) as e:
         raise ArtifactError(f"{type(e).__name__} during export; previous output retained or recoverable") from None
 

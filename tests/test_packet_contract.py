@@ -93,6 +93,7 @@ def test_policy_cache_binds_content_not_timestamp(tmp_path):
 
 
 def test_v1_and_v2_share_evidence_without_relabeling(tmp_path, monkeypatch):
+    (tmp_path / "manifest-ncai.csv").write_text("sha256\n", encoding="utf-8")
     source = tmp_path / "marker.bin"
     source.write_bytes(b"neutral metadata candidate")
     sha = reports.hashlib.sha256(source.read_bytes()).hexdigest()

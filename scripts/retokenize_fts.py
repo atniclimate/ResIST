@@ -44,15 +44,16 @@ def _typed(v):
     return ["blob", v.hex()] if isinstance(v, bytes) else [type(v).__name__, v]
 
 
-def _digests(con: sqlite3.Connection) -> dict[str, list]:
+def _digests(con: sqlite3.Connection, *, exclude=()) -> dict[str, list]:
     """Row count and sha256 of the typed (rowid, *) rows of every non-FTS table."""
     out = {}
     for name, sql in con.execute("select name, sql from sqlite_master where type = 'table' order by name"):
-        if name in FTS_NAMES:
+        if name in FTS_NAMES or name in exclude:
             continue
         # a WITHOUT ROWID table has no rowid; its plain scan is in primary-key order
         no_rowid = "without rowid" in (sql or "").lower()
-        query = f'select * from "{name}"' if no_rowid else f'select rowid, * from "{name}" order by rowid'
+        quoted = '"' + name.replace('"', '""') + '"'
+        query = f'select * from {quoted}' if no_rowid else f'select rowid, * from {quoted} order by rowid'
         h, rows = hashlib.sha256(), 0
         for row in con.execute(query):
             h.update(json.dumps([_typed(v) for v in row]).encode("utf-8") + b"\n")
@@ -86,13 +87,16 @@ def _vocab(con: sqlite3.Connection) -> dict[str, int]:
 def retokenize(src: Path, dst: Path) -> tuple[dict, list[str]]:
     """Copy src to dst, retokenize dst, verify it. Returns (report, failed check names)."""
     report = {"src_sha256": _sha_file(src)}
-    ro = sqlite3.connect(f"file:{src.as_posix()}?mode=ro", uri=True)
+    ro = sqlite3.connect(src.resolve().as_uri() + "?mode=ro", uri=True)
     con = sqlite3.connect(dst)
     try:  # one finally closes dst even when the backup fails, so main() can unlink it on Windows
         try:
             ro.backup(con)
         finally:
             ro.close()
+        con.close()  # Finish any WAL checkpoint before fingerprinting the private copy.
+        report["input_snapshot_sha256"] = _sha_file(dst)
+        con = sqlite3.connect(dst)
         pre, pre_schema = _digests(con), _schema(con)
         con.execute("drop table resolution_fts")  # shadow tables go with it; the triggers on resolution stay
         con.execute(resolution_fts_ddl())
@@ -142,6 +146,11 @@ def main(argv: list[str] | None = None) -> int:
         print("refused: dst must be under RESIST_DATA_DIR/tmp", file=sys.stderr)
         return 1
     dst.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        dst.touch(exist_ok=False)
+    except FileExistsError:
+        print("refused: dst exists", file=sys.stderr)
+        return 1
     try:
         report, failed = retokenize(src, dst)
     except Exception as e:  # the type name only: a message could carry corpus text

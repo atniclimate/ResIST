@@ -30,11 +30,12 @@ from datetime import UTC, date, datetime
 from pathlib import Path
 
 from sqlmodel import Session, select
+from sqlalchemy import text as sql
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from resist import config, netguard, registry  # noqa: E402
 from resist.errors import ArtifactError, ResistError  # noqa: E402
-from resist.services import policy  # noqa: E402
+from resist.services import policy, works  # noqa: E402
 from resist.services.extraction_evidence import record_extraction, validate_extraction
 from src.analysis.graph import ResolutionGraph, build_graph_from_resolutions  # noqa: E402
 from src.analysis.keywords import extract_all_keywords  # noqa: E402
@@ -42,7 +43,7 @@ from src.analysis.linker import add_citation_edges_to_graph, link_all_references
 from src.ingestion.parser import normalize_resolution_number, parse_resolution  # noqa: E402
 from src.ingestion.validator import flag_for_review  # noqa: E402
 from src.models.resolution import Resolution  # noqa: E402
-from src.storage.database import get_engine, init_db  # noqa: E402
+from src.storage.database import archive_writer, get_engine, init_db  # noqa: E402
 from src.storage.repository import save_resolution  # noqa: E402
 
 CONVENTIONS = {"winter": "Winter", "annual": "Annual", "mid year": "Mid-Year", "midyear": "Mid-Year"}
@@ -58,8 +59,7 @@ def convention_of(raw: str, number: str):
     kind = next((v for k, v in CONVENTIONS.items() if k in low), None)
     year = next((int(t) for t in raw.split() if t.isdigit() and len(t) == 4), None)
     if year is None and number:
-        yy = int(number[:2])
-        year = 1900 + yy if yy > 50 else 2000 + yy
+        year = works.number_year(number)
     return (f"{kind} Convention" if kind else (raw or None)), year
 
 
@@ -91,30 +91,50 @@ def main(res_dir: Path, stored: Mapping[str, tuple[str, int, int]] | None = None
         if r["status"] == "fetched" and r["sha256"]:
             by_sha[r["sha256"]].append(r)
 
-    init_db()
-    run_id = datetime.now(UTC).strftime("ingest-%Y%m%dT%H%M%SZ")
-    work = config.data_dir() / "tmp" / run_id
-    work.mkdir(parents=True, exist_ok=True)
-    try:
-        return _ingest(res_dir, extractor, table, media, by_sha, work, stored or {})
-    finally:
-        shutil.rmtree(work, ignore_errors=True)
+    with archive_writer():
+        init_db()
+        run_id = datetime.now(UTC).strftime("ingest-%Y%m%dT%H%M%SZ")
+        work = config.data_dir() / "tmp" / run_id
+        work.mkdir(parents=True, exist_ok=True)
+        try:
+            return _ingest(res_dir, extractor, table, media, by_sha, work, stored or {})
+        finally:
+            shutil.rmtree(work, ignore_errors=True)
 
 
 def _ingest(res_dir, extractor, table, media, by_sha, work, stored: Mapping[str, tuple[str, int, int]]) -> int:
     engine = get_engine()
     failed = done = skipped = refused = skipped_ocr = 0
     with Session(engine) as session:
+        session.execute(sql("CREATE TABLE IF NOT EXISTS pending_ingest_review "
+                            "(document_id TEXT PRIMARY KEY, pages INTEGER, confidence REAL)"))
+        def deliver_review(document_id, pages, confidence):
+            flag_for_review(document_id, ocr_confidence=0.5, reason=f"tesseract_ocr_unverified:{pages}_pages",
+                            parse_confidence=confidence, reuse_existing=True)
+            session.execute(sql("DELETE FROM pending_ingest_review WHERE document_id=:id"), {"id": document_id})
+            session.commit()
+
+        for document_id, pages, confidence in session.execute(sql("SELECT * FROM pending_ingest_review")).all():
+            try:
+                deliver_review(document_id, pages, confidence)
+            except Exception as exc:
+                session.rollback()
+                log(f"Pending review delivery failed: {type(exc).__name__}")
+                failed += 1
         have = set(session.exec(select(Resolution.document_id)).all())
         for n, (sha, rows) in enumerate(sorted(by_sha.items()), 1):
             if sha in have:
                 skipped += 1
                 continue
-            ids = sorted({i for r in rows for i in r["table_wdt_ids"].split(";") if i}, key=int)
-            trow = table.get(ids[0]) if ids else None
-            path = rows[0]["local_path"]
+            path = rows[0].get("local_path")
             ex = None  # Stored-text rebuilds have no historical extraction result.
             try:
+                ids = {i.strip() for r in rows for i in r["table_wdt_ids"].split(";") if i.strip()}
+                if any(not i.isascii() or not i.isdecimal() for i in ids):
+                    print(json.dumps({"sha256": sha, "status": "failed", "error": "invalid-table-id"}), flush=True)
+                    failed += 1
+                    continue
+                trow = table.get(min(ids, key=int)) if ids else None
                 sp = policy.source_policy(sha, res_dir)  # inside the try: one bad manifest sha fails one row
                 if not policy.admissible(sp):  # nothing is opened
                     refused += 1
@@ -141,7 +161,7 @@ def _ingest(res_dir, extractor, table, media, by_sha, work, stored: Mapping[str,
                     if ex.disposition == "failed":
                         raise ArtifactError(ex.extra.get("error") or "page-failed")
                     text, pages = ex.text, ex.page_count
-                    ocr_pages = sum(1 for p in ex.pages if p.route == "ocr" and p.disposition != "failed")
+                    ocr_pages = sum(1 for p in ex.pages if p.route == "ocr" or p.error == "ocr-empty-native-retained")
                     pr = parse_resolution(text, sha, [p.text for p in ex.pages])
                 if trow:
                     number = normalize_resolution_number(trow["number"]) or trow["number"] or None
@@ -157,21 +177,23 @@ def _ingest(res_dir, extractor, table, media, by_sha, work, stored: Mapping[str,
                 own = normalize_resolution_number(number)
                 pr.citations = [c for c in pr.citations
                                 if not own or normalize_resolution_number(c["normalized"]) != own]
-                name, year = convention_of(conv_raw, own or "")
+                name, year = convention_of(conv_raw, (trow["number"] if trow else None) or number or "")
                 pr.convention = {"name": name, "year": year, "location": (pr.convention or {}).get("location")}
                 pr.date_adopted = next(filter(None, (filename_date(r["local_path"]) for r in rows)), pr.date_adopted)
                 if committee:
                     pr.sponsors["committee"] = committee
                 if not text.strip():
                     pr.needs_review = True
-                res = save_resolution(session, pr, text, extraction=ex)
+                res = save_resolution(session, pr, text, extraction=ex, commit=False)
                 res.title = title
                 res.needs_review = pr.needs_review or ocr_pages > 0
                 session.add(res)
+                if ocr_pages:
+                    session.execute(sql("INSERT INTO pending_ingest_review VALUES (:id, :pages, :confidence)"),
+                                    {"id": sha, "pages": ocr_pages, "confidence": pr.confidence_score})
                 session.commit()
                 if ocr_pages:
-                    flag_for_review(sha, ocr_confidence=0.5, reason=f"tesseract_ocr_unverified:{ocr_pages}_pages",
-                                    parse_confidence=pr.confidence_score)
+                    deliver_review(sha, ocr_pages, pr.confidence_score)
                 done += 1
                 print(json.dumps({"sha256": sha, "number": number, "pages": pages, "ocr_pages": ocr_pages,
                                   "whereas": len(pr.whereas_statements), "resolved": len(pr.resolved_statements),

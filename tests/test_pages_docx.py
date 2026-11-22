@@ -196,13 +196,13 @@ def test_drafting_notes(built):
     notes = text(d.element.body)
     assert "Prepared with ResIST." in notes
     # Since LR-D (D-071) the stored clause carries no running header, so no "page header removed" note applies
-    assert "Verbatim" in notes and "SHA-256 5b62a9708e4081fd" in notes
-    assert "Read by Policy Sentinel on 10/19/2026; text SHA-256 b3ee0b8f7d68c588" in notes
+    assert "Verbatim" in notes and "SHA-256" not in notes
+    assert "Read by Policy Sentinel on 10/19/2026" in notes
     assert "Consultation wording: “Executive Order 13175" in notes
     assert "Drafter's note: Check the consultation section before the committee meets." in notes
     assert "are not legal conclusions." in notes
     cite = json.loads((built / "statements.json").read_text(encoding="utf-8"))["cite"]
-    assert "Carried Citations" in notes and f"SHA-256 {cite['documentId'][:16]}" in notes
+    assert "Carried Citations" in notes and cite["documentId"][:16] not in notes
     assert notes.index("Sources of Carried Clauses") < notes.index("Carried Citations") < notes.index("Read by Policy")
     links = {r.target_ref for r in d.part.rels.values() if r.is_external}
     assert "https://www.federalregister.gov/d/2025-23880" in links

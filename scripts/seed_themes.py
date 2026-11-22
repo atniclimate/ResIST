@@ -8,6 +8,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from sqlmodel import Session, select
 from src.storage.database import init_db, get_engine
 from src.models.resolution import Theme, ResolutionTheme, Resolution
+from src.ingestion.parser import normalize_resolution_number
 
 
 # 10 curated themes based on SESSION-TOPICS-PAGE.md analysis
@@ -116,8 +117,10 @@ def seed_themes():
 
             for res_num in resolution_numbers:
                 # Find resolution by resolution_number
+                canonical = normalize_resolution_number(res_num)
                 resolution = session.exec(
-                    select(Resolution).where(Resolution.resolution_number == res_num)
+                    select(Resolution).where(Resolution.resolution_number.in_((res_num, canonical)))
+                    .order_by((Resolution.resolution_number == canonical).desc(), Resolution.id)
                 ).first()
 
                 if not resolution:

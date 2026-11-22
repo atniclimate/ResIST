@@ -9,11 +9,13 @@ import mimetypes
 import re
 
 from fastapi import APIRouter, FastAPI
-from fastapi.responses import FileResponse, PlainTextResponse, Response
+from fastapi.responses import PlainTextResponse, Response
 from fastapi.staticfiles import StaticFiles
 
 from resist import config
+from resist.errors import ArtifactError
 from resist.web import api_v1
+from resist.web.export_files import current_export
 
 PAGES = config.repo_root() / "pages"
 NO_STORE = {"Cache-Control": "no-store"}
@@ -26,10 +28,12 @@ router = APIRouter(prefix="/app")
 
 
 def built(name: str) -> Response:
-    p = config.data_dir() / "exchange" / "pages" / name
-    if not p.is_file():
-        return PlainTextResponse("no site export; run scripts/build_pages.py", status_code=503, headers=NO_STORE)
-    return FileResponse(p, headers=NO_STORE)
+    try:
+        content = current_export(config.data_dir(), name)
+    except ArtifactError as exc:
+        return PlainTextResponse(str(exc), status_code=503, headers=NO_STORE)
+    return Response(content, media_type="application/json" if name.endswith(".json") else "application/octet-stream",
+                    headers=NO_STORE)
 
 
 @router.get("/resolutions.db")
