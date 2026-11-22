@@ -3,7 +3,7 @@
 // researchHTML() is pure; renderResearch() owns the one-level Undo and talks to the collection and the draft's own door.
 import { esc, toast, download } from "./ui.js";
 import { safeUrl } from "./compose.js";
-import { collection, itemKey, itemLabel, draftSource, collectionJson, collectionText, MAX_ITEMS } from "./collect.js";
+import { collection, changeCollection, itemKey, itemLabel, draftSource, collectionJson, collectionText, MAX_ITEMS } from "./collect.js";
 import { store } from "./draft.js";
 
 const plural = (n, one, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
@@ -16,7 +16,7 @@ function rowHTML(item, carried) {
     ? `<a href="${esc(url)}" target="_blank" rel="noopener noreferrer">Open the source PDF<span class="visually-hidden"> (opens in a new tab)</span></a>`
     : "Not recorded";
   const facts = `<dl class="research-facts"><dt>Source PDF</dt><dd class="research-src">${pdf}</dd>
-      <dt>SHA-256</dt><dd><code class="sha">${esc(item.documentId)}</code></dd></dl>`;
+      </dl>`;
   const remove = `<button type="button" class="btn small" data-remove="${key}" aria-label="Remove ${label} from research">Remove</button>`;
   if (!statement) {
     return `<li class="crow research-row" data-kind="resolution"><div class="research-lead"><span class="num">${esc(item.number)}</span></div>
@@ -32,7 +32,7 @@ function rowHTML(item, carried) {
 }
 
 // removed: { item } | null, the one-level Undo shown as a notice; carried(key) -> true when that clause is in the draft.
-export function researchHTML(items, { removed = null, carried = () => false } = {}) {
+export function researchHTML(items, { removed = null, carried = () => false, verified = true, unsaved = false } = {}) {
   const res = items.filter(i => i.kind === "resolution"), sts = items.filter(i => i.kind === "statement");
   const section = (id, title, list) => list.length ? `<section aria-labelledby="${id}"><h2 id="${id}">${title} <span class="n">${list.length}</span></h2>
     <ul class="research-rows">${list.map(i => rowHTML(i, carried)).join("")}</ul></section>` : "";
@@ -45,8 +45,8 @@ export function researchHTML(items, { removed = null, carried = () => false } = 
     : `<div class="empty-state"><h2>Nothing Collected Yet</h2>
       <p>Search the resolutions, then choose Collect on a result or on a clause.</p><a class="btn" href="#/">Search resolutions</a></div>`;
   return `<h1 tabindex="-1">Research</h1>
-    <p class="lead measure">Collect resolutions and single clauses as you search. Each item keeps ATNI's published words exactly, with its source PDF link and the file's SHA-256. Your collection stays in this browser; nothing is sent anywhere.</p>
-    ${gone}${body}`;
+    <p class="lead measure">Collect resolutions and single clauses as you search. ${verified ? "Each item keeps ATNI's published words exactly, with its source PDF link." : "Stored text and source details have not been verified against the resolution database."} Your collection stays in this browser; nothing is sent anywhere.</p>
+    ${unsaved ? '<p class="notice">Your latest changes are only available in this tab. Download your collection before closing it.</p>' : ""}${gone}${body}`;
 }
 
 export function renderResearch(main) {
@@ -56,7 +56,8 @@ export function renderResearch(main) {
   const paint = () => {
     if (removed && collection.has(itemKey(removed.item))) removed = null; // another tab put it back
     const active = globalThis.document?.activeElement, held = !!active && root.contains(active);
-    root.innerHTML = researchHTML(collection.items, { removed, carried: store.isCarried });
+    root.innerHTML = researchHTML(collection.items, { removed, carried: store.isCarried, verified: collection.verified,
+      unsaved: collection.saved?.ok === false });
     if (held) root.querySelector("h1")?.focus(); // the focused control is gone; keep the keyboard in the view
   };
   const change = fn => { own = true; try { return fn(); } finally { own = false; } };
@@ -94,10 +95,10 @@ export function renderResearch(main) {
     const b = e.target.closest?.("button");
     if (!b) return;
     if (b.id === "research-json") { download(collectionJson(collection.items), "resist-research.json", "application/json"); toast("Downloaded resist-research.json"); }
-    else if (b.id === "research-text") { download(collectionText(collection.items), "resist-research.txt", "text/plain;charset=utf-8"); toast("Downloaded resist-research.txt"); }
+    else if (b.id === "research-text") { download(collectionText(collection.items, collection.verified), "resist-research.txt", "text/plain;charset=utf-8"); toast("Downloaded resist-research.txt"); }
     else if (b.id === "research-print") window.print();
-    else if (b.id === "research-undo") undo();
-    else if (b.dataset.remove) remove(b.dataset.remove);
+    else if (b.id === "research-undo") changeCollection(undo);
+    else if (b.dataset.remove) changeCollection(() => remove(b.dataset.remove));
     else if (b.dataset.key) carry(b);
   });
   const off = collection.subscribe(() => { if (!own) paint(); });

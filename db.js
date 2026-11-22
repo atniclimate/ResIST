@@ -18,17 +18,18 @@ async function json(name) {
   return r.json();
 }
 
+export async function verifyDatabase(bytes, manifest) {
+  const digest = new Uint8Array(await crypto.subtle.digest("SHA-256", bytes));
+  const hex = Array.from(digest, b => b.toString(16).padStart(2, "0")).join("");
+  if (hex !== manifest.db_sha256) throw new Error("Database does not match build.json. Reload to fetch the current export.");
+}
+
 export async function load(onProgress = () => {}) {
   // The issue names are optional: a missing, unreadable or refused file only means no names are added to a search.
   const [sqlite3, res, info, capabilities, pinned] = await Promise.all([
     sqlite3InitModule(), fetch("resolutions.db"), json("build.json"), json("capabilities.json"),
     fetch("issues.json").then(r => (r.ok ? r.json() : null)).catch(() => undefined)]); // null: absent, undefined: unreadable
   if (!res.ok) throw new Error(`resolutions.db: HTTP ${res.status}`);
-  build = info;
-  caps = capabilities;
-  issues = issuesFrom(pinned);
-  issuesOk = issues.length > 0;
-  issuesRefused = pinned !== null && !issuesOk;
   const total = Number(res.headers.get("content-length")) || 0, reader = res.body.getReader(), chunks = [];
   let got = 0;
   for (;;) {
@@ -39,12 +40,18 @@ export async function load(onProgress = () => {}) {
   }
   const bytes = new Uint8Array(got);
   let off = 0; for (const c of chunks) { bytes.set(c, off); off += c.length; }
+  await verifyDatabase(bytes, info);
   const p = sqlite3.wasm.allocFromTypedArray(bytes);
   db = new sqlite3.oo1.DB();
   const rc = sqlite3.capi.sqlite3_deserialize(db.pointer, "main", p, bytes.length, bytes.length,
     sqlite3.capi.SQLITE_DESERIALIZE_FREEONCLOSE | sqlite3.capi.SQLITE_DESERIALIZE_READONLY);
   if (rc) throw new Error(`sqlite3_deserialize failed (${rc})`);
-  useDatabase(rows, caps, build); // throws on a manifest or export tokenizer query.js does not speak; load() rejects
+  useDatabase(rows, capabilities, info);
+  build = info;
+  caps = capabilities;
+  issues = issuesFrom(pinned);
+  issuesOk = issues.length > 0;
+  issuesRefused = pinned !== null && !issuesOk;
 }
 
 const rows = (sql, bind = []) => db.exec({ sql, bind, rowMode: "object", returnValue: "resultRows" });

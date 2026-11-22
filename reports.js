@@ -20,6 +20,10 @@ const MESSAGES = {
 export const stateMessage = state => MESSAGES[state] || MESSAGES.failed;
 const counted = (n, label) => `${n} ${label}${n === 1 ? "" : "s"}`;
 let packet = null;
+let fingerprint = null;
+function packetRequest() {
+  return fingerprint ? { request: packet.request, fingerprint } : { packet };
+}
 let packetState = "verified";
 
 export function packetHTML(value) {
@@ -32,18 +36,16 @@ export function packetHTML(value) {
       ${clause.span ? `<blockquote>${esc(clause.span.quote)}</blockquote>` : "<p>Text withheld because its stored identity did not verify.</p>"}
       <details><summary>Clause provenance</summary><dl>
         <dt>Text state</dt><dd>${esc(clause.text_state)}</dd><dt>Locator</dt><dd>${esc(clause.locator_state)}</dd>
-        <dt>Source SHA-256</dt><dd><code>${esc(source.sha256)}</code></dd>
-        <dt>Text SHA-256</dt><dd><code>${esc(source.text_sha256)}</code></dd>
         <dt>Character offsets</dt><dd>${clause.span ? `${esc(clause.span.start)}–${esc(clause.span.end)}` : "Not verified"}</dd>
         </dl></details></div>`).join("") : "<p>No adopted source-asserted clauses are included for this source.</p>"}
     <details><summary>Source and extraction evidence</summary><pre>${esc(JSON.stringify({
-      sha256: source.sha256, work_id: source.work_id, source_file_state: source.source_file_state,
-      chronology: source.chronology, extraction: source.extraction,
+      work_id: source.work_id, source_file_state: source.source_file_state,
+      chronology: source.chronology, extraction: source.extraction?.state,
     }, null, 2))}</pre></details></section>`).join("");
   const citations = value.citations.map(citation => `<li><blockquote>${esc(citation.reference.span.quote)}</blockquote>
     <p>${esc(citation.state)}: ${esc(citation.reason)}</p></li>`).join("");
   return `<p class="report-counts">${counted(value.sources.length, "source")} · ${counted(value.citations.length, "citation occurrence")}</p>
-    <p class="measure">Quotations use the stored normalized extraction; headers, whitespace and terminal punctuation may differ from the original PDF. Original-file hashes and extraction records are separate checks.</p>
+    <p class="measure">Quotations use the stored normalized extraction; headers, whitespace and terminal punctuation may differ from the original PDF.</p>
     <p>${esc(counted(counts.missing_pages, "clause page"))} missing; ${esc(counted(counts.citation_missing_pages, "citation page"))} missing;
       ${esc(counted(counts.missing_extraction_records, "source"))} without historical extraction records.</p>
     <h2>Source quotations</h2>${sources}<h2>Cited evidence and gaps</h2>
@@ -94,7 +96,7 @@ export function renderReports(main) {
   async function recheck(focus = false) {
     pending(true); packetState = "generating"; showPacket(); state("generating");
     try {
-      const response = await post("/verify", { packet });
+      const response = await post("/verify", packetRequest());
       const result = await response.json();
       if (!current()) return;
       packetState = result.status; pending(false); showPacket(); state(packetState, focus);
@@ -111,6 +113,7 @@ export function renderReports(main) {
       const result = await response.json();
       if (!current()) return;
       packet = response.ok ? result.packet : null;
+      fingerprint = response.ok ? result.fingerprint : null;
       packetState = result.status; pending(false); showPacket(); state(result.status, true);
     } catch {
       if (current()) { packet = null; pending(false); showPacket(); state("failed", true); }
@@ -123,7 +126,7 @@ export function renderReports(main) {
     if (!format) { await recheck(true); return; }
     pending(true); packetState = "generating"; showPacket(); state("generating");
     try {
-      const response = await post("/download", { packet, format });
+      const response = await post("/download", { ...packetRequest(), format });
       if (!current()) return;
       if (response.ok) {
         download(await response.arrayBuffer(), `packet.${format}`, response.headers.get("content-type"));

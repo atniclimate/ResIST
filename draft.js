@@ -19,8 +19,8 @@ const parseDraft = text => validDraft(JSON.parse(text, (k, v) => k === "toString
 
 // ---- Store -------------------------------------------------------------------------------------------------------
 
-function loadDraft() {
-  try { return parseDraft(local.get(KEY)) || newDraft(); } catch { return newDraft(); }
+function readStoredDraft(stored) {
+  try { return parseDraft(stored); } catch { return null; }
 }
 // Provenance is the database's, never the draft's: a stored or opened draft is untrusted (D-054). Once the database
 // has loaded, each carried clause's source is replaced by the database's record, and a clause whose source text is
@@ -28,6 +28,7 @@ function loadDraft() {
 // does not hold at those offsets with those words loses its mark and its words stay as typed text; a lookup answering
 // undefined (an export without the cite table) leaves it unchecked. Returns whether anything changed.
 let sourceOf = null, citeOf = null;
+const composeDraft = value => compose(value, { sourcesChecked: !!sourceOf, citationsChecked: !!citeOf });
 let checkNote = "";   // what the last checkSources() found; quiet lets the caller fold it into its own single toast
 function checkSources(d, quiet = false) {
   checkNote = "";
@@ -58,7 +59,51 @@ function checkSources(d, quiet = false) {
   if (checkNote && !quiet) toast(checkNote);
   return changed;
 }
-let draft = loadDraft();
+let lastStored = local.get(KEY);
+let draft = readStoredDraft(lastStored) || newDraft();
+let baseline = structuredClone(draft);
+const recoveryPrefix = KEY + "-conflict-";
+const backupPrefix = KEY + "-backup-";
+const recoveryKey = key => typeof key === "string" && (key.startsWith(recoveryPrefix) || key.startsWith(backupPrefix));
+
+function recoveryKeys() {
+  try { return Object.keys(localStorage).filter(recoveryKey).sort(); }
+  catch { return []; }
+}
+
+// Compare both edits with the version this tab last saw. Keep each clause's text and provenance together.
+function mergeDrafts(base, mine, theirs) {
+  let conflict = false;
+  const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+  function merge(b, m, t, key) {
+    if (same(m, b)) return t;
+    if (same(t, b) || same(t, m)) return m;
+    if (["whereas", "resolved", "notes"].includes(key) && [b, m, t].every(Array.isArray)
+        && [...b, ...m, ...t].every(item => typeof item?.id === "string")) {
+      const [before, current, remote] = [b, m, t].map(list => new Map(list.map(item => [item.id, item])));
+      const common = list => list.map(item => item.id).filter(id => before.has(id) && current.has(id) && remote.has(id));
+      const localMoved = !same(common(b), common(m));
+      if (localMoved && !same(common(b), common(t)) && !same(common(m), common(t))) conflict = true;
+      const [primary, secondary] = localMoved ? [m, t] : [t, m];
+      const order = primary.map(item => item.id);
+      let anchor = order.length;
+      for (let i = secondary.length - 1; i >= 0; i--) {
+        const id = secondary[i].id, index = order.indexOf(id);
+        if (index < 0) order.splice(anchor, 0, id);
+        else anchor = index;
+      }
+      return order.map(id => merge(before.get(id), current.get(id), remote.get(id), "item")).filter(Boolean);
+    }
+    if (key !== "item" && [b, m, t].every(v => v && typeof v === "object" && !Array.isArray(v))) {
+      return Object.fromEntries([...new Set([...Object.keys(m), ...Object.keys(t)])]
+        .map(k => [k, merge(b[k], m[k], t[k], k)]));
+    }
+    conflict = true;
+    return m;
+  }
+  const merged = merge(base, mine, theirs, "");
+  return { merged, conflict };
+}
 const subs = new Set();
 let saved = null;   // { ok, at } from the last save attempt
 let pending = 0;    // typing debounce timer
@@ -70,9 +115,49 @@ let removed = null;
 // box (D12). Module state only: never saved, and setting it never notifies (a repaint would move the caret).
 let insertAt = null;
 
+let queued = false;
+let saving;
+let unlockedBackup;
 function save() {
   clearTimeout(pending); pending = 0;
-  saved = { ok: local.set(KEY, JSON.stringify(draft)), at: new Date() };
+  const locks = globalThis.navigator?.locks;
+  if (!locks) {
+    // Without shared locks, keep this tab's latest edit independently recoverable.
+    unlockedBackup ??= backupPrefix + Date.now() + "-" + newId();
+    if (local.set(unlockedBackup, JSON.stringify(draft))) persist();
+    else saved = { ok: false, at: new Date() };
+    return;
+  }
+  if (queued) return;
+  queued = true;
+  saving = locks.request(KEY, () => {
+    queued = false;
+    persist();
+    view?.status();
+  }).catch(() => {
+    queued = false;
+    saved = { ok: false, at: new Date() };
+    view?.status();
+  });
+}
+function persist() {
+  const stored = local.get(KEY);
+  let reconciled = false;
+  const remote = stored !== lastStored && (stored === null ? newDraft() : readStoredDraft(stored));
+  if (remote) {
+    const { merged, conflict } = mergeDrafts(baseline, draft, remote);
+    if (conflict && stored !== null && !local.set(recoveryPrefix + Date.now() + "-" + newId(), stored)) {
+      saved = { ok: false, at: new Date() };
+      return;
+    }
+    draft = merged;
+    checkSources(draft);
+    reconciled = true;
+  }
+  const text = JSON.stringify(draft);
+  saved = { ok: local.set(KEY, text), at: new Date() };
+  if (saved.ok) { lastStored = text; baseline = structuredClone(draft); }
+  if (reconciled) notify();
 }
 function notify(except) {
   for (const fn of [...subs]) if (fn !== except) try { fn(draft); } catch (e) { console.error(e); }
@@ -83,6 +168,8 @@ function closingAt(list) { let i = list.length; while (i > 0 && isStandard(list[
 const isClosing = c => isStandard(c.text) && !isNcaiTransmittal(c.text);
 
 export const store = {
+  snapshot,
+  type: typed,
   get draft() { return draft; },
   get removed() { return removed; },
   update(fn) { removed = null; fn(draft); save(); notify(); },
@@ -165,7 +252,8 @@ export const store = {
   // for carried citations (optional; undefined from it means the export cannot check them).
   verifyWith(lookup, citeLookup) {
     sourceOf = lookup; citeOf = citeLookup ?? null;
-    if (checkSources(draft)) { save(); notify(); }
+    if (checkSources(draft)) save();
+    notify();
   },
   reset() { draft = newDraft(); removed = null; insertAt = null; save(); notify(); },
 };
@@ -177,13 +265,23 @@ function typed(fn) {
   pending = setTimeout(() => { save(); notify(view?.sub); view?.status(); }, 300);
   view?.live();
 }
-const flush = () => { if (pending) { save(); notify(view?.sub); } };
-globalThis.addEventListener?.("pagehide", () => { if (pending) save(); });
+async function snapshot() {
+  if (pending) { save(); notify(view?.sub); }
+  await saving;
+  return structuredClone(draft);
+}
+globalThis.addEventListener?.("pagehide", () => {
+  if (pending) save();
+  if (queued) local.set(backupPrefix + Date.now() + "-" + newId(), JSON.stringify(draft));
+});
 // Another tab saved the draft: take its copy, so this tab's next save cannot overwrite it with a stale one.
 globalThis.addEventListener?.("storage", e => {
-  if (e.key !== KEY) return;
-  clearTimeout(pending); pending = 0;
-  draft = loadDraft(); removed = null; insertAt = null; checkSources(draft); notify();
+  if (e.key !== KEY && e.key !== null) return;
+  if (queued || pending || saved?.ok === false) { save(); notify(); return; }
+  lastStored = local.get(KEY);
+  draft = readStoredDraft(lastStored) || newDraft(); removed = null; insertAt = null; checkSources(draft);
+  baseline = structuredClone(draft);
+  notify();
 });
 
 // ---- Small renderers ----------------------------------------------------------------------------------------------
@@ -226,6 +324,7 @@ function prov(c) {
   const state = clauseState(c);
   if (state === "standard") return `<span class="chip">ATNI standard text</span>`;
   if (state === "typed") return `<span class="chip">Typed</span>`;
+  if (!sourceOf) return '<span class="chip">Source unverified</span>';
   const from = resLink(c.source);
   if (state === "verbatim") return `<span class="chip carried">Verbatim from ${from}</span>`;
   if (state === "cleaned") return `<span class="chip carried">From ${from}, page header removed</span>`;
@@ -237,9 +336,10 @@ function prov(c) {
 function citesHTML(c) {
   const n = c.cites?.length ?? 0;
   if (!n) return "";
+  if (!citeOf) return `<span id="ci-${esc(c.id)}" class="chip">${plural(n, "citation")} · source unverified</span>`;
   return `<span class="chip carried">${plural(n, "carried citation")}</span><ul class="crow-cites" id="ci-${esc(c.id)}">${c.cites.map(x => {
     const src = x.source ?? {}, page = Number.isInteger(src.page) ? `page ${src.page}` : "page unknown";
-    return `<li>Carried citation “${esc(x.text)}” from ${resLink(src)}, ${kindWord(src.statementType)} ${esc(s(src.position))}, ${page}, SHA-256 <code>${esc(s(src.documentId).slice(0, 16))}</code></li>`;
+    return `<li>Carried citation “${esc(x.text)}” from ${resLink(src)}, ${kindWord(src.statementType)} ${esc(s(src.position))}, ${page}</li>`;
   }).join("")}</ul>`;
 }
 const provHTML = c => prov(c) + citesHTML(c);
@@ -299,6 +399,7 @@ function noteRow(n, i) {
   const issues = n.issues.filter(x => x && typeof x === "object");
   return `<li class="pnote">
     <h3>${title}</h3>
+    ${n.unverified ? "<p>Saved policy note. Its source and quotations are unverified.</p>" : ""}
     <p class="meta">${facts}${facts && link ? ", " : ""}${link}</p>
     ${issues.length ? `<ul class="squares">${issues.map(x => `<li><b>${esc(s(x.label))}:</b> “${esc(s(x.quote))}”${s(x.locator) ? ` <span class="meta">(${esc(s(x.locator))})</span>` : ""}<br><span class="meta">Rule: ${esc(s(x.rule))}</span></li>`).join("")}</ul>` : `<p class="meta">No flags selected.</p>`}
     <div class="field"><label for="nc-${i}">Your note</label>
@@ -308,7 +409,7 @@ function noteRow(n, i) {
 }
 
 function editorHTML() {
-  const d = draft, h = d.header, m = d.meta, model = compose(d), mk = marks(model);
+  const d = draft, h = d.header, m = d.meta, model = composeDraft(d), mk = marks(model);
   const rows = kind => {
     const out = d[kind].map((c, i) => clauseRow(kind, c, i, d[kind].length, mk));
     const r = store.removed;
@@ -423,7 +524,7 @@ const problemsHTML = model => model.problems.length
 
 // ---- The sheet: compose(draft) as the Word document will read ------------------------------------------------------
 
-const STATE_TEXT = { verbatim: "Verbatim", cleaned: "Verbatim, page header removed", edited: "Edited by the drafter" };
+const STATE_TEXT = { unverified: "Source unverified", verbatim: "Verbatim", cleaned: "Verbatim, page header removed", edited: "Edited by the drafter" };
 
 function sheetHTML(m) {
   // A carried citation is tinted in the preview only; the Word body carries the same words as plain text.
@@ -463,22 +564,22 @@ function sheetHTML(m) {
   if (m.sources.length || m.citations.length || m.notes.length) h += `<p class="pg-break"><span>Page break</span></p>
   <div class="pg s-notes">
     <p class="s-nh">DRAFTING NOTES, NOT PART OF THE RESOLUTION</p>
-    <p><i>Prepared with ResIST. These notes record where carried clauses and citations came from and what Policy Sentinel found. Delete this section before submitting if it is not wanted.</i></p>
+    <p><i>Prepared with ResIST. These notes list source details for carried clauses and citations, along with saved policy notes. Delete this section before submitting if it is not wanted.</i></p>
     ${m.sources.length ? `<table class="s-src"><thead><tr><th>Position</th><th>ATNI resolution</th><th>Text</th><th>Source</th></tr></thead><tbody>${m.sources.map(x => `<tr>
       <td>${esc(x.position)}</td><td>${esc([x.number, x.title, x.year].map(s).filter(Boolean).join(", "))}</td>
-      <td>${STATE_TEXT[x.state] ?? ""}</td><td>${outLink(x.url, "Source PDF")}<br>${esc(s(x.documentId).slice(0, 16))}</td></tr>`).join("")}</tbody></table>` : ""}
+      <td>${STATE_TEXT[x.state] ?? ""}</td><td>${outLink(x.url, "Source PDF")}</td></tr>`).join("")}</tbody></table>` : ""}
     ${m.citations.length ? `<p><b>Carried Citations</b></p><table class="s-src"><thead><tr><th>Position</th><th>Citation</th><th>From</th><th>Source</th></tr></thead><tbody>${m.citations.map(x => `<tr>
       <td>${esc(x.position)}</td><td>${esc(s(x.text))}</td><td>${esc(citeFrom(x))}</td>
-      <td>${outLink(x.url, "Source PDF")}<br>SHA-256 ${esc(s(x.documentId).slice(0, 16))}</td></tr>`).join("")}</tbody></table>` : ""}
+      <td>${outLink(x.url, "Source PDF")}</td></tr>`).join("")}</tbody></table>` : ""}
     ${m.notes.map(n => `<div class="s-note">
       <p><b>${esc(s(n.title))}</b></p>
       <p>${[n.issuingBody, n.kind, usDate(s(n.date))].map(s).filter(Boolean).map(esc).join(", ")}${outLink(n.officialUrl, "Official source") ? `, ${outLink(n.officialUrl, "Official source")}` : ""}</p>
-      ${s(n.receiptSha256) ? `<p>Read by Policy Sentinel on ${esc(usDate(s(n.retrievedAt)) || "an unrecorded date")}; text SHA-256 ${esc(s(n.receiptSha256).slice(0, 16))}</p>`
+      ${n.unverified ? "<p>Saved policy note. Its source and quotations are unverified.</p>" : s(n.receiptSha256) ? `<p>Read by Policy Sentinel on ${esc(usDate(s(n.retrievedAt)) || "an unrecorded date")}</p>`
         : s(n.retrievedAt) ? `<p>Details from Policy Sentinel on ${esc(usDate(s(n.retrievedAt)))}; no policy text was read.</p>` : ""}
       ${(Array.isArray(n.issues) ? n.issues : []).filter(x => x && typeof x === "object").map(x => `<p class="s-flag">${esc(s(x.label))}: “${esc(s(x.quote))}”${s(x.locator) ? ` (${esc(s(x.locator))})` : ""}<br><span class="s-rulet">Rule: ${esc(s(x.rule))}</span></p>`).join("")}
       ${s(n.comment) ? `<p>Drafter's note: ${esc(s(n.comment))}</p>` : ""}
     </div>`).join("")}
-    ${m.notes.length ? `<p class="s-small"><i>Policy Sentinel's flags come from automated demo rules. They quote the policy text and are not legal conclusions.</i></p>` : ""}
+    ${m.notes.some(n => !n.unverified) ? `<p class="s-small"><i>Policy Sentinel's flags come from automated demo rules. They quote the policy text and are not legal conclusions.</i></p>` : ""}
   </div>`;
   return h;
 }
@@ -553,7 +654,7 @@ export function renderDraft(main) {
   function paintLive() {
     cancelAnimationFrame(raf);
     raf = requestAnimationFrame(() => {
-      const model = compose(draft), mk = marks(model);
+      const model = composeDraft(draft), mk = marks(model);
       sheet.innerHTML = sheetHTML(model);
       for (const li of editor.querySelectorAll(".crow")) {
         const m = mk.get(li.dataset.id);
@@ -576,6 +677,18 @@ export function renderDraft(main) {
       statusEl.textContent = saved
         ? `Saved in this browser at ${saved.at.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}`
         : "Saved in this browser as you work. Nothing is sent anywhere.";
+    }
+    for (const key of recoveryKeys()) {
+      const button = document.createElement("button");
+      button.type = "button"; button.className = "btn small";
+      button.dataset.tool = "recover"; button.dataset.key = key;
+      const conflict = key.startsWith(recoveryPrefix);
+      const time = Number(key.slice((conflict ? recoveryPrefix : backupPrefix).length).split("-")[0]);
+      button.textContent = (conflict ? "Download conflicting draft from " : "Download session backup from ") + new Date(time).toLocaleString();
+      const discard = button.cloneNode(false);
+      discard.dataset.tool = "discard";
+      discard.textContent = "Discard copy";
+      statusEl.append(" ", button, " ", discard);
     }
   }
   // A row's provenance chip, carried citations and page-header notice follow the text as it is typed.
@@ -617,25 +730,25 @@ export function renderDraft(main) {
 
   async function exportWord() {
     if (busy) return;
-    busy = true; flush();
+    busy = true;
     try {
-      const bytes = buildDocx(compose(draft), { seal: (await sealBytes()) || undefined, created: new Date().toISOString() });
-      download(bytes, docxName(draft), DOCX);
+      const copy = await snapshot();
+      const bytes = buildDocx(composeDraft(copy), { seal: (await sealBytes()) || undefined, created: new Date().toISOString() });
+      download(bytes, docxName(copy), DOCX);
       toast("Word document downloaded");
     } catch (e) {
       console.error(e);
       toast("The Word document could not be built. Save a draft file to keep your work.");
     } finally { busy = false; }
   }
-  function saveFile() {
-    flush();
-    download(JSON.stringify(draft, null, 2), `resist-draft-${new Date().toLocaleDateString("en-CA")}.json`, "application/json");
+  async function saveFile() {
+    download(JSON.stringify(await snapshot(), null, 2), `resist-draft-${new Date().toLocaleDateString("en-CA")}.json`, "application/json");
     toast("Draft file saved");
   }
   async function openFile(file) {
     errEl.hidden = true; closeAsk();
     let v = null;
-    if (file.size <= 5e6) try { v = parseDraft(await file.text()); } catch { v = null; }
+    try { v = parseDraft(await file.text()); } catch { v = null; }
     fileEl.value = "";
     if (!v) { errEl.textContent = "This file is not a ResIST draft."; errEl.hidden = false; return; }
     const open = () => {
@@ -647,13 +760,22 @@ export function renderDraft(main) {
     else open();
   }
 
-  main.addEventListener("click", e => {
+  root.addEventListener("click", e => {
     const t = e.target.closest("[data-tool], [data-confirm], [data-mode], [data-act], [data-cid], [data-goto]");
     if (!t || !root.contains(t)) return;
     if (t.dataset.tool) {
       errEl.hidden = true;
       if (t.dataset.tool === "word") exportWord();
       else if (t.dataset.tool === "save") saveFile();
+      else if (t.dataset.tool === "recover") {
+        const key = t.dataset.key;
+        if (recoveryKey(key) && local.get(key)) {
+          download(local.get(key), "resist-draft-recovery.json", "application/json");
+        }
+      }
+      else if (t.dataset.tool === "discard" && recoveryKey(t.dataset.key)) {
+        ask("Discard this saved copy?", "Discard copy", () => { local.remove(t.dataset.key); paintStatus(); }, "discard");
+      }
       else if (t.dataset.tool === "open") fileEl.click();
       else if (t.dataset.tool === "new") {
         if (!changed(draft)) { store.reset(); toast("New draft started"); return; }

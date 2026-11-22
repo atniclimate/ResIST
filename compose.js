@@ -166,7 +166,7 @@ export function anchorCites(clause) {
 }
 
 // The Drafting Notes "From" cell of a compose() citation.
-export const citeFrom = x =>
+export const citeFrom = x => x.unverified ? "Source unverified" :
   `ATNI ${squash(x.number)}, ${x.clause}, ${Number.isInteger(x.page) ? `page ${x.page}` : "page unknown"}`;
 
 // Splices a citation's words into a clause at a position (clamped, and moved past a citation it falls inside), with
@@ -196,8 +196,8 @@ export function newDraft(year = new Date().getFullYear()) {
     },
     title: "",
     preamble: true,
-    whereas: STANDARD.whereas.map(t => newClause(t, "standard")),
-    resolved: [newClause(STANDARD.closing, "standard")],
+    whereas: STANDARD.whereas.map((text, i) => ({ id: `standard-whereas-${i}`, text: body(text), origin: "standard" })),
+    resolved: [{ id: "standard-closing", text: body(STANDARD.closing), origin: "standard" }],
     certification: { quorum: true },
     signatures: { president: "", secretary: "" },
     meta: {
@@ -218,7 +218,7 @@ const fill = (name, value) => ({ fill: name, value: squash(value) });
 export const lineText = line => line.map(p => typeof p === "string" ? p : p.value || `[${p.fill}]`).join("");
 export const usDate = iso => /^\d{4}-\d{2}-\d{2}/.test(iso ?? "") ? `${iso.slice(5, 7)}/${iso.slice(8, 10)}/${iso.slice(0, 4)}` : "";
 
-export function compose(draft) {
+export function compose(draft, { sourcesChecked = true, citationsChecked = true } = {}) {
   const h = draft.header, m = draft.meta, problems = [];
   const year = squash(h.year), number = squash(h.number) || "DRFT-XX";
   const live = list => list.filter(c => body(c.text));
@@ -230,16 +230,18 @@ export function compose(draft) {
     const n = list.length, last = i === n - 1;
     const lead = kind === "whereas" ? "WHEREAS," : resolvedLead(i, n);
     const joiner = kind === "whereas" ? (last ? "; now" : "; and") : (last ? "." : "; and");
-    const state = clauseState(c), text = body(c.text), cites = c.cites ?? [];
+    const state = c.origin === "carried" && !sourcesChecked ? "unverified" : clauseState(c);
+    const text = body(c.text), cites = c.cites ?? [];
     if (hasPageHeader(c.text)) problems.push(`${position(kind, i)} contains page-header text from the source PDF.`);
     if (c.origin === "carried") sources.push({
       position: position(kind, i), state, number: c.source.number, title: c.source.title, year: c.source.year,
-      convention: c.source.convention, url: c.source.url, documentId: c.source.documentId,
+      convention: c.source.convention, url: sourcesChecked ? c.source.url : "", documentId: c.source.documentId,
     });
     for (const x of cites) citations.push({
       position: position(kind, i), text: x.text, number: x.source.number, title: x.source.title, year: x.source.year,
       documentId: x.source.documentId, clause: position(x.source.statementType, x.source.position - 1),
-      page: Number.isInteger(x.source.page) ? x.source.page : null, url: x.source.url,
+      page: Number.isInteger(x.source.page) ? x.source.page : null, url: citationsChecked ? x.source.url : "",
+      ...(!citationsChecked && { unverified: true }),
     });
     // Offsets index the line only while the stored text is already its own body.
     const marks = text === c.text ? cites.map(x => ({ start: x.start, end: x.end })) : [];
@@ -311,7 +313,12 @@ export function validDraft(value) {
   meta.committees = Array.isArray(meta.committees) ? meta.committees.filter(c => COMMITTEES.includes(c)) : [];
   // A file can label any text "standard"; only ATNI's own form text keeps that label.
   const label = c => c.origin === "standard" && !isStandard(c.text) ? { ...c, origin: "typed" } : c;
-  const clean = c => cleanCites(label(c));
+  const seen = new Set();
+  const clean = c => {
+    if (!c.id || seen.has(c.id)) c = { ...c, id: newId() };
+    seen.add(c.id);
+    return cleanCites(label(c));
+  };
   return {
     ...base, ...d,
     whereas: d.whereas.map(clean), resolved: d.resolved.map(clean),
@@ -319,7 +326,8 @@ export function validDraft(value) {
     certification: { ...base.certification, ...d.certification },
     signatures: { ...base.signatures, ...d.signatures },
     meta,
-    notes: Array.isArray(d.notes) ? d.notes.filter(n => n && typeof n.title === "string" && Array.isArray(n.issues)) : [],
+    notes: Array.isArray(d.notes) ? d.notes.filter(n => n && typeof n.title === "string" && Array.isArray(n.issues))
+      .map(n => ({ ...n, unverified: true })) : [],
   };
 }
 
