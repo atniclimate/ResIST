@@ -1,0 +1,1423 @@
+copy_ref,sheet,row,rid,differs,status,ledger_id
+Climate!A2,Climate,2,ml-0087,,applied,DU-00186
+Climate!A3,Climate,3,ml-0124,,applied,DU-00187
+Climate!A4,Climate,4,ml-0125,,applied,DU-00188
+Climate!A5,Climate,5,ml-0138,,applied,DU-00189
+Climate!A6,Climate,6,ml-0171,,applied,DU-00190
+Climate!A7,Climate,7,ml-0191,,applied,DU-00191
+Culture & Elders!A10,Culture & Elders,10,ml-0414,,applied,DU-00200
+Culture & Elders!A11,Culture & Elders,11,ml-0497,,applied,DU-00201
+Culture & Elders!A12,Culture & Elders,12,ml-0509,,applied,DU-00202
+Culture & Elders!A13,Culture & Elders,13,ml-0510,,applied,DU-00203
+Culture & Elders!A14,Culture & Elders,14,ml-0511,,applied,DU-00204
+Culture & Elders!A15,Culture & Elders,15,ml-0512,,applied,DU-00205
+Culture & Elders!A16,Culture & Elders,16,ml-0513,,applied,DU-00206
+Culture & Elders!A17,Culture & Elders,17,ml-0580,,applied,DU-00207
+Culture & Elders!A18,Culture & Elders,18,ml-0581,,applied,DU-00208
+Culture & Elders!A19,Culture & Elders,19,ml-0602,,applied,DU-00209
+Culture & Elders!A2,Culture & Elders,2,ml-0085,,applied,DU-00192
+Culture & Elders!A20,Culture & Elders,20,ml-0603,,applied,DU-00210
+Culture & Elders!A21,Culture & Elders,21,ml-0604,,applied,DU-00211
+Culture & Elders!A22,Culture & Elders,22,ml-0628,,applied,DU-00212
+Culture & Elders!A23,Culture & Elders,23,ml-0629,,applied,DU-00213
+Culture & Elders!A24,Culture & Elders,24,ml-0768,,applied,DU-00214
+Culture & Elders!A25,Culture & Elders,25,ml-0790,,applied,DU-00215
+Culture & Elders!A26,Culture & Elders,26,ml-0795,,applied,DU-00216
+Culture & Elders!A27,Culture & Elders,27,ml-0796,,applied,DU-00217
+Culture & Elders!A28,Culture & Elders,28,ml-0843,committee,applied,DU-00218
+Culture & Elders!A29,Culture & Elders,29,ml-0987,,applied,DU-00219
+Culture & Elders!A3,Culture & Elders,3,ml-0086,,applied,DU-00193
+Culture & Elders!A30,Culture & Elders,30,ml-0988,,applied,DU-00220
+Culture & Elders!A31,Culture & Elders,31,ml-1026,,applied,DU-00221
+Culture & Elders!A32,Culture & Elders,32,ml-1027,,applied,DU-00222
+Culture & Elders!A33,Culture & Elders,33,ml-1068,,applied,DU-00223
+Culture & Elders!A34,Culture & Elders,34,ml-1090,permalink,applied,DU-00224
+Culture & Elders!A35,Culture & Elders,35,ml-1103,permalink,applied,DU-00225
+Culture & Elders!A36,Culture & Elders,36,ml-1127,,applied,DU-00226
+Culture & Elders!A37,Culture & Elders,37,ml-1128,,applied,DU-00227
+Culture & Elders!A38,Culture & Elders,38,ml-1129,,applied,DU-00228
+Culture & Elders!A39,Culture & Elders,39,ml-1130,,applied,DU-00229
+Culture & Elders!A4,Culture & Elders,4,ml-0099,,applied,DU-00194
+Culture & Elders!A40,Culture & Elders,40,ml-1131,,applied,DU-00230
+Culture & Elders!A41,Culture & Elders,41,ml-1166,,applied,DU-00231
+Culture & Elders!A42,Culture & Elders,42,ml-1167,,applied,DU-00232
+Culture & Elders!A43,Culture & Elders,43,ml-1168,,applied,DU-00233
+Culture & Elders!A44,Culture & Elders,44,ml-1202,,applied,DU-00234
+Culture & Elders!A45,Culture & Elders,45,ml-1203,,applied,DU-00235
+Culture & Elders!A46,Culture & Elders,46,ml-1227,,applied,DU-00236
+Culture & Elders!A47,Culture & Elders,47,ml-1228,,applied,DU-00237
+Culture & Elders!A48,Culture & Elders,48,ml-1263,,applied,DU-00238
+Culture & Elders!A49,Culture & Elders,49,ml-1264,title,applied,DU-00239
+Culture & Elders!A5,Culture & Elders,5,ml-0137,,applied,DU-00195
+Culture & Elders!A50,Culture & Elders,50,ml-1283,,applied,DU-00240
+Culture & Elders!A51,Culture & Elders,51,ml-1284,,applied,DU-00241
+Culture & Elders!A52,Culture & Elders,52,ml-1312,,applied,DU-00242
+Culture & Elders!A53,Culture & Elders,53,ml-1313,,applied,DU-00243
+Culture & Elders!A54,Culture & Elders,54,ml-1336,,applied,DU-00244
+Culture & Elders!A55,Culture & Elders,55,ml-1337,,applied,DU-00245
+Culture & Elders!A56,Culture & Elders,56,ml-1379,,applied,DU-00246
+Culture & Elders!A57,Culture & Elders,57,ml-1380,,applied,DU-00247
+Culture & Elders!A58,Culture & Elders,58,ml-1394,,applied,DU-00248
+Culture & Elders!A59,Culture & Elders,59,ml-1466,,applied,DU-00249
+Culture & Elders!A6,Culture & Elders,6,ml-0151,,applied,DU-00196
+Culture & Elders!A60,Culture & Elders,60,ml-1495,,applied,DU-00250
+Culture & Elders!A61,Culture & Elders,61,ml-1496,,applied,DU-00251
+Culture & Elders!A62,Culture & Elders,62,ml-1545,conf,applied,DU-00252
+Culture & Elders!A63,Culture & Elders,63,ml-1546,conf,applied,DU-00253
+Culture & Elders!A64,Culture & Elders,64,ml-1547,conf,applied,DU-00254
+Culture & Elders!A65,Culture & Elders,65,ml-1548,conf,applied,DU-00255
+Culture & Elders!A66,Culture & Elders,66,ml-1601,"permalink,conf",applied,DU-00256
+Culture & Elders!A67,Culture & Elders,67,ml-1602,"permalink,conf",applied,DU-00257
+Culture & Elders!A7,Culture & Elders,7,ml-0170,,applied,DU-00197
+Culture & Elders!A8,Culture & Elders,8,ml-0246,,applied,DU-00198
+Culture & Elders!A9,Culture & Elders,9,ml-0247,,applied,DU-00199
+Duplicates!A10,Duplicates,10,ml-0465,,applied,DU-00152
+Duplicates!A11,Duplicates,11,ml-0913,,applied,DU-00153
+Duplicates!A12,Duplicates,12,ml-0519,,applied,DU-00154
+Duplicates!A13,Duplicates,13,ml-0540,,applied,DU-00155
+Duplicates!A14,Duplicates,14,ml-0567,,applied,DU-00156
+Duplicates!A15,Duplicates,15,ml-0824,,applied,DU-00157
+Duplicates!A16,Duplicates,16,ml-0597,,applied,DU-00158
+Duplicates!A17,Duplicates,17,ml-1517,,applied,DU-00159
+Duplicates!A18,Duplicates,18,ml-0725,,applied,DU-00160
+Duplicates!A19,Duplicates,19,ml-0758,,applied,DU-00161
+Duplicates!A2,Duplicates,2,ml-0120,,applied,DU-00144
+Duplicates!A20,Duplicates,20,ml-1009,,applied,DU-00162
+Duplicates!A21,Duplicates,21,ml-1041,,applied,DU-00163
+Duplicates!A22,Duplicates,22,ml-1106,,applied,DU-00164
+Duplicates!A23,Duplicates,23,ml-1194,,applied,DU-00165
+Duplicates!A24,Duplicates,24,ml-1167,,applied,DU-00166
+Duplicates!A25,Duplicates,25,ml-1203,,applied,DU-00167
+Duplicates!A26,Duplicates,26,ml-1264,,applied,DU-00168
+Duplicates!A27,Duplicates,27,ml-1090,,applied,DU-00169
+Duplicates!A28,Duplicates,28,ml-1304,title,applied,DU-00170
+Duplicates!A29,Duplicates,29,ml-1321,,applied,DU-00171
+Duplicates!A3,Duplicates,3,ml-0160,,applied,DU-00145
+Duplicates!A30,Duplicates,30,ml-1442,title,applied,DU-00172
+Duplicates!A31,Duplicates,31,ml-1447,,applied,DU-00173
+Duplicates!A32,Duplicates,32,ml-1456,,applied,DU-00174
+Duplicates!A33,Duplicates,33,ml-1582,,applied,DU-00175
+Duplicates!A34,Duplicates,34,ml-1478,,applied,DU-00176
+Duplicates!A35,Duplicates,35,ml-1533,,applied,DU-00177
+Duplicates!A36,Duplicates,36,ml-1496,,applied,DU-00178
+Duplicates!A37,Duplicates,37,ml-1514,title,applied,DU-00179
+Duplicates!A38,Duplicates,38,ml-1557,,applied,DU-00180
+Duplicates!A39,Duplicates,39,ml-1583,permalink,applied,DU-00181
+Duplicates!A4,Duplicates,4,ml-0218,,applied,DU-00146
+Duplicates!A40,Duplicates,40,ml-1601,permalink,applied,DU-00182
+Duplicates!A41,Duplicates,41,ml-1638,,applied,DU-00183
+Duplicates!A42,Duplicates,42,ml-1602,permalink,applied,DU-00184
+Duplicates!A43,Duplicates,43,ml-1637,,applied,DU-00185
+Duplicates!A5,Duplicates,5,ml-1142,,applied,DU-00147
+Duplicates!A6,Duplicates,6,ml-0416,,applied,DU-00148
+Duplicates!A7,Duplicates,7,ml-0669,,applied,DU-00149
+Duplicates!A8,Duplicates,8,ml-0418,,applied,DU-00150
+Duplicates!A9,Duplicates,9,ml-0620,,applied,DU-00151
+Economic Development!A10,Economic Development,10,ml-0190,,applied,DU-00266
+Economic Development!A100,Economic Development,100,ml-1420,,applied,DU-00356
+Economic Development!A101,Economic Development,101,ml-1421,,applied,DU-00357
+Economic Development!A102,Economic Development,102,ml-1422,,applied,DU-00358
+Economic Development!A103,Economic Development,103,ml-1423,,applied,DU-00359
+Economic Development!A104,Economic Development,104,ml-1456,,applied,DU-00360
+Economic Development!A105,Economic Development,105,ml-1457,,applied,DU-00361
+Economic Development!A106,Economic Development,106,ml-1458,,applied,DU-00362
+Economic Development!A107,Economic Development,107,ml-1459,,applied,DU-00363
+Economic Development!A108,Economic Development,108,ml-1460,,applied,DU-00364
+Economic Development!A109,Economic Development,109,ml-1461,,applied,DU-00365
+Economic Development!A11,Economic Development,11,ml-0209,,applied,DU-00267
+Economic Development!A110,Economic Development,110,ml-1462,,applied,DU-00366
+Economic Development!A111,Economic Development,111,ml-1491,,applied,DU-00367
+Economic Development!A112,Economic Development,112,ml-1492,,applied,DU-00368
+Economic Development!A113,Economic Development,113,ml-1493,,applied,DU-00369
+Economic Development!A114,Economic Development,114,ml-1494,,applied,DU-00370
+Economic Development!A115,Economic Development,115,ml-1500,,applied,DU-00371
+Economic Development!A116,Economic Development,116,ml-1501,,applied,DU-00372
+Economic Development!A117,Economic Development,117,ml-1502,,applied,DU-00373
+Economic Development!A118,Economic Development,118,ml-1503,,applied,DU-00374
+Economic Development!A119,Economic Development,119,ml-1504,,applied,DU-00375
+Economic Development!A12,Economic Development,12,ml-0210,,applied,DU-00268
+Economic Development!A120,Economic Development,120,ml-1505,,applied,DU-00376
+Economic Development!A121,Economic Development,121,ml-1506,,applied,DU-00377
+Economic Development!A122,Economic Development,122,ml-1507,,applied,DU-00378
+Economic Development!A13,Economic Development,13,ml-0244,,applied,DU-00269
+Economic Development!A14,Economic Development,14,ml-0245,,applied,DU-00270
+Economic Development!A15,Economic Development,15,ml-0268,,applied,DU-00271
+Economic Development!A16,Economic Development,16,ml-0283,amended,applied,DU-00272
+Economic Development!A17,Economic Development,17,ml-0284,,applied,DU-00273
+Economic Development!A18,Economic Development,18,ml-0285,,applied,DU-00274
+Economic Development!A19,Economic Development,19,ml-0433,,applied,DU-00275
+Economic Development!A2,Economic Development,2,ml-0083,,applied,DU-00258
+Economic Development!A20,Economic Development,20,ml-0476,,applied,DU-00276
+Economic Development!A21,Economic Development,21,ml-0477,,applied,DU-00277
+Economic Development!A22,Economic Development,22,ml-0495,,applied,DU-00278
+Economic Development!A23,Economic Development,23,ml-0496,,applied,DU-00279
+Economic Development!A24,Economic Development,24,ml-0506,,applied,DU-00280
+Economic Development!A25,Economic Development,25,ml-0507,,applied,DU-00281
+Economic Development!A26,Economic Development,26,ml-0508,,applied,DU-00282
+Economic Development!A27,Economic Development,27,ml-0533,,applied,DU-00283
+Economic Development!A28,Economic Development,28,ml-0534,,applied,DU-00284
+Economic Development!A29,Economic Development,29,ml-0579,,applied,DU-00285
+Economic Development!A3,Economic Development,3,ml-0084,,applied,DU-00259
+Economic Development!A30,Economic Development,30,ml-0648,,applied,DU-00286
+Economic Development!A31,Economic Development,31,ml-0649,,applied,DU-00287
+Economic Development!A32,Economic Development,32,ml-0650,amended,applied,DU-00288
+Economic Development!A33,Economic Development,33,ml-0710,,applied,DU-00289
+Economic Development!A34,Economic Development,34,ml-0711,,applied,DU-00290
+Economic Development!A35,Economic Development,35,ml-0750,,applied,DU-00291
+Economic Development!A36,Economic Development,36,ml-0863,,applied,DU-00292
+Economic Development!A37,Economic Development,37,ml-0864,,applied,DU-00293
+Economic Development!A38,Economic Development,38,ml-0865,,applied,DU-00294
+Economic Development!A39,Economic Development,39,ml-0901,,applied,DU-00295
+Economic Development!A4,Economic Development,4,ml-0097,,applied,DU-00260
+Economic Development!A40,Economic Development,40,ml-0910,,applied,DU-00296
+Economic Development!A41,Economic Development,41,ml-0911,,applied,DU-00297
+Economic Development!A42,Economic Development,42,ml-0925,,applied,DU-00298
+Economic Development!A43,Economic Development,43,ml-0940,,applied,DU-00299
+Economic Development!A44,Economic Development,44,ml-0941,,applied,DU-00300
+Economic Development!A45,Economic Development,45,ml-0969,,applied,DU-00301
+Economic Development!A46,Economic Development,46,ml-0970,,applied,DU-00302
+Economic Development!A47,Economic Development,47,ml-0985,,applied,DU-00303
+Economic Development!A48,Economic Development,48,ml-0986,,applied,DU-00304
+Economic Development!A49,Economic Development,49,ml-1017,,applied,DU-00305
+Economic Development!A5,Economic Development,5,ml-0148,,applied,DU-00261
+Economic Development!A50,Economic Development,50,ml-1018,,applied,DU-00306
+Economic Development!A51,Economic Development,51,ml-1019,,applied,DU-00307
+Economic Development!A52,Economic Development,52,ml-1033,,applied,DU-00308
+Economic Development!A53,Economic Development,53,ml-1059,,applied,DU-00309
+Economic Development!A54,Economic Development,54,ml-1062,,applied,DU-00310
+Economic Development!A55,Economic Development,55,ml-1063,,applied,DU-00311
+Economic Development!A56,Economic Development,56,ml-1064,,applied,DU-00312
+Economic Development!A57,Economic Development,57,ml-1065,,applied,DU-00313
+Economic Development!A58,Economic Development,58,ml-1066,,applied,DU-00314
+Economic Development!A59,Economic Development,59,ml-1067,,applied,DU-00315
+Economic Development!A6,Economic Development,6,ml-0149,,applied,DU-00262
+Economic Development!A60,Economic Development,60,ml-1083,permalink,applied,DU-00316
+Economic Development!A61,Economic Development,61,ml-1084,permalink,applied,DU-00317
+Economic Development!A62,Economic Development,62,ml-1085,permalink,applied,DU-00318
+Economic Development!A63,Economic Development,63,ml-1098,permalink,applied,DU-00319
+Economic Development!A64,Economic Development,64,ml-1116,,applied,DU-00320
+Economic Development!A65,Economic Development,65,ml-1117,,applied,DU-00321
+Economic Development!A66,Economic Development,66,ml-1118,,applied,DU-00322
+Economic Development!A67,Economic Development,67,ml-1119,,applied,DU-00323
+Economic Development!A68,Economic Development,68,ml-1149,,applied,DU-00324
+Economic Development!A69,Economic Development,69,ml-1150,,applied,DU-00325
+Economic Development!A7,Economic Development,7,ml-0150,,applied,DU-00263
+Economic Development!A70,Economic Development,70,ml-1151,,applied,DU-00326
+Economic Development!A71,Economic Development,71,ml-1152,,applied,DU-00327
+Economic Development!A72,Economic Development,72,ml-1200,,applied,DU-00328
+Economic Development!A73,Economic Development,73,ml-1252,,applied,DU-00329
+Economic Development!A74,Economic Development,74,ml-1253,,applied,DU-00330
+Economic Development!A75,Economic Development,75,ml-1254,,applied,DU-00331
+Economic Development!A76,Economic Development,76,ml-1255,,applied,DU-00332
+Economic Development!A77,Economic Development,77,ml-1256,,applied,DU-00333
+Economic Development!A78,Economic Development,78,ml-1269,,applied,DU-00334
+Economic Development!A79,Economic Development,79,ml-1270,,applied,DU-00335
+Economic Development!A8,Economic Development,8,ml-0187,,applied,DU-00264
+Economic Development!A80,Economic Development,80,ml-1271,,applied,DU-00336
+Economic Development!A81,Economic Development,81,ml-1272,,applied,DU-00337
+Economic Development!A82,Economic Development,82,ml-1273,,applied,DU-00338
+Economic Development!A83,Economic Development,83,ml-1274,,applied,DU-00339
+Economic Development!A84,Economic Development,84,ml-1305,,applied,DU-00340
+Economic Development!A85,Economic Development,85,ml-1311,,applied,DU-00341
+Economic Development!A86,Economic Development,86,ml-1321,,applied,DU-00342
+Economic Development!A87,Economic Development,87,ml-1333,,applied,DU-00343
+Economic Development!A88,Economic Development,88,ml-1334,,applied,DU-00344
+Economic Development!A89,Economic Development,89,ml-1375,,applied,DU-00345
+Economic Development!A9,Economic Development,9,ml-0188,,applied,DU-00265
+Economic Development!A90,Economic Development,90,ml-1376,,applied,DU-00346
+Economic Development!A91,Economic Development,91,ml-1377,,applied,DU-00347
+Economic Development!A92,Economic Development,92,ml-1378,,applied,DU-00348
+Economic Development!A93,Economic Development,93,ml-1395,,applied,DU-00349
+Economic Development!A94,Economic Development,94,ml-1396,,applied,DU-00350
+Economic Development!A95,Economic Development,95,ml-1397,,applied,DU-00351
+Economic Development!A96,Economic Development,96,ml-1398,,applied,DU-00352
+Economic Development!A97,Economic Development,97,ml-1399,,applied,DU-00353
+Economic Development!A98,Economic Development,98,ml-1418,,applied,DU-00354
+Economic Development!A99,Economic Development,99,ml-1419,,applied,DU-00355
+Education (Higher)!A1,Education (Higher),1,ml-0095,,applied,DU-00538
+Education (Higher)!A2,Education (Higher),2,ml-0096,,applied,DU-00539
+Education (Higher)!A3,Education (Higher),3,ml-0119,,applied,DU-00540
+Education (Higher)!A4,Education (Higher),4,ml-0120,,applied,DU-00541
+Education (Higher)!A5,Education (Higher),5,ml-0121,,applied,DU-00542
+Education (Higher)!A6,Education (Higher),6,ml-0122,,applied,DU-00543
+Education (Higher)!A7,Education (Higher),7,ml-0123,,applied,DU-00544
+Education (K-12)!A1,Education (K-12),1,ml-0167,,applied,DU-00545
+Education (K-12)!A2,Education (K-12),2,ml-0168,,applied,DU-00546
+Education (K-12)!A3,Education (K-12),3,ml-0169,,applied,DU-00547
+Education!A10,Education,10,ml-0282,,applied,DU-00387
+Education!A100,Education,100,ml-1001,,applied,DU-00477
+Education!A101,Education,101,ml-1002,,applied,DU-00478
+Education!A102,Education,102,ml-1003,,applied,DU-00479
+Education!A103,Education,103,ml-1012,,applied,DU-00480
+Education!A104,Education,104,ml-1021,,applied,DU-00481
+Education!A105,Education,105,ml-1055,,applied,DU-00482
+Education!A106,Education,106,ml-1056,,applied,DU-00483
+Education!A107,Education,107,ml-1057,,applied,DU-00484
+Education!A108,Education,108,ml-1058,,applied,DU-00485
+Education!A109,Education,109,ml-1060,,applied,DU-00486
+Education!A11,Education,11,ml-0295,,applied,DU-00388
+Education!A110,Education,110,ml-1061,,applied,DU-00487
+Education!A111,Education,111,ml-1109,permalink,applied,DU-00488
+Education!A112,Education,112,ml-1110,permalink,applied,DU-00489
+Education!A113,Education,113,ml-1120,,applied,DU-00490
+Education!A114,Education,114,ml-1121,,applied,DU-00491
+Education!A115,Education,115,ml-1122,,applied,DU-00492
+Education!A116,Education,116,ml-1123,,applied,DU-00493
+Education!A117,Education,117,ml-1124,,applied,DU-00494
+Education!A118,Education,118,ml-1125,,applied,DU-00495
+Education!A119,Education,119,ml-1126,,applied,DU-00496
+Education!A12,Education,12,ml-0296,,applied,DU-00389
+Education!A120,Education,120,ml-1164,,applied,DU-00497
+Education!A121,Education,121,ml-1165,,applied,DU-00498
+Education!A122,Education,122,ml-1205,,applied,DU-00499
+Education!A123,Education,123,ml-1206,,applied,DU-00500
+Education!A124,Education,124,ml-1207,,applied,DU-00501
+Education!A125,Education,125,ml-1208,,applied,DU-00502
+Education!A126,Education,126,ml-1209,,applied,DU-00503
+Education!A127,Education,127,ml-1233,,applied,DU-00504
+Education!A128,Education,128,ml-1237,,applied,DU-00505
+Education!A129,Education,129,ml-1238,,applied,DU-00506
+Education!A13,Education,13,ml-0316,,applied,DU-00390
+Education!A130,Education,130,ml-1239,,applied,DU-00507
+Education!A131,Education,131,ml-1275,,applied,DU-00508
+Education!A132,Education,132,ml-1276,,applied,DU-00509
+Education!A133,Education,133,ml-1307,,applied,DU-00510
+Education!A134,Education,134,ml-1308,,applied,DU-00511
+Education!A135,Education,135,ml-1322,,applied,DU-00512
+Education!A136,Education,136,ml-1341,,applied,DU-00513
+Education!A137,Education,137,ml-1342,,applied,DU-00514
+Education!A138,Education,138,ml-1346,,applied,DU-00515
+Education!A139,Education,139,ml-1369,,applied,DU-00516
+Education!A14,Education,14,ml-0317,,applied,DU-00391
+Education!A140,Education,140,ml-1370,,applied,DU-00517
+Education!A141,Education,141,ml-1371,,applied,DU-00518
+Education!A142,Education,142,ml-1372,,applied,DU-00519
+Education!A143,Education,143,ml-1373,,applied,DU-00520
+Education!A144,Education,144,ml-1374,,applied,DU-00521
+Education!A145,Education,145,ml-1392,,applied,DU-00522
+Education!A146,Education,146,ml-1393,,applied,DU-00523
+Education!A147,Education,147,ml-1426,,applied,DU-00524
+Education!A148,Education,148,ml-1427,,applied,DU-00525
+Education!A149,Education,149,ml-1428,,applied,DU-00526
+Education!A15,Education,15,ml-0336,,applied,DU-00392
+Education!A150,Education,150,ml-1453,,applied,DU-00527
+Education!A151,Education,151,ml-1454,,applied,DU-00528
+Education!A152,Education,152,ml-1455,,applied,DU-00529
+Education!A153,Education,153,ml-1508,,applied,DU-00530
+Education!A154,Education,154,ml-1509,,applied,DU-00531
+Education!A155,Education,155,ml-1510,,applied,DU-00532
+Education!A156,Education,156,ml-1511,,applied,DU-00533
+Education!A157,Education,157,ml-1512,,applied,DU-00534
+Education!A158,Education,158,ml-1513,,applied,DU-00535
+Education!A159,Education,159,ml-1514,,applied,DU-00536
+Education!A16,Education,16,ml-0337,,applied,DU-00393
+Education!A160,Education,160,ml-1515,,applied,DU-00537
+Education!A17,Education,17,ml-0338,,applied,DU-00394
+Education!A18,Education,18,ml-0339,,applied,DU-00395
+Education!A19,Education,19,ml-0340,,applied,DU-00396
+Education!A2,Education,2,ml-0207,,applied,DU-00379
+Education!A20,Education,20,ml-0363,,applied,DU-00397
+Education!A21,Education,21,ml-0381,,applied,DU-00398
+Education!A22,Education,22,ml-0382,,applied,DU-00399
+Education!A23,Education,23,ml-0395,,applied,DU-00400
+Education!A24,Education,24,ml-0396,,applied,DU-00401
+Education!A25,Education,25,ml-0410,,applied,DU-00402
+Education!A26,Education,26,ml-0411,,applied,DU-00403
+Education!A27,Education,27,ml-0412,,applied,DU-00404
+Education!A28,Education,28,ml-0435,,applied,DU-00405
+Education!A29,Education,29,ml-0455,,applied,DU-00406
+Education!A3,Education,3,ml-0208,,applied,DU-00380
+Education!A30,Education,30,ml-0456,,applied,DU-00407
+Education!A31,Education,31,ml-0473,,applied,DU-00408
+Education!A32,Education,32,ml-0474,,applied,DU-00409
+Education!A33,Education,33,ml-0475,,applied,DU-00410
+Education!A34,Education,34,ml-0493,,applied,DU-00411
+Education!A35,Education,35,ml-0494,,applied,DU-00412
+Education!A36,Education,36,ml-0532,,applied,DU-00413
+Education!A37,Education,37,ml-0554,,applied,DU-00414
+Education!A38,Education,38,ml-0578,,applied,DU-00415
+Education!A39,Education,39,ml-0641,,applied,DU-00416
+Education!A4,Education,4,ml-0223,,applied,DU-00381
+Education!A40,Education,40,ml-0643,,applied,DU-00417
+Education!A41,Education,41,ml-0644,,applied,DU-00418
+Education!A42,Education,42,ml-0645,,applied,DU-00419
+Education!A43,Education,43,ml-0646,,applied,DU-00420
+Education!A44,Education,44,ml-0647,,applied,DU-00421
+Education!A45,Education,45,ml-0666,,applied,DU-00422
+Education!A46,Education,46,ml-0667,,applied,DU-00423
+Education!A47,Education,47,ml-0685,,applied,DU-00424
+Education!A48,Education,48,ml-0686,,applied,DU-00425
+Education!A49,Education,49,ml-0687,,applied,DU-00426
+Education!A5,Education,5,ml-0224,,applied,DU-00382
+Education!A50,Education,50,ml-0706,,applied,DU-00427
+Education!A51,Education,51,ml-0707,,applied,DU-00428
+Education!A52,Education,52,ml-0708,,applied,DU-00429
+Education!A53,Education,53,ml-0709,,applied,DU-00430
+Education!A54,Education,54,ml-0740,ncai,applied,DU-00431
+Education!A55,Education,55,ml-0741,,applied,DU-00432
+Education!A56,Education,56,ml-0742,ncai,applied,DU-00433
+Education!A57,Education,57,ml-0743,ncai,applied,DU-00434
+Education!A58,Education,58,ml-0751,,applied,DU-00435
+Education!A59,Education,59,ml-0752,,applied,DU-00436
+Education!A6,Education,6,ml-0225,,applied,DU-00383
+Education!A60,Education,60,ml-0753,,applied,DU-00437
+Education!A61,Education,61,ml-0754,,applied,DU-00438
+Education!A62,Education,62,ml-0789,,applied,DU-00439
+Education!A63,Education,63,ml-0797,,applied,DU-00440
+Education!A64,Education,64,ml-0815,,applied,DU-00441
+Education!A65,Education,65,ml-0833,,applied,DU-00442
+Education!A66,Education,66,ml-0834,,applied,DU-00443
+Education!A67,Education,67,ml-0835,,applied,DU-00444
+Education!A68,Education,68,ml-0836,,applied,DU-00445
+Education!A69,Education,69,ml-0837,,applied,DU-00446
+Education!A7,Education,7,ml-0266,,applied,DU-00384
+Education!A70,Education,70,ml-0838,,applied,DU-00447
+Education!A71,Education,71,ml-0839,,applied,DU-00448
+Education!A72,Education,72,ml-0840,,applied,DU-00449
+Education!A73,Education,73,ml-0841,,applied,DU-00450
+Education!A74,Education,74,ml-0842,,applied,DU-00451
+Education!A75,Education,75,ml-0859,,applied,DU-00452
+Education!A76,Education,76,ml-0860,,applied,DU-00453
+Education!A77,Education,77,ml-0861,,applied,DU-00454
+Education!A78,Education,78,ml-0862,,applied,DU-00455
+Education!A79,Education,79,ml-0886,ncai,applied,DU-00456
+Education!A8,Education,8,ml-0267,,applied,DU-00385
+Education!A80,Education,80,ml-0887,,applied,DU-00457
+Education!A81,Education,81,ml-0888,,applied,DU-00458
+Education!A82,Education,82,ml-0904,,applied,DU-00459
+Education!A83,Education,83,ml-0905,,applied,DU-00460
+Education!A84,Education,84,ml-0906,,applied,DU-00461
+Education!A85,Education,85,ml-0907,,applied,DU-00462
+Education!A86,Education,86,ml-0908,,applied,DU-00463
+Education!A87,Education,87,ml-0909,,applied,DU-00464
+Education!A88,Education,88,ml-0917,,applied,DU-00465
+Education!A89,Education,89,ml-0918,,applied,DU-00466
+Education!A9,Education,9,ml-0281,,applied,DU-00386
+Education!A90,Education,90,ml-0919,,applied,DU-00467
+Education!A91,Education,91,ml-0945,,applied,DU-00468
+Education!A92,Education,92,ml-0946,,applied,DU-00469
+Education!A93,Education,93,ml-0947,,applied,DU-00470
+Education!A94,Education,94,ml-0975,,applied,DU-00471
+Education!A95,Education,95,ml-0976,,applied,DU-00472
+Education!A96,Education,96,ml-0977,,applied,DU-00473
+Education!A97,Education,97,ml-0978,,applied,DU-00474
+Education!A98,Education,98,ml-0999,,applied,DU-00475
+Education!A99,Education,99,ml-1000,,applied,DU-00476
+Energy!A1,Energy,1,ml-0081,,applied,DU-00548
+Energy!A2,Energy,2,ml-0117,,applied,DU-00549
+Energy!A3,Energy,3,ml-0118,,applied,DU-00550
+Energy!A4,Energy,4,ml-0186,,applied,DU-00551
+Energy!A5,Energy,5,ml-0206,conf,applied,DU-00552
+Energy!A6,Energy,6,ml-0370,,applied,DU-00553
+Energy!A7,Energy,7,ml-0431,,applied,DU-00554
+Energy!A8,Energy,8,ml-0432,,applied,DU-00555
+Gaming!A10,Gaming,10,ml-0816,,applied,DU-00564
+Gaming!A11,Gaming,11,ml-0935,,applied,DU-00565
+Gaming!A12,Gaming,12,ml-0936,,applied,DU-00566
+Gaming!A13,Gaming,13,ml-0939,,applied,DU-00567
+Gaming!A14,Gaming,14,ml-0989,,applied,DU-00568
+Gaming!A15,Gaming,15,ml-1020,,applied,DU-00569
+Gaming!A16,Gaming,16,ml-1052,,applied,DU-00570
+Gaming!A17,Gaming,17,ml-1053,,applied,DU-00571
+Gaming!A18,Gaming,18,ml-1148,,applied,DU-00572
+Gaming!A19,Gaming,19,ml-1229,,applied,DU-00573
+Gaming!A2,Gaming,2,ml-0239,,applied,DU-00556
+Gaming!A20,Gaming,20,ml-1230,,applied,DU-00574
+Gaming!A21,Gaming,21,ml-1262,,applied,DU-00575
+Gaming!A22,Gaming,22,ml-1320,,applied,DU-00576
+Gaming!A23,Gaming,23,ml-1344,,applied,DU-00577
+Gaming!A24,Gaming,24,ml-1435,,applied,DU-00578
+Gaming!A25,Gaming,25,ml-1521,,applied,DU-00579
+Gaming!A3,Gaming,3,ml-0240,,applied,DU-00557
+Gaming!A4,Gaming,4,ml-0469,,applied,DU-00558
+Gaming!A5,Gaming,5,ml-0557,,applied,DU-00559
+Gaming!A6,Gaming,6,ml-0664,,applied,DU-00560
+Gaming!A7,Gaming,7,ml-0665,,applied,DU-00561
+Gaming!A8,Gaming,8,ml-0739,,applied,DU-00562
+Gaming!A9,Gaming,9,ml-0788,,applied,DU-00563
+Health!A10,Health,10,ml-0115,,applied,DU-00588
+Health!A100,Health,100,ml-0856,,applied,DU-00678
+Health!A101,Health,101,ml-0857,,applied,DU-00679
+Health!A102,Health,102,ml-0858,,applied,DU-00680
+Health!A103,Health,103,ml-0882,,applied,DU-00681
+Health!A104,Health,104,ml-0883,,applied,DU-00682
+Health!A105,Health,105,ml-0884,,applied,DU-00683
+Health!A106,Health,106,ml-0885,,applied,DU-00684
+Health!A107,Health,107,ml-0902,,applied,DU-00685
+Health!A108,Health,108,ml-0903,,applied,DU-00686
+Health!A109,Health,109,ml-0913,,applied,DU-00687
+Health!A11,Health,11,ml-0116,,applied,DU-00589
+Health!A110,Health,110,ml-0920,,applied,DU-00688
+Health!A111,Health,111,ml-0921,,applied,DU-00689
+Health!A112,Health,112,ml-0922,,applied,DU-00690
+Health!A113,Health,113,ml-0923,,applied,DU-00691
+Health!A114,Health,114,ml-0924,,applied,DU-00692
+Health!A115,Health,115,ml-0961,,applied,DU-00693
+Health!A116,Health,116,ml-0962,,applied,DU-00694
+Health!A117,Health,117,ml-0963,,applied,DU-00695
+Health!A118,Health,118,ml-0964,,applied,DU-00696
+Health!A119,Health,119,ml-0965,,applied,DU-00697
+Health!A12,Health,12,ml-0136,,applied,DU-00590
+Health!A120,Health,120,ml-0998,,applied,DU-00698
+Health!A121,Health,121,ml-1022,,applied,DU-00699
+Health!A122,Health,122,ml-1023,,applied,DU-00700
+Health!A123,Health,123,ml-1024,,applied,DU-00701
+Health!A124,Health,124,ml-1025,,applied,DU-00702
+Health!A125,Health,125,ml-1049,,applied,DU-00703
+Health!A126,Health,126,ml-1050,,applied,DU-00704
+Health!A127,Health,127,ml-1051,,applied,DU-00705
+Health!A128,Health,128,ml-1076,permalink,applied,DU-00706
+Health!A129,Health,129,ml-1077,permalink,applied,DU-00707
+Health!A13,Health,13,ml-0164,,applied,DU-00591
+Health!A130,Health,130,ml-1078,permalink,applied,DU-00708
+Health!A131,Health,131,ml-1079,permalink,applied,DU-00709
+Health!A132,Health,132,ml-1080,permalink,applied,DU-00710
+Health!A133,Health,133,ml-1081,permalink,applied,DU-00711
+Health!A134,Health,134,ml-1082,permalink,applied,DU-00712
+Health!A135,Health,135,ml-1099,permalink,applied,DU-00713
+Health!A136,Health,136,ml-1100,permalink,applied,DU-00714
+Health!A137,Health,137,ml-1101,permalink,applied,DU-00715
+Health!A138,Health,138,ml-1132,,applied,DU-00716
+Health!A139,Health,139,ml-1133,,applied,DU-00717
+Health!A14,Health,14,ml-0165,,applied,DU-00592
+Health!A140,Health,140,ml-1134,,applied,DU-00718
+Health!A141,Health,141,ml-1135,,applied,DU-00719
+Health!A142,Health,142,ml-1158,,applied,DU-00720
+Health!A143,Health,143,ml-1159,,applied,DU-00721
+Health!A144,Health,144,ml-1160,,applied,DU-00722
+Health!A145,Health,145,ml-1161,,applied,DU-00723
+Health!A146,Health,146,ml-1162,,applied,DU-00724
+Health!A147,Health,147,ml-1163,,applied,DU-00725
+Health!A148,Health,148,ml-1183,,applied,DU-00726
+Health!A149,Health,149,ml-1184,,applied,DU-00727
+Health!A15,Health,15,ml-0166,,applied,DU-00593
+Health!A150,Health,150,ml-1185,,applied,DU-00728
+Health!A151,Health,151,ml-1186,,applied,DU-00729
+Health!A152,Health,152,ml-1212,,applied,DU-00730
+Health!A153,Health,153,ml-1213,,applied,DU-00731
+Health!A154,Health,154,ml-1214,,applied,DU-00732
+Health!A155,Health,155,ml-1215,,applied,DU-00733
+Health!A156,Health,156,ml-1224,,applied,DU-00734
+Health!A157,Health,157,ml-1243,,applied,DU-00735
+Health!A158,Health,158,ml-1244,,applied,DU-00736
+Health!A159,Health,159,ml-1277,,applied,DU-00737
+Health!A16,Health,16,ml-0183,,applied,DU-00594
+Health!A160,Health,160,ml-1278,,applied,DU-00738
+Health!A161,Health,161,ml-1279,,applied,DU-00739
+Health!A162,Health,162,ml-1299,,applied,DU-00740
+Health!A163,Health,163,ml-1300,,applied,DU-00741
+Health!A164,Health,164,ml-1301,,applied,DU-00742
+Health!A165,Health,165,ml-1302,,applied,DU-00743
+Health!A166,Health,166,ml-1303,,applied,DU-00744
+Health!A167,Health,167,ml-1329,,applied,DU-00745
+Health!A168,Health,168,ml-1330,,applied,DU-00746
+Health!A169,Health,169,ml-1331,,applied,DU-00747
+Health!A17,Health,17,ml-0184,,applied,DU-00595
+Health!A170,Health,170,ml-1332,,applied,DU-00748
+Health!A171,Health,171,ml-1366,,applied,DU-00749
+Health!A172,Health,172,ml-1367,,applied,DU-00750
+Health!A173,Health,173,ml-1368,,applied,DU-00751
+Health!A174,Health,174,ml-1401,,applied,DU-00752
+Health!A175,Health,175,ml-1402,,applied,DU-00753
+Health!A176,Health,176,ml-1403,,applied,DU-00754
+Health!A177,Health,177,ml-1404,,applied,DU-00755
+Health!A178,Health,178,ml-1436,,applied,DU-00756
+Health!A179,Health,179,ml-1437,,applied,DU-00757
+Health!A18,Health,18,ml-0185,,applied,DU-00596
+Health!A180,Health,180,ml-1438,,applied,DU-00758
+Health!A181,Health,181,ml-1439,,applied,DU-00759
+Health!A182,Health,182,ml-1440,,applied,DU-00760
+Health!A183,Health,183,ml-1441,,applied,DU-00761
+Health!A184,Health,184,ml-1442,,applied,DU-00762
+Health!A185,Health,185,ml-1443,,applied,DU-00763
+Health!A186,Health,186,ml-1444,,applied,DU-00764
+Health!A187,Health,187,ml-1445,,applied,DU-00765
+Health!A188,Health,188,ml-1481,,applied,DU-00766
+Health!A189,Health,189,ml-1482,,applied,DU-00767
+Health!A19,Health,19,ml-0189,,applied,DU-00597
+Health!A190,Health,190,ml-1483,,applied,DU-00768
+Health!A191,Health,191,ml-1484,,applied,DU-00769
+Health!A192,Health,192,ml-1485,,applied,DU-00770
+Health!A193,Health,193,ml-1522,,applied,DU-00771
+Health!A194,Health,194,ml-1523,,applied,DU-00772
+Health!A195,Health,195,ml-1524,,applied,DU-00773
+Health!A196,Health,196,ml-1525,,applied,DU-00774
+Health!A197,Health,197,ml-1526,,applied,DU-00775
+Health!A198,Health,198,ml-1527,,applied,DU-00776
+Health!A199,Health,199,ml-1528,,applied,DU-00777
+Health!A2,Health,2,ml-0076,,applied,DU-00580
+Health!A20,Health,20,ml-0201,,applied,DU-00598
+Health!A21,Health,21,ml-0202,,applied,DU-00599
+Health!A22,Health,22,ml-0203,,applied,DU-00600
+Health!A23,Health,23,ml-0204,,applied,DU-00601
+Health!A24,Health,24,ml-0205,,applied,DU-00602
+Health!A25,Health,25,ml-0212,,applied,DU-00603
+Health!A26,Health,26,ml-0237,,applied,DU-00604
+Health!A27,Health,27,ml-0238,,applied,DU-00605
+Health!A28,Health,28,ml-0254,,applied,DU-00606
+Health!A29,Health,29,ml-0255,,applied,DU-00607
+Health!A3,Health,3,ml-0077,,applied,DU-00581
+Health!A30,Health,30,ml-0265,,applied,DU-00608
+Health!A31,Health,31,ml-0277,,applied,DU-00609
+Health!A32,Health,32,ml-0278,,applied,DU-00610
+Health!A33,Health,33,ml-0279,,applied,DU-00611
+Health!A34,Health,34,ml-0280,,applied,DU-00612
+Health!A35,Health,35,ml-0294,,applied,DU-00613
+Health!A36,Health,36,ml-0314,,applied,DU-00614
+Health!A37,Health,37,ml-0315,,applied,DU-00615
+Health!A38,Health,38,ml-0324,,applied,DU-00616
+Health!A39,Health,39,ml-0325,,applied,DU-00617
+Health!A4,Health,4,ml-0078,,applied,DU-00582
+Health!A40,Health,40,ml-0326,,applied,DU-00618
+Health!A41,Health,41,ml-0334,,applied,DU-00619
+Health!A42,Health,42,ml-0335,,applied,DU-00620
+Health!A43,Health,43,ml-0380,,applied,DU-00621
+Health!A44,Health,44,ml-0405,,applied,DU-00622
+Health!A45,Health,45,ml-0406,,applied,DU-00623
+Health!A46,Health,46,ml-0407,,applied,DU-00624
+Health!A47,Health,47,ml-0408,,applied,DU-00625
+Health!A48,Health,48,ml-0409,,applied,DU-00626
+Health!A49,Health,49,ml-0429,,applied,DU-00627
+Health!A5,Health,5,ml-0079,,applied,DU-00583
+Health!A50,Health,50,ml-0430,,applied,DU-00628
+Health!A51,Health,51,ml-0434,,proposed,DU-00629
+Health!A52,Health,52,ml-0436,,applied,DU-00630
+Health!A53,Health,53,ml-0437,,applied,DU-00631
+Health!A54,Health,54,ml-0438,,applied,DU-00632
+Health!A55,Health,55,ml-0439,,applied,DU-00633
+Health!A56,Health,56,ml-0440,,applied,DU-00634
+Health!A57,Health,57,ml-0441,,applied,DU-00635
+Health!A58,Health,58,ml-0442,,applied,DU-00636
+Health!A59,Health,59,ml-0465,,applied,DU-00637
+Health!A6,Health,6,ml-0080,,applied,DU-00584
+Health!A60,Health,60,ml-0466,,applied,DU-00638
+Health!A61,Health,61,ml-0467,,applied,DU-00639
+Health!A62,Health,62,ml-0468,,applied,DU-00640
+Health!A63,Health,63,ml-0528,,applied,DU-00641
+Health!A64,Health,64,ml-0529,,applied,DU-00642
+Health!A65,Health,65,ml-0530,,applied,DU-00643
+Health!A66,Health,66,ml-0531,,applied,DU-00644
+Health!A67,Health,67,ml-0575,,applied,DU-00645
+Health!A68,Health,68,ml-0576,,applied,DU-00646
+Health!A69,Health,69,ml-0577,,applied,DU-00647
+Health!A7,Health,7,ml-0088,,applied,DU-00585
+Health!A70,Health,70,ml-0600,,applied,DU-00648
+Health!A71,Health,71,ml-0601,,applied,DU-00649
+Health!A72,Health,72,ml-0617,,applied,DU-00650
+Health!A73,Health,73,ml-0627,,applied,DU-00651
+Health!A74,Health,74,ml-0642,,applied,DU-00652
+Health!A75,Health,75,ml-0662,,applied,DU-00653
+Health!A76,Health,76,ml-0678,,applied,DU-00654
+Health!A77,Health,77,ml-0699,,applied,DU-00655
+Health!A78,Health,78,ml-0700,,applied,DU-00656
+Health!A79,Health,79,ml-0701,,applied,DU-00657
+Health!A8,Health,8,ml-0113,,applied,DU-00586
+Health!A80,Health,80,ml-0702,,applied,DU-00658
+Health!A81,Health,81,ml-0703,,applied,DU-00659
+Health!A82,Health,82,ml-0704,,applied,DU-00660
+Health!A83,Health,83,ml-0705,,applied,DU-00661
+Health!A84,Health,84,ml-0738,,applied,DU-00662
+Health!A85,Health,85,ml-0763,,applied,DU-00663
+Health!A86,Health,86,ml-0764,,applied,DU-00664
+Health!A87,Health,87,ml-0765,,applied,DU-00665
+Health!A88,Health,88,ml-0766,,applied,DU-00666
+Health!A89,Health,89,ml-0767,,applied,DU-00667
+Health!A9,Health,9,ml-0114,,applied,DU-00587
+Health!A90,Health,90,ml-0786,,applied,DU-00668
+Health!A91,Health,91,ml-0787,,applied,DU-00669
+Health!A92,Health,92,ml-0807,,applied,DU-00670
+Health!A93,Health,93,ml-0808,,applied,DU-00671
+Health!A94,Health,94,ml-0809,,applied,DU-00672
+Health!A95,Health,95,ml-0830,,applied,DU-00673
+Health!A96,Health,96,ml-0831,,applied,DU-00674
+Health!A97,Health,97,ml-0832,,applied,DU-00675
+Health!A98,Health,98,ml-0854,,applied,DU-00676
+Health!A99,Health,99,ml-0855,,applied,DU-00677
+Housing!A10,Housing,10,ml-0526,,applied,DU-00786
+Housing!A11,Housing,11,ml-0527,,applied,DU-00787
+Housing!A12,Housing,12,ml-0572,,applied,DU-00788
+Housing!A13,Housing,13,ml-0573,,applied,DU-00789
+Housing!A14,Housing,14,ml-0574,,applied,DU-00790
+Housing!A15,Housing,15,ml-0599,,applied,DU-00791
+Housing!A16,Housing,16,ml-0616,,applied,DU-00792
+Housing!A17,Housing,17,ml-0639,,applied,DU-00793
+Housing!A18,Housing,18,ml-0640,,applied,DU-00794
+Housing!A19,Housing,19,ml-0660,,applied,DU-00795
+Housing!A2,Housing,2,ml-0127,,applied,DU-00778
+Housing!A20,Housing,20,ml-0661,,applied,DU-00796
+Housing!A21,Housing,21,ml-0676,,applied,DU-00797
+Housing!A22,Housing,22,ml-0677,,applied,DU-00798
+Housing!A23,Housing,23,ml-0698,,applied,DU-00799
+Housing!A24,Housing,24,ml-0735,,applied,DU-00800
+Housing!A25,Housing,25,ml-0736,,applied,DU-00801
+Housing!A26,Housing,26,ml-0737,,applied,DU-00802
+Housing!A27,Housing,27,ml-0784,,applied,DU-00803
+Housing!A28,Housing,28,ml-0785,,applied,DU-00804
+Housing!A29,Housing,29,ml-0805,,applied,DU-00805
+Housing!A3,Housing,3,ml-0152,,applied,DU-00779
+Housing!A30,Housing,30,ml-0806,,applied,DU-00806
+Housing!A31,Housing,31,ml-0829,,applied,DU-00807
+Housing!A32,Housing,32,ml-0870,,applied,DU-00808
+Housing!A33,Housing,33,ml-0914,,applied,DU-00809
+Housing!A34,Housing,34,ml-1028,,applied,DU-00810
+Housing!A35,Housing,35,ml-1029,,applied,DU-00811
+Housing!A36,Housing,36,ml-1030,,applied,DU-00812
+Housing!A37,Housing,37,ml-1031,,applied,DU-00813
+Housing!A38,Housing,38,ml-1044,,applied,DU-00814
+Housing!A39,Housing,39,ml-1045,,applied,DU-00815
+Housing!A4,Housing,4,ml-0263,,applied,DU-00780
+Housing!A40,Housing,40,ml-1046,,applied,DU-00816
+Housing!A41,Housing,41,ml-1047,,applied,DU-00817
+Housing!A42,Housing,42,ml-1048,,applied,DU-00818
+Housing!A43,Housing,43,ml-1104,permalink,applied,DU-00819
+Housing!A44,Housing,44,ml-1105,permalink,applied,DU-00820
+Housing!A45,Housing,45,ml-1106,permalink,applied,DU-00821
+Housing!A46,Housing,46,ml-1107,permalink,applied,DU-00822
+Housing!A47,Housing,47,ml-1187,,applied,DU-00823
+Housing!A48,Housing,48,ml-1188,,applied,DU-00824
+Housing!A49,Housing,49,ml-1189,,applied,DU-00825
+Housing!A5,Housing,5,ml-0264,,applied,DU-00781
+Housing!A50,Housing,50,ml-1190,,applied,DU-00826
+Housing!A51,Housing,51,ml-1191,,applied,DU-00827
+Housing!A52,Housing,52,ml-1192,,applied,DU-00828
+Housing!A53,Housing,53,ml-1193,,applied,DU-00829
+Housing!A54,Housing,54,ml-1194,,applied,DU-00830
+Housing!A55,Housing,55,ml-1195,,applied,DU-00831
+Housing!A56,Housing,56,ml-1234,,applied,DU-00832
+Housing!A57,Housing,57,ml-1235,,applied,DU-00833
+Housing!A58,Housing,58,ml-1236,,applied,DU-00834
+Housing!A59,Housing,59,ml-1287,,applied,DU-00835
+Housing!A6,Housing,6,ml-0312,,applied,DU-00782
+Housing!A60,Housing,60,ml-1288,,applied,DU-00836
+Housing!A61,Housing,61,ml-1289,,applied,DU-00837
+Housing!A62,Housing,62,ml-1290,,applied,DU-00838
+Housing!A63,Housing,63,ml-1291,,applied,DU-00839
+Housing!A64,Housing,64,ml-1292,,applied,DU-00840
+Housing!A65,Housing,65,ml-1319,,applied,DU-00841
+Housing!A66,Housing,66,ml-1360,,applied,DU-00842
+Housing!A67,Housing,67,ml-1361,,applied,DU-00843
+Housing!A68,Housing,68,ml-1362,,applied,DU-00844
+Housing!A69,Housing,69,ml-1363,,applied,DU-00845
+Housing!A7,Housing,7,ml-0313,,applied,DU-00783
+Housing!A70,Housing,70,ml-1364,,applied,DU-00846
+Housing!A71,Housing,71,ml-1365,,applied,DU-00847
+Housing!A72,Housing,72,ml-1383,,applied,DU-00848
+Housing!A73,Housing,73,ml-1424,,applied,DU-00849
+Housing!A74,Housing,74,ml-1425,,applied,DU-00850
+Housing!A75,Housing,75,ml-1467,,applied,DU-00851
+Housing!A76,Housing,76,ml-1468,,applied,DU-00852
+Housing!A77,Housing,77,ml-1469,,applied,DU-00853
+Housing!A78,Housing,78,ml-1470,,applied,DU-00854
+Housing!A79,Housing,79,ml-1471,,applied,DU-00855
+Housing!A8,Housing,8,ml-0524,,applied,DU-00784
+Housing!A80,Housing,80,ml-1488,,applied,DU-00856
+Housing!A9,Housing,9,ml-0525,,applied,DU-00785
+ICWA!A10,ICWA,10,ml-0991,,applied,DU-00865
+ICWA!A11,ICWA,11,ml-1042,,applied,DU-00866
+ICWA!A12,ICWA,12,ml-1043,,applied,DU-00867
+ICWA!A13,ICWA,13,ml-1231,,applied,DU-00868
+ICWA!A14,ICWA,14,ml-1232,,applied,DU-00869
+ICWA!A15,ICWA,15,ml-1280,,applied,DU-00870
+ICWA!A16,ICWA,16,ml-1281,,applied,DU-00871
+ICWA!A17,ICWA,17,ml-1335,,applied,DU-00872
+ICWA!A18,ICWA,18,ml-1359,,applied,DU-00873
+ICWA!A19,ICWA,19,ml-1410,,applied,DU-00874
+ICWA!A2,ICWA,2,ml-0135,,applied,DU-00857
+ICWA!A20,ICWA,20,ml-1417,,applied,DU-00875
+ICWA!A21,ICWA,21,ml-1529,,applied,DU-00876
+ICWA!A3,ICWA,3,ml-0394,,applied,DU-00858
+ICWA!A4,ICWA,4,ml-0492,,applied,DU-00859
+ICWA!A5,ICWA,5,ml-0505,,applied,DU-00860
+ICWA!A6,ICWA,6,ml-0571,,applied,DU-00861
+ICWA!A7,ICWA,7,ml-0638,,applied,DU-00862
+ICWA!A8,ICWA,8,ml-0979,,applied,DU-00863
+ICWA!A9,ICWA,9,ml-0990,,applied,DU-00864
+Law & Justice!A10,Law & Justice,10,ml-0253,,applied,DU-00885
+Law & Justice!A11,Law & Justice,11,ml-0276,,applied,DU-00886
+Law & Justice!A12,Law & Justice,12,ml-0288,,applied,DU-00887
+Law & Justice!A13,Law & Justice,13,ml-0293,,applied,DU-00888
+Law & Justice!A14,Law & Justice,14,ml-0333,,applied,DU-00889
+Law & Justice!A15,Law & Justice,15,ml-0379,,applied,DU-00890
+Law & Justice!A16,Law & Justice,16,ml-0404,,applied,DU-00891
+Law & Justice!A17,Law & Justice,17,ml-0453,,applied,DU-00892
+Law & Justice!A18,Law & Justice,18,ml-0491,,applied,DU-00893
+Law & Justice!A19,Law & Justice,19,ml-0522,,applied,DU-00894
+Law & Justice!A2,Law & Justice,2,ml-0126,,applied,DU-00877
+Law & Justice!A20,Law & Justice,20,ml-0523,,applied,DU-00895
+Law & Justice!A21,Law & Justice,21,ml-0552,,applied,DU-00896
+Law & Justice!A22,Law & Justice,22,ml-0553,,applied,DU-00897
+Law & Justice!A23,Law & Justice,23,ml-0659,,applied,DU-00898
+Law & Justice!A24,Law & Justice,24,ml-0674,,applied,DU-00899
+Law & Justice!A25,Law & Justice,25,ml-0675,,applied,DU-00900
+Law & Justice!A26,Law & Justice,26,ml-0697,,applied,DU-00901
+Law & Justice!A27,Law & Justice,27,ml-0732,,applied,DU-00902
+Law & Justice!A28,Law & Justice,28,ml-0733,,applied,DU-00903
+Law & Justice!A29,Law & Justice,29,ml-0734,,applied,DU-00904
+Law & Justice!A3,Law & Justice,3,ml-0147,,applied,DU-00878
+Law & Justice!A30,Law & Justice,30,ml-0761,,applied,DU-00905
+Law & Justice!A31,Law & Justice,31,ml-0762,,applied,DU-00906
+Law & Justice!A32,Law & Justice,32,ml-0782,,applied,DU-00907
+Law & Justice!A33,Law & Justice,33,ml-0783,,applied,DU-00908
+Law & Justice!A34,Law & Justice,34,ml-0804,,applied,DU-00909
+Law & Justice!A35,Law & Justice,35,ml-0828,,applied,DU-00910
+Law & Justice!A36,Law & Justice,36,ml-0869,,applied,DU-00911
+Law & Justice!A37,Law & Justice,37,ml-0933,,applied,DU-00912
+Law & Justice!A38,Law & Justice,38,ml-0934,,applied,DU-00913
+Law & Justice!A39,Law & Justice,39,ml-0942,,applied,DU-00914
+Law & Justice!A4,Law & Justice,4,ml-0160,,applied,DU-00879
+Law & Justice!A40,Law & Justice,40,ml-0955,,applied,DU-00915
+Law & Justice!A41,Law & Justice,41,ml-0956,,applied,DU-00916
+Law & Justice!A42,Law & Justice,42,ml-0957,,applied,DU-00917
+Law & Justice!A43,Law & Justice,43,ml-1004,,applied,DU-00918
+Law & Justice!A44,Law & Justice,44,ml-1008,,applied,DU-00919
+Law & Justice!A45,Law & Justice,45,ml-1014,,applied,DU-00920
+Law & Justice!A46,Law & Justice,46,ml-1096,permalink,applied,DU-00921
+Law & Justice!A47,Law & Justice,47,ml-1097,permalink,applied,DU-00922
+Law & Justice!A48,Law & Justice,48,ml-1245,,applied,DU-00923
+Law & Justice!A49,Law & Justice,49,ml-1282,,applied,DU-00924
+Law & Justice!A5,Law & Justice,5,ml-0182,,applied,DU-00880
+Law & Justice!A50,Law & Justice,50,ml-1328,,applied,DU-00925
+Law & Justice!A51,Law & Justice,51,ml-1384,,applied,DU-00926
+Law & Justice!A52,Law & Justice,52,ml-1385,,applied,DU-00927
+Law & Justice!A53,Law & Justice,53,ml-1386,,applied,DU-00928
+Law & Justice!A54,Law & Justice,54,ml-1387,,applied,DU-00929
+Law & Justice!A55,Law & Justice,55,ml-1388,,applied,DU-00930
+Law & Justice!A56,Law & Justice,56,ml-1389,,applied,DU-00931
+Law & Justice!A57,Law & Justice,57,ml-1390,,applied,DU-00932
+Law & Justice!A58,Law & Justice,58,ml-1429,,applied,DU-00933
+Law & Justice!A59,Law & Justice,59,ml-1430,,applied,DU-00934
+Law & Justice!A6,Law & Justice,6,ml-0211,,applied,DU-00881
+Law & Justice!A60,Law & Justice,60,ml-1431,,applied,DU-00935
+Law & Justice!A61,Law & Justice,61,ml-1464,,applied,DU-00936
+Law & Justice!A62,Law & Justice,62,ml-1465,,applied,DU-00937
+Law & Justice!A63,Law & Justice,63,ml-1498,,applied,DU-00938
+Law & Justice!A7,Law & Justice,7,ml-0222,,applied,DU-00882
+Law & Justice!A8,Law & Justice,8,ml-0236,,applied,DU-00883
+Law & Justice!A9,Law & Justice,9,ml-0252,,applied,DU-00884
+Native Vote!A10,Native Vote,10,ml-0310,,applied,DU-00947
+Native Vote!A11,Native Vote,11,ml-0311,,applied,DU-00948
+Native Vote!A12,Native Vote,12,ml-0378,,applied,DU-00949
+Native Vote!A13,Native Vote,13,ml-0428,,applied,DU-00950
+Native Vote!A14,Native Vote,14,ml-0448,,applied,DU-00951
+Native Vote!A15,Native Vote,15,ml-0696,,applied,DU-00952
+Native Vote!A16,Native Vote,16,ml-0880,,applied,DU-00953
+Native Vote!A17,Native Vote,17,ml-0881,,applied,DU-00954
+Native Vote!A18,Native Vote,18,ml-1032,,applied,DU-00955
+Native Vote!A19,Native Vote,19,ml-1054,,applied,DU-00956
+Native Vote!A2,Native Vote,2,ml-0093,,applied,DU-00939
+Native Vote!A3,Native Vote,3,ml-0094,,applied,DU-00940
+Native Vote!A4,Native Vote,4,ml-0112,,applied,DU-00941
+Native Vote!A5,Native Vote,5,ml-0146,,applied,DU-00942
+Native Vote!A6,Native Vote,6,ml-0170,,applied,DU-00943
+Native Vote!A7,Native Vote,7,ml-0200,,applied,DU-00944
+Native Vote!A8,Native Vote,8,ml-0261,,applied,DU-00945
+Native Vote!A9,Native Vote,9,ml-0262,,applied,DU-00946
+Natural Resources!A10,Natural Resources,10,ml-0110,,applied,DU-00965
+Natural Resources!A100,Natural Resources,100,ml-0548,,applied,DU-01055
+Natural Resources!A101,Natural Resources,101,ml-0549,,applied,DU-01056
+Natural Resources!A102,Natural Resources,102,ml-0550,,applied,DU-01057
+Natural Resources!A103,Natural Resources,103,ml-0551,,applied,DU-01058
+Natural Resources!A104,Natural Resources,104,ml-0569,,applied,DU-01059
+Natural Resources!A105,Natural Resources,105,ml-0570,,applied,DU-01060
+Natural Resources!A106,Natural Resources,106,ml-0595,,applied,DU-01061
+Natural Resources!A107,Natural Resources,107,ml-0596,,applied,DU-01062
+Natural Resources!A108,Natural Resources,108,ml-0597,,applied,DU-01063
+Natural Resources!A109,Natural Resources,109,ml-0598,,applied,DU-01064
+Natural Resources!A11,Natural Resources,11,ml-0111,,applied,DU-00966
+Natural Resources!A110,Natural Resources,110,ml-0634,,applied,DU-01065
+Natural Resources!A111,Natural Resources,111,ml-0635,,applied,DU-01066
+Natural Resources!A112,Natural Resources,112,ml-0636,,applied,DU-01067
+Natural Resources!A113,Natural Resources,113,ml-0637,,applied,DU-01068
+Natural Resources!A114,Natural Resources,114,ml-0657,,applied,DU-01069
+Natural Resources!A115,Natural Resources,115,ml-0658,,applied,DU-01070
+Natural Resources!A116,Natural Resources,116,ml-0670,,applied,DU-01071
+Natural Resources!A117,Natural Resources,117,ml-0671,,applied,DU-01072
+Natural Resources!A118,Natural Resources,118,ml-0672,,applied,DU-01073
+Natural Resources!A119,Natural Resources,119,ml-0673,,applied,DU-01074
+Natural Resources!A12,Natural Resources,12,ml-0129,,applied,DU-00967
+Natural Resources!A120,Natural Resources,120,ml-0689,,applied,DU-01075
+Natural Resources!A121,Natural Resources,121,ml-0728,,applied,DU-01076
+Natural Resources!A122,Natural Resources,122,ml-0729,,applied,DU-01077
+Natural Resources!A123,Natural Resources,123,ml-0730,,applied,DU-01078
+Natural Resources!A124,Natural Resources,124,ml-0731,,applied,DU-01079
+Natural Resources!A125,Natural Resources,125,ml-0749,,applied,DU-01080
+Natural Resources!A126,Natural Resources,126,ml-0769,,applied,DU-01081
+Natural Resources!A127,Natural Resources,127,ml-0779,,applied,DU-01082
+Natural Resources!A128,Natural Resources,128,ml-0780,,applied,DU-01083
+Natural Resources!A129,Natural Resources,129,ml-0781,,applied,DU-01084
+Natural Resources!A13,Natural Resources,13,ml-0130,,applied,DU-00968
+Natural Resources!A130,Natural Resources,130,ml-0810,,applied,DU-01085
+Natural Resources!A131,Natural Resources,131,ml-0811,,applied,DU-01086
+Natural Resources!A132,Natural Resources,132,ml-0812,,applied,DU-01087
+Natural Resources!A133,Natural Resources,133,ml-0813,,applied,DU-01088
+Natural Resources!A134,Natural Resources,134,ml-0826,,applied,DU-01089
+Natural Resources!A135,Natural Resources,135,ml-0827,,applied,DU-01090
+Natural Resources!A136,Natural Resources,136,ml-0872,,applied,DU-01091
+Natural Resources!A137,Natural Resources,137,ml-0873,,applied,DU-01092
+Natural Resources!A138,Natural Resources,138,ml-0898,,applied,DU-01093
+Natural Resources!A139,Natural Resources,139,ml-0899,,applied,DU-01094
+Natural Resources!A14,Natural Resources,14,ml-0131,,applied,DU-00969
+Natural Resources!A140,Natural Resources,140,ml-0900,,applied,DU-01095
+Natural Resources!A141,Natural Resources,141,ml-0916,,applied,DU-01096
+Natural Resources!A142,Natural Resources,142,ml-0928,,applied,DU-01097
+Natural Resources!A143,Natural Resources,143,ml-0929,,applied,DU-01098
+Natural Resources!A144,Natural Resources,144,ml-0930,,applied,DU-01099
+Natural Resources!A145,Natural Resources,145,ml-0948,,applied,DU-01100
+Natural Resources!A146,Natural Resources,146,ml-0949,,applied,DU-01101
+Natural Resources!A147,Natural Resources,147,ml-0971,,applied,DU-01102
+Natural Resources!A148,Natural Resources,148,ml-0972,,applied,DU-01103
+Natural Resources!A149,Natural Resources,149,ml-0973,,applied,DU-01104
+Natural Resources!A15,Natural Resources,15,ml-0132,,applied,DU-00970
+Natural Resources!A150,Natural Resources,150,ml-0974,,applied,DU-01105
+Natural Resources!A151,Natural Resources,151,ml-0993,,applied,DU-01106
+Natural Resources!A152,Natural Resources,152,ml-0994,,applied,DU-01107
+Natural Resources!A153,Natural Resources,153,ml-0995,,applied,DU-01108
+Natural Resources!A154,Natural Resources,154,ml-0996,,applied,DU-01109
+Natural Resources!A155,Natural Resources,155,ml-1007,,applied,DU-01110
+Natural Resources!A156,Natural Resources,156,ml-1009,,applied,DU-01111
+Natural Resources!A157,Natural Resources,157,ml-1010,,applied,DU-01112
+Natural Resources!A158,Natural Resources,158,ml-1011,,applied,DU-01113
+Natural Resources!A159,Natural Resources,159,ml-1015,,applied,DU-01114
+Natural Resources!A16,Natural Resources,16,ml-0133,,applied,DU-00971
+Natural Resources!A160,Natural Resources,160,ml-1037,,applied,DU-01115
+Natural Resources!A161,Natural Resources,161,ml-1038,,applied,DU-01116
+Natural Resources!A162,Natural Resources,162,ml-1039,,applied,DU-01117
+Natural Resources!A163,Natural Resources,163,ml-1040,,applied,DU-01118
+Natural Resources!A164,Natural Resources,164,ml-1041,,applied,DU-01119
+Natural Resources!A165,Natural Resources,165,ml-1086,permalink,applied,DU-01120
+Natural Resources!A166,Natural Resources,166,ml-1087,permalink,applied,DU-01121
+Natural Resources!A167,Natural Resources,167,ml-1088,permalink,applied,DU-01122
+Natural Resources!A168,Natural Resources,168,ml-1089,permalink,applied,DU-01123
+Natural Resources!A169,Natural Resources,169,ml-1108,permalink,applied,DU-01124
+Natural Resources!A17,Natural Resources,17,ml-0134,,applied,DU-00972
+Natural Resources!A170,Natural Resources,170,ml-1111,permalink,applied,DU-01125
+Natural Resources!A171,Natural Resources,171,ml-1112,permalink,applied,DU-01126
+Natural Resources!A172,Natural Resources,172,ml-1113,permalink,applied,DU-01127
+Natural Resources!A173,Natural Resources,173,ml-1136,,applied,DU-01128
+Natural Resources!A174,Natural Resources,174,ml-1137,,applied,DU-01129
+Natural Resources!A175,Natural Resources,175,ml-1138,,applied,DU-01130
+Natural Resources!A176,Natural Resources,176,ml-1139,,applied,DU-01131
+Natural Resources!A177,Natural Resources,177,ml-1140,,applied,DU-01132
+Natural Resources!A178,Natural Resources,178,ml-1153,,applied,DU-01133
+Natural Resources!A179,Natural Resources,179,ml-1154,,applied,DU-01134
+Natural Resources!A18,Natural Resources,18,ml-0143,,applied,DU-00973
+Natural Resources!A180,Natural Resources,180,ml-1155,,applied,DU-01135
+Natural Resources!A181,Natural Resources,181,ml-1156,,applied,DU-01136
+Natural Resources!A182,Natural Resources,182,ml-1157,,applied,DU-01137
+Natural Resources!A183,Natural Resources,183,ml-1176,,applied,DU-01138
+Natural Resources!A184,Natural Resources,184,ml-1177,,applied,DU-01139
+Natural Resources!A185,Natural Resources,185,ml-1178,,applied,DU-01140
+Natural Resources!A186,Natural Resources,186,ml-1179,,applied,DU-01141
+Natural Resources!A187,Natural Resources,187,ml-1220,,applied,DU-01142
+Natural Resources!A188,Natural Resources,188,ml-1221,,applied,DU-01143
+Natural Resources!A189,Natural Resources,189,ml-1222,,applied,DU-01144
+Natural Resources!A19,Natural Resources,19,ml-0144,,applied,DU-00974
+Natural Resources!A190,Natural Resources,190,ml-1223,,applied,DU-01145
+Natural Resources!A191,Natural Resources,191,ml-1257,,applied,DU-01146
+Natural Resources!A192,Natural Resources,192,ml-1258,,applied,DU-01147
+Natural Resources!A193,Natural Resources,193,ml-1314,,applied,DU-01148
+Natural Resources!A194,Natural Resources,194,ml-1315,,applied,DU-01149
+Natural Resources!A195,Natural Resources,195,ml-1316,,applied,DU-01150
+Natural Resources!A196,Natural Resources,196,ml-1317,,applied,DU-01151
+Natural Resources!A197,Natural Resources,197,ml-1318,,applied,DU-01152
+Natural Resources!A198,Natural Resources,198,ml-1338,,applied,DU-01153
+Natural Resources!A199,Natural Resources,199,ml-1339,,applied,DU-01154
+Natural Resources!A2,Natural Resources,2,ml-0090,,applied,DU-00957
+Natural Resources!A20,Natural Resources,20,ml-0145,,applied,DU-00975
+Natural Resources!A200,Natural Resources,200,ml-1340,,applied,DU-01155
+Natural Resources!A201,Natural Resources,201,ml-1343,,applied,DU-01156
+Natural Resources!A202,Natural Resources,202,ml-1356,,applied,DU-01157
+Natural Resources!A203,Natural Resources,203,ml-1357,,applied,DU-01158
+Natural Resources!A204,Natural Resources,204,ml-1358,,applied,DU-01159
+Natural Resources!A205,Natural Resources,205,ml-1405,,applied,DU-01160
+Natural Resources!A206,Natural Resources,206,ml-1406,,applied,DU-01161
+Natural Resources!A207,Natural Resources,207,ml-1407,,applied,DU-01162
+Natural Resources!A208,Natural Resources,208,ml-1408,,applied,DU-01163
+Natural Resources!A209,Natural Resources,209,ml-1409,,applied,DU-01164
+Natural Resources!A21,Natural Resources,21,ml-0158,,applied,DU-00976
+Natural Resources!A210,Natural Resources,210,ml-1446,,applied,DU-01165
+Natural Resources!A211,Natural Resources,211,ml-1447,,applied,DU-01166
+Natural Resources!A212,Natural Resources,212,ml-1448,,applied,DU-01167
+Natural Resources!A213,Natural Resources,213,ml-1472,,applied,DU-01168
+Natural Resources!A214,Natural Resources,214,ml-1473,,applied,DU-01169
+Natural Resources!A215,Natural Resources,215,ml-1474,,applied,DU-01170
+Natural Resources!A216,Natural Resources,216,ml-1475,,applied,DU-01171
+Natural Resources!A217,Natural Resources,217,ml-1476,,applied,DU-01172
+Natural Resources!A218,Natural Resources,218,ml-1477,,applied,DU-01173
+Natural Resources!A219,Natural Resources,219,ml-1478,,applied,DU-01174
+Natural Resources!A22,Natural Resources,22,ml-0159,,applied,DU-00977
+Natural Resources!A220,Natural Resources,220,ml-1479,,applied,DU-01175
+Natural Resources!A221,Natural Resources,221,ml-1480,,applied,DU-01176
+Natural Resources!A222,Natural Resources,222,ml-1499,,applied,DU-01177
+Natural Resources!A223,Natural Resources,223,ml-1517,,applied,DU-01178
+Natural Resources!A224,Natural Resources,224,ml-1518,,applied,DU-01179
+Natural Resources!A225,Natural Resources,225,ml-1519,,applied,DU-01180
+Natural Resources!A226,Natural Resources,226,ml-1520,,applied,DU-01181
+Natural Resources!A23,Natural Resources,23,ml-0172,,applied,DU-00978
+Natural Resources!A24,Natural Resources,24,ml-0180,,applied,DU-00979
+Natural Resources!A25,Natural Resources,25,ml-0181,,applied,DU-00980
+Natural Resources!A26,Natural Resources,26,ml-0195,,applied,DU-00981
+Natural Resources!A27,Natural Resources,27,ml-0196,,applied,DU-00982
+Natural Resources!A28,Natural Resources,28,ml-0197,,applied,DU-00983
+Natural Resources!A29,Natural Resources,29,ml-0198,,applied,DU-00984
+Natural Resources!A3,Natural Resources,3,ml-0091,,applied,DU-00958
+Natural Resources!A30,Natural Resources,30,ml-0199,,applied,DU-00985
+Natural Resources!A31,Natural Resources,31,ml-0219,,applied,DU-00986
+Natural Resources!A32,Natural Resources,32,ml-0220,,applied,DU-00987
+Natural Resources!A33,Natural Resources,33,ml-0221,,applied,DU-00988
+Natural Resources!A34,Natural Resources,34,ml-0228,,applied,DU-00989
+Natural Resources!A35,Natural Resources,35,ml-0231,,applied,DU-00990
+Natural Resources!A36,Natural Resources,36,ml-0232,,applied,DU-00991
+Natural Resources!A37,Natural Resources,37,ml-0233,,applied,DU-00992
+Natural Resources!A38,Natural Resources,38,ml-0234,,applied,DU-00993
+Natural Resources!A39,Natural Resources,39,ml-0235,,applied,DU-00994
+Natural Resources!A4,Natural Resources,4,ml-0092,,applied,DU-00959
+Natural Resources!A40,Natural Resources,40,ml-0250,,applied,DU-00995
+Natural Resources!A41,Natural Resources,41,ml-0251,,applied,DU-00996
+Natural Resources!A42,Natural Resources,42,ml-0259,,applied,DU-00997
+Natural Resources!A43,Natural Resources,43,ml-0260,,applied,DU-00998
+Natural Resources!A44,Natural Resources,44,ml-0274,,applied,DU-00999
+Natural Resources!A45,Natural Resources,45,ml-0275,,applied,DU-01000
+Natural Resources!A46,Natural Resources,46,ml-0291,,applied,DU-01001
+Natural Resources!A47,Natural Resources,47,ml-0307,,applied,DU-01002
+Natural Resources!A48,Natural Resources,48,ml-0308,,applied,DU-01003
+Natural Resources!A49,Natural Resources,49,ml-0309,,applied,DU-01004
+Natural Resources!A5,Natural Resources,5,ml-0105,,applied,DU-00960
+Natural Resources!A50,Natural Resources,50,ml-0319,,applied,DU-01005
+Natural Resources!A51,Natural Resources,51,ml-0320,,applied,DU-01006
+Natural Resources!A52,Natural Resources,52,ml-0321,,applied,DU-01007
+Natural Resources!A53,Natural Resources,53,ml-0322,,applied,DU-01008
+Natural Resources!A54,Natural Resources,54,ml-0323,,applied,DU-01009
+Natural Resources!A55,Natural Resources,55,ml-0329,,applied,DU-01010
+Natural Resources!A56,Natural Resources,56,ml-0330,,applied,DU-01011
+Natural Resources!A57,Natural Resources,57,ml-0331,,applied,DU-01012
+Natural Resources!A58,Natural Resources,58,ml-0332,,applied,DU-01013
+Natural Resources!A59,Natural Resources,59,ml-0373,,applied,DU-01014
+Natural Resources!A6,Natural Resources,6,ml-0106,,applied,DU-00961
+Natural Resources!A60,Natural Resources,60,ml-0374,,applied,DU-01015
+Natural Resources!A61,Natural Resources,61,ml-0375,,applied,DU-01016
+Natural Resources!A62,Natural Resources,62,ml-0376,,applied,DU-01017
+Natural Resources!A63,Natural Resources,63,ml-0377,,applied,DU-01018
+Natural Resources!A64,Natural Resources,64,ml-0391,,applied,DU-01019
+Natural Resources!A65,Natural Resources,65,ml-0392,,applied,DU-01020
+Natural Resources!A66,Natural Resources,66,ml-0393,,applied,DU-01021
+Natural Resources!A67,Natural Resources,67,ml-0403,,applied,DU-01022
+Natural Resources!A68,Natural Resources,68,ml-0421,,applied,DU-01023
+Natural Resources!A69,Natural Resources,69,ml-0422,,applied,DU-01024
+Natural Resources!A7,Natural Resources,7,ml-0107,,applied,DU-00962
+Natural Resources!A70,Natural Resources,70,ml-0423,,applied,DU-01025
+Natural Resources!A71,Natural Resources,71,ml-0424,,applied,DU-01026
+Natural Resources!A72,Natural Resources,72,ml-0425,,applied,DU-01027
+Natural Resources!A73,Natural Resources,73,ml-0426,,applied,DU-01028
+Natural Resources!A74,Natural Resources,74,ml-0427,,applied,DU-01029
+Natural Resources!A75,Natural Resources,75,ml-0443,,applied,DU-01030
+Natural Resources!A76,Natural Resources,76,ml-0444,,applied,DU-01031
+Natural Resources!A77,Natural Resources,77,ml-0445,,applied,DU-01032
+Natural Resources!A78,Natural Resources,78,ml-0446,,applied,DU-01033
+Natural Resources!A79,Natural Resources,79,ml-0447,,applied,DU-01034
+Natural Resources!A8,Natural Resources,8,ml-0108,,applied,DU-00963
+Natural Resources!A80,Natural Resources,80,ml-0462,,applied,DU-01035
+Natural Resources!A81,Natural Resources,81,ml-0463,,applied,DU-01036
+Natural Resources!A82,Natural Resources,82,ml-0464,,applied,DU-01037
+Natural Resources!A83,Natural Resources,83,ml-0484,,applied,DU-01038
+Natural Resources!A84,Natural Resources,84,ml-0485,,applied,DU-01039
+Natural Resources!A85,Natural Resources,85,ml-0486,,applied,DU-01040
+Natural Resources!A86,Natural Resources,86,ml-0487,,applied,DU-01041
+Natural Resources!A87,Natural Resources,87,ml-0488,,applied,DU-01042
+Natural Resources!A88,Natural Resources,88,ml-0489,,applied,DU-01043
+Natural Resources!A89,Natural Resources,89,ml-0490,,applied,DU-01044
+Natural Resources!A9,Natural Resources,9,ml-0109,,applied,DU-00964
+Natural Resources!A90,Natural Resources,90,ml-0502,,applied,DU-01045
+Natural Resources!A91,Natural Resources,91,ml-0503,,applied,DU-01046
+Natural Resources!A92,Natural Resources,92,ml-0504,,applied,DU-01047
+Natural Resources!A93,Natural Resources,93,ml-0521,,applied,DU-01048
+Natural Resources!A94,Natural Resources,94,ml-0542,,applied,DU-01049
+Natural Resources!A95,Natural Resources,95,ml-0543,,applied,DU-01050
+Natural Resources!A96,Natural Resources,96,ml-0544,,applied,DU-01051
+Natural Resources!A97,Natural Resources,97,ml-0545,,applied,DU-01052
+Natural Resources!A98,Natural Resources,98,ml-0546,,applied,DU-01053
+Natural Resources!A99,Natural Resources,99,ml-0547,,applied,DU-01054
+Sheet1!A10,Sheet1,10,ml-1618,,applied,DU-00055
+Sheet1!A11,Sheet1,11,ml-1619,,applied,DU-00056
+Sheet1!A12,Sheet1,12,ml-1620,,applied,DU-00057
+Sheet1!A13,Sheet1,13,ml-1621,,applied,DU-00058
+Sheet1!A14,Sheet1,14,ml-1622,,applied,DU-00059
+Sheet1!A15,Sheet1,15,ml-1623,,applied,DU-00060
+Sheet1!A16,Sheet1,16,ml-1624,,applied,DU-00061
+Sheet1!A17,Sheet1,17,ml-1625,,applied,DU-00062
+Sheet1!A18,Sheet1,18,ml-1626,,applied,DU-00063
+Sheet1!A19,Sheet1,19,ml-1627,,applied,DU-00064
+Sheet1!A2,Sheet1,2,ml-1610,,applied,DU-00047
+Sheet1!A20,Sheet1,20,ml-1628,,applied,DU-00065
+Sheet1!A21,Sheet1,21,ml-1629,,applied,DU-00066
+Sheet1!A22,Sheet1,22,ml-1630,,applied,DU-00067
+Sheet1!A23,Sheet1,23,ml-1631,,applied,DU-00068
+Sheet1!A24,Sheet1,24,ml-1632,,applied,DU-00069
+Sheet1!A25,Sheet1,25,ml-1633,,applied,DU-00070
+Sheet1!A26,Sheet1,26,ml-1634,,applied,DU-00071
+Sheet1!A27,Sheet1,27,ml-1635,,applied,DU-00072
+Sheet1!A28,Sheet1,28,ml-1636,,applied,DU-00073
+Sheet1!A29,Sheet1,29,ml-1637,,applied,DU-00074
+Sheet1!A3,Sheet1,3,ml-1611,,applied,DU-00048
+Sheet1!A30,Sheet1,30,ml-1638,,applied,DU-00075
+Sheet1!A31,Sheet1,31,ml-1639,,applied,DU-00076
+Sheet1!A32,Sheet1,32,ml-1640,,applied,DU-00077
+Sheet1!A33,Sheet1,33,ml-1641,,applied,DU-00078
+Sheet1!A34,Sheet1,34,ml-1642,,applied,DU-00079
+Sheet1!A35,Sheet1,35,ml-1643,,applied,DU-00080
+Sheet1!A36,Sheet1,36,ml-1644,,applied,DU-00081
+Sheet1!A37,Sheet1,37,ml-1645,,applied,DU-00082
+Sheet1!A38,Sheet1,38,ml-1646,,applied,DU-00083
+Sheet1!A39,Sheet1,39,ml-1647,,applied,DU-00084
+Sheet1!A4,Sheet1,4,ml-1612,,applied,DU-00049
+Sheet1!A40,Sheet1,40,ml-1648,,applied,DU-00085
+Sheet1!A41,Sheet1,41,ml-1649,,applied,DU-00086
+Sheet1!A42,Sheet1,42,ml-1650,,applied,DU-00087
+Sheet1!A43,Sheet1,43,ml-1651,,applied,DU-00088
+Sheet1!A44,Sheet1,44,ml-1652,,applied,DU-00089
+Sheet1!A45,Sheet1,45,ml-1653,,applied,DU-00090
+Sheet1!A46,Sheet1,46,ml-1654,,applied,DU-00091
+Sheet1!A47,Sheet1,47,ml-1655,,applied,DU-00092
+Sheet1!A48,Sheet1,48,ml-1656,,applied,DU-00093
+Sheet1!A49,Sheet1,49,ml-1657,,applied,DU-00094
+Sheet1!A5,Sheet1,5,ml-1613,,applied,DU-00050
+Sheet1!A50,Sheet1,50,ml-1658,,applied,DU-00095
+Sheet1!A51,Sheet1,51,ml-1659,,applied,DU-00096
+Sheet1!A52,Sheet1,52,ml-1660,,applied,DU-00097
+Sheet1!A53,Sheet1,53,ml-1661,,applied,DU-00098
+Sheet1!A54,Sheet1,54,ml-1662,,applied,DU-00099
+Sheet1!A55,Sheet1,55,ml-1663,,applied,DU-00100
+Sheet1!A56,Sheet1,56,ml-1664,,applied,DU-00101
+Sheet1!A57,Sheet1,57,ml-1665,,applied,DU-00102
+Sheet1!A58,Sheet1,58,ml-1666,,applied,DU-00103
+Sheet1!A59,Sheet1,59,ml-1667,,applied,DU-00104
+Sheet1!A6,Sheet1,6,ml-1614,,applied,DU-00051
+Sheet1!A60,Sheet1,60,ml-1668,,applied,DU-00105
+Sheet1!A61,Sheet1,61,ml-1669,,applied,DU-00106
+Sheet1!A62,Sheet1,62,ml-1670,,applied,DU-00107
+Sheet1!A63,Sheet1,63,ml-1671,,applied,DU-00108
+Sheet1!A64,Sheet1,64,ml-1672,,applied,DU-00109
+Sheet1!A65,Sheet1,65,ml-1673,,applied,DU-00110
+Sheet1!A66,Sheet1,66,ml-1674,,applied,DU-00111
+Sheet1!A67,Sheet1,67,ml-1675,,applied,DU-00112
+Sheet1!A68,Sheet1,68,ml-1676,,applied,DU-00113
+Sheet1!A69,Sheet1,69,ml-1677,,applied,DU-00114
+Sheet1!A7,Sheet1,7,ml-1615,,applied,DU-00052
+Sheet1!A70,Sheet1,70,ml-1678,,applied,DU-00115
+Sheet1!A71,Sheet1,71,ml-1679,,applied,DU-00116
+Sheet1!A72,Sheet1,72,ml-1680,,applied,DU-00117
+Sheet1!A73,Sheet1,73,ml-1681,,applied,DU-00118
+Sheet1!A74,Sheet1,74,ml-1682,,applied,DU-00119
+Sheet1!A75,Sheet1,75,ml-1683,,applied,DU-00120
+Sheet1!A76,Sheet1,76,ml-1684,,applied,DU-00121
+Sheet1!A77,Sheet1,77,ml-1685,,applied,DU-00122
+Sheet1!A78,Sheet1,78,ml-1686,,applied,DU-00123
+Sheet1!A79,Sheet1,79,ml-1687,,applied,DU-00124
+Sheet1!A8,Sheet1,8,ml-1616,,applied,DU-00053
+Sheet1!A80,Sheet1,80,ml-1688,,applied,DU-00125
+Sheet1!A81,Sheet1,81,ml-1689,,applied,DU-00126
+Sheet1!A82,Sheet1,82,ml-1690,,applied,DU-00127
+Sheet1!A83,Sheet1,83,ml-1691,,applied,DU-00128
+Sheet1!A84,Sheet1,84,ml-1692,,applied,DU-00129
+Sheet1!A85,Sheet1,85,ml-1693,,applied,DU-00130
+Sheet1!A86,Sheet1,86,ml-1694,,applied,DU-00131
+Sheet1!A87,Sheet1,87,ml-1695,,applied,DU-00132
+Sheet1!A88,Sheet1,88,ml-1696,,applied,DU-00133
+Sheet1!A89,Sheet1,89,ml-1697,,applied,DU-00134
+Sheet1!A9,Sheet1,9,ml-1617,,applied,DU-00054
+Sheet1!A90,Sheet1,90,ml-1698,,applied,DU-00135
+Sheet1!A91,Sheet1,91,ml-1699,,applied,DU-00136
+Sheet1!A92,Sheet1,92,ml-1700,,applied,DU-00137
+Sheet1!A93,Sheet1,93,ml-1701,,applied,DU-00138
+Sheet1!A94,Sheet1,94,ml-1702,,applied,DU-00139
+Sheet1!A95,Sheet1,95,ml-1703,,applied,DU-00140
+Sheet1!A96,Sheet1,96,ml-1704,,applied,DU-00141
+Sheet1!A97,Sheet1,97,ml-1705,,applied,DU-00142
+Sheet1!A98,Sheet1,98,ml-1706,,applied,DU-00143
+TANF!A10,TANF,10,ml-0825,,applied,DU-01190
+TANF!A11,TANF,11,ml-0927,,applied,DU-01191
+TANF!A12,TANF,12,ml-0958,,applied,DU-01192
+TANF!A13,TANF,13,ml-0959,,applied,DU-01193
+TANF!A14,TANF,14,ml-1016,,applied,DU-01194
+TANF!A15,TANF,15,ml-1114,,applied,DU-01195
+TANF!A16,TANF,16,ml-1141,,applied,DU-01196
+TANF!A17,TANF,17,ml-1169,,applied,DU-01197
+TANF!A18,TANF,18,ml-1170,,applied,DU-01198
+TANF!A19,TANF,19,ml-1171,,applied,DU-01199
+TANF!A2,TANF,2,ml-0141,,applied,DU-01182
+TANF!A20,TANF,20,ml-1172,,applied,DU-01200
+TANF!A21,TANF,21,ml-1180,,applied,DU-01201
+TANF!A22,TANF,22,ml-1181,,applied,DU-01202
+TANF!A23,TANF,23,ml-1182,,applied,DU-01203
+TANF!A24,TANF,24,ml-1260,,applied,DU-01204
+TANF!A25,TANF,25,ml-1261,,applied,DU-01205
+TANF!A26,TANF,26,ml-1285,,applied,DU-01206
+TANF!A27,TANF,27,ml-1286,,applied,DU-01207
+TANF!A28,TANF,28,ml-1326,,applied,DU-01208
+TANF!A29,TANF,29,ml-1327,,applied,DU-01209
+TANF!A3,TANF,3,ml-0142,,applied,DU-01183
+TANF!A30,TANF,30,ml-1355,,applied,DU-01210
+TANF!A31,TANF,31,ml-1432,,applied,DU-01211
+TANF!A32,TANF,32,ml-1433,,applied,DU-01212
+TANF!A4,TANF,4,ml-0565,,applied,DU-01184
+TANF!A5,TANF,5,ml-0566,,applied,DU-01185
+TANF!A6,TANF,6,ml-0567,,applied,DU-01186
+TANF!A7,TANF,7,ml-0568,,applied,DU-01187
+TANF!A8,TANF,8,ml-0823,,applied,DU-01188
+TANF!A9,TANF,9,ml-0824,,applied,DU-01189
+TERO!A10,TERO,10,ml-0614,,applied,DU-01313
+TERO!A11,TERO,11,ml-0724,,applied,DU-01314
+TERO!A12,TERO,12,ml-0814,,applied,DU-01315
+TERO!A2,TERO,2,ml-0154,,applied,DU-01305
+TERO!A3,TERO,3,ml-0192,,applied,DU-01306
+TERO!A4,TERO,4,ml-0214,,applied,DU-01307
+TERO!A5,TERO,5,ml-0218,,applied,DU-01308
+TERO!A6,TERO,6,ml-0230,,applied,DU-01309
+TERO!A7,TERO,7,ml-0452,,applied,DU-01310
+TERO!A8,TERO,8,ml-0559,,applied,DU-01311
+TERO!A9,TERO,9,ml-0613,,applied,DU-01312
+Taxation!A10,Taxation,10,ml-0178,,applied,DU-01221
+Taxation!A11,Taxation,11,ml-0179,,applied,DU-01222
+Taxation!A12,Taxation,12,ml-0292,,applied,DU-01223
+Taxation!A13,Taxation,13,ml-0304,,applied,DU-01224
+Taxation!A14,Taxation,14,ml-0305,,applied,DU-01225
+Taxation!A15,Taxation,15,ml-0306,,applied,DU-01226
+Taxation!A16,Taxation,16,ml-0371,,applied,DU-01227
+Taxation!A17,Taxation,17,ml-0372,title,applied,DU-01228
+Taxation!A18,Taxation,18,ml-0461,,applied,DU-01229
+Taxation!A19,Taxation,19,ml-0520,,applied,DU-01230
+Taxation!A2,Taxation,2,ml-0089,,applied,DU-01213
+Taxation!A20,Taxation,20,ml-0563,,applied,DU-01231
+Taxation!A21,Taxation,21,ml-0564,,applied,DU-01232
+Taxation!A22,Taxation,22,ml-0593,,applied,DU-01233
+Taxation!A23,Taxation,23,ml-0594,,applied,DU-01234
+Taxation!A24,Taxation,24,ml-0615,,applied,DU-01235
+Taxation!A25,Taxation,25,ml-0622,,applied,DU-01236
+Taxation!A26,Taxation,26,ml-0655,,applied,DU-01237
+Taxation!A27,Taxation,27,ml-0656,,applied,DU-01238
+Taxation!A28,Taxation,28,ml-0726,,applied,DU-01239
+Taxation!A29,Taxation,29,ml-0727,,applied,DU-01240
+Taxation!A3,Taxation,3,ml-0102,,applied,DU-01214
+Taxation!A30,Taxation,30,ml-0772,,applied,DU-01241
+Taxation!A31,Taxation,31,ml-0938,,applied,DU-01242
+Taxation!A32,Taxation,32,ml-0980,,applied,DU-01243
+Taxation!A33,Taxation,33,ml-0981,,applied,DU-01244
+Taxation!A34,Taxation,34,ml-0982,,applied,DU-01245
+Taxation!A35,Taxation,35,ml-0983,,applied,DU-01246
+Taxation!A36,Taxation,36,ml-0984,,applied,DU-01247
+Taxation!A4,Taxation,4,ml-0103,,applied,DU-01215
+Taxation!A5,Taxation,5,ml-0104,,applied,DU-01216
+Taxation!A6,Taxation,6,ml-0157,,applied,DU-01217
+Taxation!A7,Taxation,7,ml-0175,,applied,DU-01218
+Taxation!A8,Taxation,8,ml-0176,,applied,DU-01219
+Taxation!A9,Taxation,9,ml-0177,,applied,DU-01220
+Telecommunications & Utility!A10,Telecommunications & Utility,10,ml-0419,,applied,DU-01256
+Telecommunications & Utility!A11,Telecommunications & Utility,11,ml-0420,,applied,DU-01257
+Telecommunications & Utility!A12,Telecommunications & Utility,12,ml-0459,,applied,DU-01258
+Telecommunications & Utility!A13,Telecommunications & Utility,13,ml-0460,,applied,DU-01259
+Telecommunications & Utility!A14,Telecommunications & Utility,14,ml-0483,,applied,DU-01260
+Telecommunications & Utility!A15,Telecommunications & Utility,15,ml-0519,,applied,DU-01261
+Telecommunications & Utility!A16,Telecommunications & Utility,16,ml-0539,,applied,DU-01262
+Telecommunications & Utility!A17,Telecommunications & Utility,17,ml-0540,,applied,DU-01263
+Telecommunications & Utility!A18,Telecommunications & Utility,18,ml-0541,,applied,DU-01264
+Telecommunications & Utility!A19,Telecommunications & Utility,19,ml-0560,,applied,DU-01265
+Telecommunications & Utility!A2,Telecommunications & Utility,2,ml-0100,,applied,DU-01248
+Telecommunications & Utility!A20,Telecommunications & Utility,20,ml-0561,,applied,DU-01266
+Telecommunications & Utility!A21,Telecommunications & Utility,21,ml-0562,,applied,DU-01267
+Telecommunications & Utility!A22,Telecommunications & Utility,22,ml-0592,,applied,DU-01268
+Telecommunications & Utility!A23,Telecommunications & Utility,23,ml-0618,,applied,DU-01269
+Telecommunications & Utility!A24,Telecommunications & Utility,24,ml-0619,,applied,DU-01270
+Telecommunications & Utility!A25,Telecommunications & Utility,25,ml-0620,,applied,DU-01271
+Telecommunications & Utility!A26,Telecommunications & Utility,26,ml-0679,,applied,DU-01272
+Telecommunications & Utility!A27,Telecommunications & Utility,27,ml-0680,,applied,DU-01273
+Telecommunications & Utility!A28,Telecommunications & Utility,28,ml-0681,,applied,DU-01274
+Telecommunications & Utility!A29,Telecommunications & Utility,29,ml-0682,,applied,DU-01275
+Telecommunications & Utility!A3,Telecommunications & Utility,3,ml-0101,,applied,DU-01249
+Telecommunications & Utility!A30,Telecommunications & Utility,30,ml-0683,,applied,DU-01276
+Telecommunications & Utility!A31,Telecommunications & Utility,31,ml-0684,,applied,DU-01277
+Telecommunications & Utility!A32,Telecommunications & Utility,32,ml-0694,,applied,DU-01278
+Telecommunications & Utility!A33,Telecommunications & Utility,33,ml-0695,,applied,DU-01279
+Telecommunications & Utility!A34,Telecommunications & Utility,34,ml-0725,,applied,DU-01280
+Telecommunications & Utility!A35,Telecommunications & Utility,35,ml-0758,,applied,DU-01281
+Telecommunications & Utility!A36,Telecommunications & Utility,36,ml-0759,,applied,DU-01282
+Telecommunications & Utility!A37,Telecommunications & Utility,37,ml-0760,,applied,DU-01283
+Telecommunications & Utility!A38,Telecommunications & Utility,38,ml-0799,,applied,DU-01284
+Telecommunications & Utility!A39,Telecommunications & Utility,39,ml-0822,,applied,DU-01285
+Telecommunications & Utility!A4,Telecommunications & Utility,4,ml-0155,,applied,DU-01250
+Telecommunications & Utility!A40,Telecommunications & Utility,40,ml-0849,,applied,DU-01286
+Telecommunications & Utility!A41,Telecommunications & Utility,41,ml-0850,,applied,DU-01287
+Telecommunications & Utility!A42,Telecommunications & Utility,42,ml-0851,,applied,DU-01288
+Telecommunications & Utility!A43,Telecommunications & Utility,43,ml-0852,,applied,DU-01289
+Telecommunications & Utility!A44,Telecommunications & Utility,44,ml-0853,,applied,DU-01290
+Telecommunications & Utility!A45,Telecommunications & Utility,45,ml-0871,,applied,DU-01291
+Telecommunications & Utility!A46,Telecommunications & Utility,46,ml-0876,,applied,DU-01292
+Telecommunications & Utility!A47,Telecommunications & Utility,47,ml-0877,,applied,DU-01293
+Telecommunications & Utility!A48,Telecommunications & Utility,48,ml-0878,,applied,DU-01294
+Telecommunications & Utility!A49,Telecommunications & Utility,49,ml-0879,,applied,DU-01295
+Telecommunications & Utility!A5,Telecommunications & Utility,5,ml-0156,,applied,DU-01251
+Telecommunications & Utility!A50,Telecommunications & Utility,50,ml-0896,,applied,DU-01296
+Telecommunications & Utility!A51,Telecommunications & Utility,51,ml-0897,,applied,DU-01297
+Telecommunications & Utility!A52,Telecommunications & Utility,52,ml-0950,,applied,DU-01298
+Telecommunications & Utility!A53,Telecommunications & Utility,53,ml-0966,,applied,DU-01299
+Telecommunications & Utility!A54,Telecommunications & Utility,54,ml-0967,,applied,DU-01300
+Telecommunications & Utility!A55,Telecommunications & Utility,55,ml-0968,,applied,DU-01301
+Telecommunications & Utility!A56,Telecommunications & Utility,56,ml-0997,,applied,DU-01302
+Telecommunications & Utility!A57,Telecommunications & Utility,57,ml-1226,,applied,DU-01303
+Telecommunications & Utility!A58,Telecommunications & Utility,58,ml-1246,,applied,DU-01304
+Telecommunications & Utility!A6,Telecommunications & Utility,6,ml-0193,,applied,DU-01252
+Telecommunications & Utility!A7,Telecommunications & Utility,7,ml-0389,,applied,DU-01253
+Telecommunications & Utility!A8,Telecommunications & Utility,8,ml-0390,,applied,DU-01254
+Telecommunications & Utility!A9,Telecommunications & Utility,9,ml-0418,,applied,DU-01255
+Transportation!A10,Transportation,10,ml-0290,,applied,DU-01324
+Transportation!A100,Transportation,100,ml-1309,,applied,DU-01414
+Transportation!A101,Transportation,101,ml-1325,,applied,DU-01415
+Transportation!A102,Transportation,102,ml-1350,,applied,DU-01416
+Transportation!A103,Transportation,103,ml-1351,,applied,DU-01417
+Transportation!A104,Transportation,104,ml-1352,,applied,DU-01418
+Transportation!A105,Transportation,105,ml-1353,,applied,DU-01419
+Transportation!A106,Transportation,106,ml-1354,,applied,DU-01420
+Transportation!A107,Transportation,107,ml-1391,,applied,DU-01421
+Transportation!A108,Transportation,108,ml-1415,,applied,DU-01422
+Transportation!A109,Transportation,109,ml-1416,,applied,DU-01423
+Transportation!A11,Transportation,11,ml-0369,,applied,DU-01325
+Transportation!A12,Transportation,12,ml-0387,,applied,DU-01326
+Transportation!A13,Transportation,13,ml-0388,,applied,DU-01327
+Transportation!A14,Transportation,14,ml-0399,,applied,DU-01328
+Transportation!A15,Transportation,15,ml-0400,,applied,DU-01329
+Transportation!A16,Transportation,16,ml-0401,,applied,DU-01330
+Transportation!A17,Transportation,17,ml-0402,,applied,DU-01331
+Transportation!A18,Transportation,18,ml-0415,,applied,DU-01332
+Transportation!A19,Transportation,19,ml-0416,,applied,DU-01333
+Transportation!A2,Transportation,2,ml-0217,,applied,DU-01316
+Transportation!A20,Transportation,20,ml-0417,,applied,DU-01334
+Transportation!A21,Transportation,21,ml-0449,,applied,DU-01335
+Transportation!A22,Transportation,22,ml-0450,,applied,DU-01336
+Transportation!A23,Transportation,23,ml-0451,,applied,DU-01337
+Transportation!A24,Transportation,24,ml-0458,,applied,DU-01338
+Transportation!A25,Transportation,25,ml-0482,,applied,DU-01339
+Transportation!A26,Transportation,26,ml-0501,,applied,DU-01340
+Transportation!A27,Transportation,27,ml-0517,,applied,DU-01341
+Transportation!A28,Transportation,28,ml-0518,,applied,DU-01342
+Transportation!A29,Transportation,29,ml-0537,,applied,DU-01343
+Transportation!A3,Transportation,3,ml-0226,,applied,DU-01317
+Transportation!A30,Transportation,30,ml-0538,,applied,DU-01344
+Transportation!A31,Transportation,31,ml-0558,,applied,DU-01345
+Transportation!A32,Transportation,32,ml-0588,,applied,DU-01346
+Transportation!A33,Transportation,33,ml-0589,,applied,DU-01347
+Transportation!A34,Transportation,34,ml-0590,,applied,DU-01348
+Transportation!A35,Transportation,35,ml-0591,,applied,DU-01349
+Transportation!A36,Transportation,36,ml-0609,,applied,DU-01350
+Transportation!A37,Transportation,37,ml-0610,,applied,DU-01351
+Transportation!A38,Transportation,38,ml-0611,,applied,DU-01352
+Transportation!A39,Transportation,39,ml-0612,,applied,DU-01353
+Transportation!A4,Transportation,4,ml-0227,,applied,DU-01318
+Transportation!A40,Transportation,40,ml-0652,,applied,DU-01354
+Transportation!A41,Transportation,41,ml-0653,,applied,DU-01355
+Transportation!A42,Transportation,42,ml-0654,,applied,DU-01356
+Transportation!A43,Transportation,43,ml-0668,,applied,DU-01357
+Transportation!A44,Transportation,44,ml-0669,,applied,DU-01358
+Transportation!A45,Transportation,45,ml-0693,,applied,DU-01359
+Transportation!A46,Transportation,46,ml-0719,,applied,DU-01360
+Transportation!A47,Transportation,47,ml-0720,,applied,DU-01361
+Transportation!A48,Transportation,48,ml-0721,,applied,DU-01362
+Transportation!A49,Transportation,49,ml-0722,,applied,DU-01363
+Transportation!A5,Transportation,5,ml-0249,,applied,DU-01319
+Transportation!A50,Transportation,50,ml-0723,ncai,applied,DU-01364
+Transportation!A51,Transportation,51,ml-0756,,applied,DU-01365
+Transportation!A52,Transportation,52,ml-0757,,applied,DU-01366
+Transportation!A53,Transportation,53,ml-0774,,applied,DU-01367
+Transportation!A54,Transportation,54,ml-0775,,applied,DU-01368
+Transportation!A55,Transportation,55,ml-0776,,applied,DU-01369
+Transportation!A56,Transportation,56,ml-0777,,applied,DU-01370
+Transportation!A57,Transportation,57,ml-0778,,applied,DU-01371
+Transportation!A58,Transportation,58,ml-0801,,applied,DU-01372
+Transportation!A59,Transportation,59,ml-0802,,applied,DU-01373
+Transportation!A6,Transportation,6,ml-0257,,applied,DU-01320
+Transportation!A60,Transportation,60,ml-0803,,applied,DU-01374
+Transportation!A61,Transportation,61,ml-0819,,applied,DU-01375
+Transportation!A62,Transportation,62,ml-0820,,applied,DU-01376
+Transportation!A63,Transportation,63,ml-0821,,applied,DU-01377
+Transportation!A64,Transportation,64,ml-0846,,applied,DU-01378
+Transportation!A65,Transportation,65,ml-0847,,applied,DU-01379
+Transportation!A66,Transportation,66,ml-0848,,applied,DU-01380
+Transportation!A67,Transportation,67,ml-0875,,applied,DU-01381
+Transportation!A68,Transportation,68,ml-0892,,applied,DU-01382
+Transportation!A69,Transportation,69,ml-0893,,applied,DU-01383
+Transportation!A7,Transportation,7,ml-0258,,applied,DU-01321
+Transportation!A70,Transportation,70,ml-0894,,applied,DU-01384
+Transportation!A71,Transportation,71,ml-0895,amended,applied,DU-01385
+Transportation!A72,Transportation,72,ml-0915,,applied,DU-01386
+Transportation!A73,Transportation,73,ml-0943,,applied,DU-01387
+Transportation!A74,Transportation,74,ml-0992,,applied,DU-01388
+Transportation!A75,Transportation,75,ml-1035,,applied,DU-01389
+Transportation!A76,Transportation,76,ml-1036,,applied,DU-01390
+Transportation!A77,Transportation,77,ml-1075,permalink,applied,DU-01391
+Transportation!A78,Transportation,78,ml-1143,,applied,DU-01392
+Transportation!A79,Transportation,79,ml-1144,,applied,DU-01393
+Transportation!A8,Transportation,8,ml-0272,,applied,DU-01322
+Transportation!A80,Transportation,80,ml-1145,,applied,DU-01394
+Transportation!A81,Transportation,81,ml-1146,,applied,DU-01395
+Transportation!A82,Transportation,82,ml-1147,,applied,DU-01396
+Transportation!A83,Transportation,83,ml-1196,,applied,DU-01397
+Transportation!A84,Transportation,84,ml-1197,,applied,DU-01398
+Transportation!A85,Transportation,85,ml-1198,,applied,DU-01399
+Transportation!A86,Transportation,86,ml-1216,,applied,DU-01400
+Transportation!A87,Transportation,87,ml-1217,,applied,DU-01401
+Transportation!A88,Transportation,88,ml-1218,,applied,DU-01402
+Transportation!A89,Transportation,89,ml-1219,,applied,DU-01403
+Transportation!A9,Transportation,9,ml-0273,,applied,DU-01323
+Transportation!A90,Transportation,90,ml-1247,,applied,DU-01404
+Transportation!A91,Transportation,91,ml-1248,,applied,DU-01405
+Transportation!A92,Transportation,92,ml-1249,,applied,DU-01406
+Transportation!A93,Transportation,93,ml-1250,,applied,DU-01407
+Transportation!A94,Transportation,94,ml-1268,,applied,DU-01408
+Transportation!A95,Transportation,95,ml-1294,,applied,DU-01409
+Transportation!A96,Transportation,96,ml-1295,,applied,DU-01410
+Transportation!A97,Transportation,97,ml-1296,,applied,DU-01411
+Transportation!A98,Transportation,98,ml-1297,,applied,DU-01412
+Transportation!A99,Transportation,99,ml-1298,,applied,DU-01413
+Veterans!A10,Veterans,10,ml-0478,,applied,DU-01432
+Veterans!A11,Veterans,11,ml-0479,,applied,DU-01433
+Veterans!A12,Veterans,12,ml-0500,,applied,DU-01434
+Veterans!A13,Veterans,13,ml-0516,,applied,DU-01435
+Veterans!A14,Veterans,14,ml-0586,,applied,DU-01436
+Veterans!A15,Veterans,15,ml-0607,,applied,DU-01437
+Veterans!A16,Veterans,16,ml-0608,,applied,DU-01438
+Veterans!A17,Veterans,17,ml-0631,,applied,DU-01439
+Veterans!A18,Veterans,18,ml-0632,,applied,DU-01440
+Veterans!A19,Veterans,19,ml-0633,,applied,DU-01441
+Veterans!A2,Veterans,2,ml-0066,"title,committee,prepared_by,passed,conf,to_ncai",proposed,DU-01424
+Veterans!A20,Veterans,20,ml-0690,,applied,DU-01442
+Veterans!A21,Veterans,21,ml-0691,,applied,DU-01443
+Veterans!A22,Veterans,22,ml-0692,,applied,DU-01444
+Veterans!A23,Veterans,23,ml-0755,,applied,DU-01445
+Veterans!A24,Veterans,24,ml-0770,,applied,DU-01446
+Veterans!A25,Veterans,25,ml-0798,,applied,DU-01447
+Veterans!A26,Veterans,26,ml-0844,,applied,DU-01448
+Veterans!A27,Veterans,27,ml-0874,,applied,DU-01449
+Veterans!A28,Veterans,28,ml-0890,,applied,DU-01450
+Veterans!A29,Veterans,29,ml-0891,,applied,DU-01451
+Veterans!A3,Veterans,3,ml-0174,,applied,DU-01425
+Veterans!A30,Veterans,30,ml-0926,,applied,DU-01452
+Veterans!A31,Veterans,31,ml-1074,,applied,DU-01453
+Veterans!A32,Veterans,32,ml-1242,,applied,DU-01454
+Veterans!A33,Veterans,33,ml-1306,,applied,DU-01455
+Veterans!A34,Veterans,34,ml-1345,,applied,DU-01456
+Veterans!A35,Veterans,35,ml-1349,,applied,DU-01457
+Veterans!A36,Veterans,36,ml-1400,,applied,DU-01458
+Veterans!A37,Veterans,37,ml-1434,,applied,DU-01459
+Veterans!A38,Veterans,38,ml-1516,,applied,DU-01460
+Veterans!A4,Veterans,4,ml-0216,,applied,DU-01426
+Veterans!A5,Veterans,5,ml-0229,,applied,DU-01427
+Veterans!A6,Veterans,6,ml-0289,,applied,DU-01428
+Veterans!A7,Veterans,7,ml-0368,,applied,DU-01429
+Veterans!A8,Veterans,8,ml-0386,,applied,DU-01430
+Veterans!A9,Veterans,9,ml-0398,,applied,DU-01431
+Youth!A2,Youth,2,ml-0153,,applied,DU-01461
+Youth!A3,Youth,3,ml-0173,,applied,DU-01462
+Youth!A4,Youth,4,ml-0367,,applied,DU-01463
+Youth!A5,Youth,5,ml-0630,,applied,DU-01464
+Youth!A6,Youth,6,ml-0718,,applied,DU-01465
+Youth!A7,Youth,7,ml-0791,,applied,DU-01466
+Youth!A8,Youth,8,ml-1013,,applied,DU-01467
+Youth!A9,Youth,9,ml-1251,,applied,DU-01468

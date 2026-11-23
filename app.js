@@ -667,6 +667,8 @@ function aboutView() {
         <p>Under the <a href="${TSDF}" rel="noopener">Tiered Sovereign Data Framework</a>, ATNI's web-published resolutions are T0: public. This site carries no other material.</p>
         <p>Code: <a href="${CODE}" rel="noopener">github.com/atniclimate/ResIST</a>, under the <a href="https://polyformproject.org/licenses/noncommercial/1.0.0" rel="noopener">PolyForm Noncommercial License 1.0.0</a>. Required Notice: Copyright Affiliated Tribes of Northwest Indians (https://atnitribes.org)</p>
         <p class="meta">Built ${esc(usDate(build.built) || build.built)}.</p></section>
+      <section><h2>Acknowledgements</h2>
+        <p>Patrick Freeland and Wyatt Ash-Milby, at ATNI. Wyatt Ash-Milby built The Resolution Library, a workbook that lists ATNI's numbered resolutions from 2001 to 2026 with their committee, preparer, convention and outcome. That sorting work inspired ResIST.</p></section>
     </div>
   </div>`;
 }

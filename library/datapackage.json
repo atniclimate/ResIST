@@ -1,0 +1,1269 @@
+{
+  "profile": "tabular-data-package",
+  "name": "atni-resolution-library",
+  "title": "The Resolution Library (clean, public)",
+  "description": "The Resolution Library was built by Wyatt Ash-Milby at ATNI. T0 (D-081). Cleaned through a recorded ledger; values as written are kept beside normalized values.",
+  "version": "1.0.0",
+  "created": "2026-11-20T19:04:57Z",
+  "contributors": [
+    {
+      "title": "Wyatt Ash-Milby",
+      "role": "author",
+      "organization": "Affiliated Tribes of Northwest Indians"
+    }
+  ],
+  "sources": [
+    {
+      "title": "The Resolution Library.xlsx",
+      "sha256": "8fb4a11c75d775f82cec5049482527b61b31fe43fce360cdc51905ac8a442722"
+    }
+  ],
+  "resources": [
+    {
+      "name": "committee",
+      "path": "csv/committee.csv",
+      "profile": "tabular-data-resource",
+      "format": "csv",
+      "mediatype": "text/csv",
+      "encoding": "utf-8",
+      "bytes": 5303,
+      "hash": "sha256:b1e5b064d90d124453e17ebc9b7b52b70aa63fe95e4ff17916b10eb80c8d916d",
+      "dialect": {
+        "delimiter": ",",
+        "lineTerminator": "\n",
+        "quoteChar": "\"",
+        "doubleQuote": true,
+        "header": true
+      },
+      "schema": {
+        "fields": [
+          {
+            "name": "committee_key",
+            "type": "string",
+            "description": "stable key of a committee entity (the ledger committee_key)"
+          },
+          {
+            "name": "display_name",
+            "type": "string",
+            "description": "proposed display name (new_value of the ledger committee record)"
+          },
+          {
+            "name": "kind",
+            "type": "string",
+            "description": "entity kind from the ledger"
+          },
+          {
+            "name": "parent_key",
+            "type": "string",
+            "description": "proposed parent committee; NULL if none"
+          },
+          {
+            "name": "name_confirmed",
+            "type": "integer",
+            "description": "1 when the ledger class of the entity is keep or auto, else 0"
+          },
+          {
+            "name": "source_names",
+            "type": "string",
+            "description": "the source workbook's own names for the entity as the ledger records them (old_value of the committee record)"
+          },
+          {
+            "name": "labels",
+            "type": "string",
+            "description": "'label (n); ...': every ledger label that names this key, applied or proposed; n = listed resolutions with that label and a link to the key; by n descending, then label; NULL if the key has no label"
+          },
+          {
+            "name": "first_year",
+            "type": "integer",
+            "description": "smallest year over listed resolutions with an applied link; NULL if none"
+          },
+          {
+            "name": "last_year",
+            "type": "integer",
+            "description": "largest year over listed resolutions with an applied link; NULL if none"
+          },
+          {
+            "name": "n_resolutions",
+            "type": "integer",
+            "description": "listed resolutions with an applied link to the key"
+          },
+          {
+            "name": "ledger_id",
+            "type": "string",
+            "description": "id of the ledger row that defines the entity"
+          }
+        ],
+        "primaryKey": [
+          "committee_key"
+        ],
+        "foreignKeys": [
+          {
+            "fields": [
+              "parent_key"
+            ],
+            "reference": {
+              "resource": "committee",
+              "fields": [
+                "committee_key"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "committee_alias",
+      "path": "csv/committee_alias.csv",
+      "profile": "tabular-data-resource",
+      "format": "csv",
+      "mediatype": "text/csv",
+      "encoding": "utf-8",
+      "bytes": 8650,
+      "hash": "sha256:083be8ac55159cf1e6025c01000c8a7a56e62dc1ad613bb0e0dfd1fb23ab0a4e",
+      "dialect": {
+        "delimiter": ",",
+        "lineTerminator": "\n",
+        "quoteChar": "\"",
+        "doubleQuote": true,
+        "header": true
+      },
+      "schema": {
+        "fields": [
+          {
+            "name": "ledger_id",
+            "type": "string",
+            "description": "id of the ledger row (committee_map, record label)"
+          },
+          {
+            "name": "label_as_written",
+            "type": "string",
+            "description": "the exact string of one Committee cell"
+          },
+          {
+            "name": "part_order",
+            "type": "integer",
+            "description": "position of the part inside the cell, from 1"
+          },
+          {
+            "name": "relation",
+            "type": "string",
+            "description": "the ledger's reading of the part (a code word)"
+          },
+          {
+            "name": "committee_key",
+            "type": "string",
+            "description": "committee the part names; NULL when the part names none"
+          },
+          {
+            "name": "status",
+            "type": "string",
+            "description": "applied when the ledger class is auto or keep, else proposed"
+          },
+          {
+            "name": "first_year",
+            "type": "integer",
+            "description": "copied from the ledger"
+          },
+          {
+            "name": "last_year",
+            "type": "integer",
+            "description": "copied from the ledger"
+          },
+          {
+            "name": "n_cells",
+            "type": "integer",
+            "description": "copied from the ledger"
+          },
+          {
+            "name": "n_resolutions",
+            "type": "integer",
+            "description": "copied from the ledger (counts listed resolutions)"
+          }
+        ],
+        "primaryKey": [
+          "ledger_id"
+        ],
+        "foreignKeys": [
+          {
+            "fields": [
+              "committee_key"
+            ],
+            "reference": {
+              "resource": "committee",
+              "fields": [
+                "committee_key"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "person",
+      "path": "csv/person.csv",
+      "profile": "tabular-data-resource",
+      "format": "csv",
+      "mediatype": "text/csv",
+      "encoding": "utf-8",
+      "bytes": 16028,
+      "hash": "sha256:ac8c17c58cce4e207bbf4db6c69db8f3d619ccbee68b9133afe9e4c82d0f6537",
+      "dialect": {
+        "delimiter": ",",
+        "lineTerminator": "\n",
+        "quoteChar": "\"",
+        "doubleQuote": true,
+        "header": true
+      },
+      "schema": {
+        "fields": [
+          {
+            "name": "person_key",
+            "type": "string",
+            "description": "stable key of a person entity (the ledger person_key)"
+          },
+          {
+            "name": "display_name",
+            "type": "string",
+            "description": "display name (new_value of the ledger person record)"
+          },
+          {
+            "name": "name_confirmed",
+            "type": "integer",
+            "description": "1 when the ledger class of the entity is keep or auto, else 0"
+          },
+          {
+            "name": "forms",
+            "type": "string",
+            "description": "'form (n); ...': the person's forms as the Prepared By cells write them; n = listed resolutions with that form; by n descending, then form"
+          },
+          {
+            "name": "first_year",
+            "type": "integer",
+            "description": "smallest year over listed resolutions with an applied preparer row of the person; NULL if none"
+          },
+          {
+            "name": "last_year",
+            "type": "integer",
+            "description": "largest year over listed resolutions with an applied preparer row of the person; NULL if none"
+          },
+          {
+            "name": "n_resolutions",
+            "type": "integer",
+            "description": "listed resolutions with an applied preparer row of the person"
+          },
+          {
+            "name": "ledger_id",
+            "type": "string",
+            "description": "id of the ledger row that defines the entity"
+          }
+        ],
+        "primaryKey": [
+          "person_key"
+        ]
+      }
+    },
+    {
+      "name": "person_form",
+      "path": "csv/person_form.csv",
+      "profile": "tabular-data-resource",
+      "format": "csv",
+      "mediatype": "text/csv",
+      "encoding": "utf-8",
+      "bytes": 7206,
+      "hash": "sha256:cf8aaf4893871c86789497bbfeacd74e559cde2c97af3aa358845d7e52da2c46",
+      "dialect": {
+        "delimiter": ",",
+        "lineTerminator": "\n",
+        "quoteChar": "\"",
+        "doubleQuote": true,
+        "header": true
+      },
+      "schema": {
+        "fields": [
+          {
+            "name": "form",
+            "type": "string",
+            "description": "a name exactly as one Prepared By part writes it (ledger part_text)"
+          },
+          {
+            "name": "person_key",
+            "type": "string",
+            "description": "the person the form belongs to"
+          },
+          {
+            "name": "n_resolutions",
+            "type": "integer",
+            "description": "listed resolutions with that form"
+          }
+        ],
+        "primaryKey": [
+          "form"
+        ],
+        "foreignKeys": [
+          {
+            "fields": [
+              "person_key"
+            ],
+            "reference": {
+              "resource": "person",
+              "fields": [
+                "person_key"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "session",
+      "path": "csv/session.csv",
+      "profile": "tabular-data-resource",
+      "format": "csv",
+      "mediatype": "text/csv",
+      "encoding": "utf-8",
+      "bytes": 7709,
+      "hash": "sha256:30a413def2e33be2e481fe8b5e752b6203da981f735e739dc53b6d7cf5ecfb8f",
+      "dialect": {
+        "delimiter": ",",
+        "lineTerminator": "\n",
+        "quoteChar": "\"",
+        "doubleQuote": true,
+        "header": true
+      },
+      "schema": {
+        "fields": [
+          {
+            "name": "session_id",
+            "type": "string",
+            "description": "'atni:<kind>:<year>'"
+          },
+          {
+            "name": "year",
+            "type": "integer",
+            "description": "year of the session"
+          },
+          {
+            "name": "kind",
+            "type": "string",
+            "description": "session kind"
+          },
+          {
+            "name": "labels_as_written",
+            "type": "string",
+            "description": "distinct non-blank Conf. cell strings of the session's listed resolutions, sorted and '; '-joined; '' when all were derived"
+          },
+          {
+            "name": "n_resolutions",
+            "type": "integer",
+            "description": "listed resolutions of the session"
+          },
+          {
+            "name": "first_number",
+            "type": "string",
+            "description": "smallest number among them (by year, then sequence)"
+          },
+          {
+            "name": "last_number",
+            "type": "string",
+            "description": "largest number among them"
+          },
+          {
+            "name": "permalink_date_mode",
+            "type": "string",
+            "description": "most frequent permalink_date among them (ties: the earliest); NULL if none"
+          },
+          {
+            "name": "permalink_date_min",
+            "type": "string",
+            "description": "earliest permalink_date among them"
+          },
+          {
+            "name": "permalink_date_max",
+            "type": "string",
+            "description": "latest permalink_date among them"
+          },
+          {
+            "name": "in_site",
+            "type": "integer",
+            "description": "listed resolutions of the session with a document_id"
+          }
+        ],
+        "primaryKey": [
+          "session_id"
+        ]
+      }
+    },
+    {
+      "name": "resolution",
+      "path": "csv/resolution.csv",
+      "profile": "tabular-data-resource",
+      "format": "csv",
+      "mediatype": "text/csv",
+      "encoding": "utf-8",
+      "bytes": 1145763,
+      "hash": "sha256:8faf66a16cfad03420159bec75344a03e05edb9a421918e05bad104cf17da3fc",
+      "dialect": {
+        "delimiter": ",",
+        "lineTerminator": "\n",
+        "quoteChar": "\"",
+        "doubleQuote": true,
+        "header": true
+      },
+      "schema": {
+        "fields": [
+          {
+            "name": "rid",
+            "type": "string",
+            "description": "'ml-NNNN' (a Master Library row, NNNN = the row number) or 's1-NNNN' (a Sheet1 row)"
+          },
+          {
+            "name": "source_sheet",
+            "type": "string",
+            "description": "sheet the resolution row is on"
+          },
+          {
+            "name": "source_row",
+            "type": "integer",
+            "description": "row number on source_sheet; the cell of field X is source_sheet!<column of X><source_row>"
+          },
+          {
+            "name": "listed",
+            "type": "integer",
+            "description": "1 for a resolution that is listed; 0 for a draft-numbered entry that is kept as written in the library, left out of every count and absent from the public export"
+          },
+          {
+            "name": "not_listed_reason",
+            "type": "string",
+            "description": "why listed is 0 (the ledger value); NULL when listed is 1"
+          },
+          {
+            "name": "number_as_written",
+            "type": "string",
+            "description": "the Number cell exactly"
+          },
+          {
+            "name": "number",
+            "type": "string",
+            "description": "YYYY-NN: the year, a hyphen and the sequence padded to two digits (three digits are kept)"
+          },
+          {
+            "name": "year",
+            "type": "integer",
+            "description": "year of the number"
+          },
+          {
+            "name": "sequence",
+            "type": "integer",
+            "description": "sequence of the number"
+          },
+          {
+            "name": "site_number",
+            "type": "string",
+            "description": "YY-NN: the form the published site database uses"
+          },
+          {
+            "name": "title_as_written",
+            "type": "string",
+            "description": "the Title cell exactly"
+          },
+          {
+            "name": "title",
+            "type": "string",
+            "description": "display title: as written with the applied ledger fixes"
+          },
+          {
+            "name": "committee_as_written",
+            "type": "string",
+            "description": "the Committee cell exactly"
+          },
+          {
+            "name": "committee_keys",
+            "type": "string",
+            "description": "applied committee keys in part order, ';'-joined; NULL if none"
+          },
+          {
+            "name": "prepared_by_as_written",
+            "type": "string",
+            "description": "the Prepared By cell exactly"
+          },
+          {
+            "name": "preparer_keys",
+            "type": "string",
+            "description": "applied person keys in part order, ';'-joined; NULL if none"
+          },
+          {
+            "name": "conf_as_written",
+            "type": "string",
+            "description": "the Conf. cell exactly"
+          },
+          {
+            "name": "session_id",
+            "type": "string",
+            "description": "the resolution's session; NULL if none"
+          },
+          {
+            "name": "origin",
+            "type": "string",
+            "description": "applied origin value; NULL if none"
+          },
+          {
+            "name": "status_hint",
+            "type": "string",
+            "description": "applied status word written outside the Passed cell; NULL if none"
+          },
+          {
+            "name": "passed_as_written",
+            "type": "string",
+            "description": "the Passed cell exactly"
+          },
+          {
+            "name": "outcome",
+            "type": "string",
+            "description": "adopted, not_adopted, tabled, or unknown (not recorded)"
+          },
+          {
+            "name": "amended_as_written",
+            "type": "string",
+            "description": "the Amended cell exactly"
+          },
+          {
+            "name": "amended",
+            "type": "integer",
+            "description": "1 when the Amended cell reads Yes; NULL otherwise"
+          },
+          {
+            "name": "amended_link",
+            "type": "string",
+            "description": "applied link recorded in the Amended cell; NULL if none"
+          },
+          {
+            "name": "attachment_link",
+            "type": "string",
+            "description": "applied attachment link; NULL if none"
+          },
+          {
+            "name": "ncai_link",
+            "type": "string",
+            "description": "applied link recorded in the NCAI cell; NULL if none"
+          },
+          {
+            "name": "ncai_as_written",
+            "type": "string",
+            "description": "the NCAI cell exactly"
+          },
+          {
+            "name": "to_ncai_as_written",
+            "type": "string",
+            "description": "the TO NCAI cell exactly"
+          },
+          {
+            "name": "to_ncai",
+            "type": "string",
+            "description": "yes, no or n/a; NULL when not recorded"
+          },
+          {
+            "name": "permalink_as_written",
+            "type": "string",
+            "description": "the Permalink cell exactly"
+          },
+          {
+            "name": "permalink_url",
+            "type": "string",
+            "description": "the permalink with surrounding whitespace removed; NULL when blank or MISSING"
+          },
+          {
+            "name": "permalink_kind",
+            "type": "string",
+            "description": "upload when the permalink has an uploads path, else page; NULL when permalink_url is NULL"
+          },
+          {
+            "name": "permalink_number",
+            "type": "string",
+            "description": "YY-NN found in the last path segment of the permalink; NULL if none"
+          },
+          {
+            "name": "permalink_date",
+            "type": "string",
+            "description": "YYYY-MM-DD read from a YYYYMMDD_ prefix of the last path segment; NULL if none or not a date"
+          },
+          {
+            "name": "file_missing",
+            "type": "integer",
+            "description": "1 when the applied ledger value file_missing is 1, else 0"
+          },
+          {
+            "name": "document_id",
+            "type": "string",
+            "description": "SHA-256 of the site document the resolution is linked to; NULL if none"
+          },
+          {
+            "name": "match_class",
+            "type": "string",
+            "description": "the crosswalk's match class for the resolution"
+          },
+          {
+            "name": "copies",
+            "type": "integer",
+            "description": "copy rows of the resolution on other sheets"
+          },
+          {
+            "name": "review_items",
+            "type": "integer",
+            "description": "open review items that name the resolution (4.13)"
+          }
+        ],
+        "primaryKey": [
+          "rid"
+        ],
+        "foreignKeys": [
+          {
+            "fields": [
+              "session_id"
+            ],
+            "reference": {
+              "resource": "session",
+              "fields": [
+                "session_id"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "resolution_committee",
+      "path": "csv/resolution_committee.csv",
+      "profile": "tabular-data-resource",
+      "format": "csv",
+      "mediatype": "text/csv",
+      "encoding": "utf-8",
+      "bytes": 103654,
+      "hash": "sha256:23f9e5cbfd487152ec5d08df4f33205ea1f4049cc37aef00f33b02463ff9cd06",
+      "dialect": {
+        "delimiter": ",",
+        "lineTerminator": "\n",
+        "quoteChar": "\"",
+        "doubleQuote": true,
+        "header": true
+      },
+      "schema": {
+        "fields": [
+          {
+            "name": "rid",
+            "type": "string",
+            "description": "the resolution"
+          },
+          {
+            "name": "part_order",
+            "type": "integer",
+            "description": "position of the part inside the Committee cell, from 1"
+          },
+          {
+            "name": "source_ref",
+            "type": "string",
+            "description": "the Committee cell, e.g. <sheet>!C<row>"
+          },
+          {
+            "name": "label_as_written",
+            "type": "string",
+            "description": "the exact Committee cell string"
+          },
+          {
+            "name": "committee_key",
+            "type": "string",
+            "description": "applied committee; NULL when the link is proposed"
+          },
+          {
+            "name": "relation",
+            "type": "string",
+            "description": "the ledger's reading of the part"
+          },
+          {
+            "name": "status",
+            "type": "string",
+            "description": "applied or proposed"
+          },
+          {
+            "name": "ledger_id",
+            "type": "string",
+            "description": "id of the ledger label row"
+          }
+        ],
+        "primaryKey": [
+          "rid",
+          "part_order"
+        ],
+        "foreignKeys": [
+          {
+            "fields": [
+              "rid"
+            ],
+            "reference": {
+              "resource": "resolution",
+              "fields": [
+                "rid"
+              ]
+            }
+          },
+          {
+            "fields": [
+              "committee_key"
+            ],
+            "reference": {
+              "resource": "committee",
+              "fields": [
+                "committee_key"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "preparer",
+      "path": "csv/preparer.csv",
+      "profile": "tabular-data-resource",
+      "format": "csv",
+      "mediatype": "text/csv",
+      "encoding": "utf-8",
+      "bytes": 143301,
+      "hash": "sha256:106c88475712a557e8b074873787dab4a4a02a2cba070be0bff854bab71f974e",
+      "dialect": {
+        "delimiter": ",",
+        "lineTerminator": "\n",
+        "quoteChar": "\"",
+        "doubleQuote": true,
+        "header": true
+      },
+      "schema": {
+        "fields": [
+          {
+            "name": "rid",
+            "type": "string",
+            "description": "the resolution"
+          },
+          {
+            "name": "part_order",
+            "type": "integer",
+            "description": "position of the part inside the Prepared By cell, from 1"
+          },
+          {
+            "name": "source_ref",
+            "type": "string",
+            "description": "the Prepared By cell, e.g. <sheet>!D<row>"
+          },
+          {
+            "name": "text_as_written",
+            "type": "string",
+            "description": "the whole Prepared By cell"
+          },
+          {
+            "name": "part_text",
+            "type": "string",
+            "description": "the part"
+          },
+          {
+            "name": "part_kind",
+            "type": "string",
+            "description": "person, body, tribe_or_org or single_token"
+          },
+          {
+            "name": "role",
+            "type": "string",
+            "description": "always prepared_by"
+          },
+          {
+            "name": "status",
+            "type": "string",
+            "description": "applied or proposed"
+          },
+          {
+            "name": "person_key",
+            "type": "string",
+            "description": "applied person; NULL unless status is applied and part_kind is person"
+          },
+          {
+            "name": "body",
+            "type": "string",
+            "description": "body name for a body part; NULL otherwise"
+          },
+          {
+            "name": "org",
+            "type": "string",
+            "description": "organisation text for a tribe_or_org part; NULL otherwise"
+          },
+          {
+            "name": "ledger_id",
+            "type": "string",
+            "description": "id of the ledger part row"
+          }
+        ],
+        "primaryKey": [
+          "rid",
+          "part_order"
+        ],
+        "foreignKeys": [
+          {
+            "fields": [
+              "rid"
+            ],
+            "reference": {
+              "resource": "resolution",
+              "fields": [
+                "rid"
+              ]
+            }
+          },
+          {
+            "fields": [
+              "person_key"
+            ],
+            "reference": {
+              "resource": "person",
+              "fields": [
+                "person_key"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "crosswalk",
+      "path": "csv/crosswalk.csv",
+      "profile": "tabular-data-resource",
+      "format": "csv",
+      "mediatype": "text/csv",
+      "encoding": "utf-8",
+      "bytes": 474446,
+      "hash": "sha256:9a34e3a81b3db2dd1527168e9cbf5214cad6c69d788af6955ce13023cc256bbe",
+      "dialect": {
+        "delimiter": ",",
+        "lineTerminator": "\n",
+        "quoteChar": "\"",
+        "doubleQuote": true,
+        "header": true
+      },
+      "schema": {
+        "fields": [
+          {
+            "name": "ledger_id",
+            "type": "string",
+            "description": "id of the ledger row"
+          },
+          {
+            "name": "record",
+            "type": "string",
+            "description": "resolution (one per library resolution) or site (a site document the workbook lacks)"
+          },
+          {
+            "name": "rid",
+            "type": "string",
+            "description": "the resolution; NULL for a site record"
+          },
+          {
+            "name": "number",
+            "type": "string",
+            "description": "number as the ledger gives it"
+          },
+          {
+            "name": "site_number",
+            "type": "string",
+            "description": "site number as the ledger gives it"
+          },
+          {
+            "name": "site_resolution_id",
+            "type": "integer",
+            "description": "id of the row in the site database; NULL if none"
+          },
+          {
+            "name": "document_id",
+            "type": "string",
+            "description": "applied document SHA-256; NULL if none"
+          },
+          {
+            "name": "match_class",
+            "type": "string",
+            "description": "ledger match class"
+          },
+          {
+            "name": "title_similarity",
+            "type": "number",
+            "description": "ledger title similarity; NULL if none"
+          },
+          {
+            "name": "status",
+            "type": "string",
+            "description": "applied, proposed, none or site_only (4.11)"
+          },
+          {
+            "name": "workbook_title",
+            "type": "string",
+            "description": "display title of the resolution; NULL for a site record"
+          },
+          {
+            "name": "site_title",
+            "type": "string",
+            "description": "title in the site database for site_resolution_id; NULL if none"
+          },
+          {
+            "name": "site_date_adopted",
+            "type": "string",
+            "description": "date_adopted in the site database; NULL if none"
+          },
+          {
+            "name": "site_convention_name",
+            "type": "string",
+            "description": "convention_name in the site database; NULL if none"
+          }
+        ],
+        "primaryKey": [
+          "ledger_id"
+        ],
+        "foreignKeys": [
+          {
+            "fields": [
+              "rid"
+            ],
+            "reference": {
+              "resource": "resolution",
+              "fields": [
+                "rid"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "copy",
+      "path": "csv/copy.csv",
+      "profile": "tabular-data-resource",
+      "format": "csv",
+      "mediatype": "text/csv",
+      "encoding": "utf-8",
+      "bytes": 84328,
+      "hash": "sha256:d1e79dbbd81c7bd8ecead132b67c5932f77db504219fe2a57b9cc2426fc39051",
+      "dialect": {
+        "delimiter": ",",
+        "lineTerminator": "\n",
+        "quoteChar": "\"",
+        "doubleQuote": true,
+        "header": true
+      },
+      "schema": {
+        "fields": [
+          {
+            "name": "copy_ref",
+            "type": "string",
+            "description": "cell reference of the copy's Number cell, <sheet>!A<row>"
+          },
+          {
+            "name": "sheet",
+            "type": "string",
+            "description": "sheet the copy is on"
+          },
+          {
+            "name": "row",
+            "type": "integer",
+            "description": "row number of the copy"
+          },
+          {
+            "name": "rid",
+            "type": "string",
+            "description": "the resolution the row copies"
+          },
+          {
+            "name": "differs",
+            "type": "string",
+            "description": "comma-joined names of the fields whose stripped values differ between the copy and its resolution row; '' if none"
+          },
+          {
+            "name": "status",
+            "type": "string",
+            "description": "applied or proposed (ledger class)"
+          },
+          {
+            "name": "ledger_id",
+            "type": "string",
+            "description": "id of the ledger row"
+          }
+        ],
+        "primaryKey": [
+          "copy_ref"
+        ],
+        "foreignKeys": [
+          {
+            "fields": [
+              "rid"
+            ],
+            "reference": {
+              "resource": "resolution",
+              "fields": [
+                "rid"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "duplicate_group",
+      "path": "csv/duplicate_group.csv",
+      "profile": "tabular-data-resource",
+      "format": "csv",
+      "mediatype": "text/csv",
+      "encoding": "utf-8",
+      "bytes": 4774,
+      "hash": "sha256:1306ef79512eb56f26715f52a137dbfa1da4ffe16ddcc3476a3aa8dcc50ffc0e",
+      "dialect": {
+        "delimiter": ",",
+        "lineTerminator": "\n",
+        "quoteChar": "\"",
+        "doubleQuote": true,
+        "header": true
+      },
+      "schema": {
+        "fields": [
+          {
+            "name": "ledger_id",
+            "type": "string",
+            "description": "id of the ledger row"
+          },
+          {
+            "name": "group_id",
+            "type": "string",
+            "description": "ledger group id"
+          },
+          {
+            "name": "relation",
+            "type": "string",
+            "description": "same_number, same_title or duplicates_tab_pair"
+          },
+          {
+            "name": "numbers",
+            "type": "string",
+            "description": "numbers of the group as the ledger gives them"
+          },
+          {
+            "name": "members",
+            "type": "string",
+            "description": "rids of the group, ';'-joined"
+          },
+          {
+            "name": "status",
+            "type": "string",
+            "description": "kept (ledger class keep or auto) or proposed (review)"
+          },
+          {
+            "name": "note",
+            "type": "string",
+            "description": "the ledger's note; NULL if none"
+          }
+        ],
+        "primaryKey": [
+          "ledger_id"
+        ]
+      }
+    },
+    {
+      "name": "number_gap",
+      "path": "csv/number_gap.csv",
+      "profile": "tabular-data-resource",
+      "format": "csv",
+      "mediatype": "text/csv",
+      "encoding": "utf-8",
+      "bytes": 686,
+      "hash": "sha256:4a38917ad1d101ef9c5267a1699b1224f5c5b91e6ba370f15763cd4f08a42266",
+      "dialect": {
+        "delimiter": ",",
+        "lineTerminator": "\n",
+        "quoteChar": "\"",
+        "doubleQuote": true,
+        "header": true
+      },
+      "schema": {
+        "fields": [
+          {
+            "name": "year",
+            "type": "integer",
+            "description": "year"
+          },
+          {
+            "name": "sequence",
+            "type": "integer",
+            "description": "a sequence from 1 to the year's largest listed Master sequence that no listed Master resolution has"
+          },
+          {
+            "name": "number",
+            "type": "string",
+            "description": "YYYY-NN of the gap"
+          },
+          {
+            "name": "on_site",
+            "type": "integer",
+            "description": "1 when the site database has that number"
+          }
+        ],
+        "primaryKey": [
+          "year",
+          "sequence"
+        ]
+      }
+    },
+    {
+      "name": "coverage",
+      "path": "csv/coverage.csv",
+      "profile": "tabular-data-resource",
+      "format": "csv",
+      "mediatype": "text/csv",
+      "encoding": "utf-8",
+      "bytes": 1215,
+      "hash": "sha256:074470ab7ccc60f07469c57d6a6ab759963fd835b5b18e2ec07ef4567104164a",
+      "dialect": {
+        "delimiter": ",",
+        "lineTerminator": "\n",
+        "quoteChar": "\"",
+        "doubleQuote": true,
+        "header": true
+      },
+      "schema": {
+        "fields": [
+          {
+            "name": "year",
+            "type": "integer",
+            "description": "year"
+          },
+          {
+            "name": "resolutions",
+            "type": "integer",
+            "description": "listed resolutions of the year"
+          },
+          {
+            "name": "with_title",
+            "type": "integer",
+            "description": "with a non-blank Title cell"
+          },
+          {
+            "name": "with_committee",
+            "type": "integer",
+            "description": "with a non-blank Committee cell"
+          },
+          {
+            "name": "with_committee_applied",
+            "type": "integer",
+            "description": "with at least one applied committee link"
+          },
+          {
+            "name": "with_prepared_by",
+            "type": "integer",
+            "description": "with a non-blank Prepared By cell"
+          },
+          {
+            "name": "with_session",
+            "type": "integer",
+            "description": "with a session_id"
+          },
+          {
+            "name": "with_outcome",
+            "type": "integer",
+            "description": "with an outcome other than unknown"
+          },
+          {
+            "name": "with_to_ncai",
+            "type": "integer",
+            "description": "with a to_ncai value"
+          },
+          {
+            "name": "amended_yes",
+            "type": "integer",
+            "description": "with amended = 1"
+          },
+          {
+            "name": "with_permalink",
+            "type": "integer",
+            "description": "with a permalink_url"
+          },
+          {
+            "name": "with_file",
+            "type": "integer",
+            "description": "with a non-blank File cell (a count only)"
+          },
+          {
+            "name": "linked_to_site",
+            "type": "integer",
+            "description": "with a document_id"
+          }
+        ],
+        "primaryKey": [
+          "year"
+        ]
+      }
+    },
+    {
+      "name": "applied_fix",
+      "path": "csv/applied_fix.csv",
+      "profile": "tabular-data-resource",
+      "format": "csv",
+      "mediatype": "text/csv",
+      "encoding": "utf-8",
+      "bytes": 41214,
+      "hash": "sha256:969ec6a6f5e9c71be7d76fc2100ac5039e2a544633cb76283c043b75afd5c8c7",
+      "dialect": {
+        "delimiter": ",",
+        "lineTerminator": "\n",
+        "quoteChar": "\"",
+        "doubleQuote": true,
+        "header": true
+      },
+      "schema": {
+        "fields": [
+          {
+            "name": "ledger",
+            "type": "string",
+            "description": "ledger file stem (row_fixes or session_map)"
+          },
+          {
+            "name": "ledger_id",
+            "type": "string",
+            "description": "id of the ledger row"
+          },
+          {
+            "name": "rid",
+            "type": "string",
+            "description": "the resolution; NULL when the row is not a resolution"
+          },
+          {
+            "name": "source_ref",
+            "type": "string",
+            "description": "the first reference of the ledger row"
+          },
+          {
+            "name": "field",
+            "type": "string",
+            "description": "field changed"
+          },
+          {
+            "name": "old_value",
+            "type": "string",
+            "description": "value before"
+          },
+          {
+            "name": "new_value",
+            "type": "string",
+            "description": "value after"
+          },
+          {
+            "name": "rule",
+            "type": "string",
+            "description": "the ledger's decided_by"
+          }
+        ],
+        "primaryKey": [
+          "ledger",
+          "ledger_id"
+        ]
+      }
+    }
+  ]
+}

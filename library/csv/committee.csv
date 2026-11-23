@@ -1,0 +1,31 @@
+committee_key,display_name,kind,parent_key,name_confirmed,source_names,labels,first_year,last_year,n_resolutions,ledger_id
+climate_resilience,Climate Resilience,committee,,0,tab: Climate; chart: Climate Resiliency,Climate Resilience (3); Climate (2); Climate Change (1),2023,2024,3,CM-00001
+culture_elders,Culture & Elders,committee,,0,tab: Culture & Elders; chart: Culture and Elders,"Culture/Elders (32); Culture & Elders Committee (30); Culture & Elders (8); Cultural/Elders (4); Culture and Elders (3); Culture and Elders, Education (2); Education, Culture and Elders (2); Culture & Elders; Native Vote (1)",2000,2025,77,CM-00002
+drug_abuse,Drug Abuse & Prevention,subcommittee_or_topic,health,0,tab: -; chart: -,Health; Drug Abuse & Prevention (3); Drug Abuse (1),,,0,CM-00003
+economic_development,Economic Development,committee,,1,tab: Economic Development; chart: Economic Development,"Economic Development (162); Economic Development, Taxation (2); Economic Development (TABLED) (1); Economic Development Committtee: Human Resources (1); Economic Development Sub-Committtee: Tourism (1); Off the Floor: Economic Development (1); Taxation, Economic Development (1)",2000,2026,162,CM-00004
+education,Education,committee,,1,tab: Education; chart: -,"Education (180); Culture and Elders, Education (2); Education, Culture and Elders (2); Off the Floor - Education (1)",2000,2026,180,CM-00005
+education_higher,Education (Higher),committee,education,0,tab: Education (Higher); chart: Education (Higher),Education (Higher) (7),2024,2025,7,CM-00006
+education_k12,Education (K-12),committee,education,0,tab: Education (K-12); chart: -,Education K-12 (3),2023,2023,3,CM-00007
+energy,Energy,committee,,1,tab: Energy; chart: Energy,Energy (10),2018,2025,10,CM-00008
+food_sovereignty,Food Sovereignty,subcommittee_or_topic,,0,tab: -; chart: Food Sovereignty,Food Sovereignty (1),2026,2026,1,CM-00009
+gaming,Gaming,committee,,1,tab: Gaming; chart: Gaming,"Gaming (25); Gaming  (2); Trust Reform, Gaming (1)",2001,2025,27,CM-00010
+health,Health,committee,,0,tab: Health; chart: Health and Drug Prevention,"Health (233); Health  (4); Health; Drug Abuse & Prevention (3); ICWA, Health (2); Off the Floor - Health (1); Off the Floor Health (1)",2000,2025,237,CM-00011
+housing,Housing,committee,,1,tab: Housing; chart: Housing,Housing (92),2000,2025,92,CM-00012
+human_resources,Human Resources,subcommittee_or_topic,economic_development,0,tab: -; chart: -,Economic Development Committtee: Human Resources (1),,,0,CM-00013
+icwa,ICWA,committee,,1,tab: ICWA; chart: ICWA,"Indian Child Welfare/Social Service (10); Indian Child Welfare/Social Services (10); ICWA (7); ICW /Social Services (2); ICW/Social Services (2); ICWA, Health (2); Indian Child Welfare (2)",2004,2025,9,CM-00014
+international_affairs,International Affairs,subcommittee_or_topic,,0,tab: -; chart: International Affairs,International Affairs (3),2025,2026,3,CM-00015
+judicial,Judicial,subcommittee_or_topic,,0,tab: -; chart: -,Judicial (1),2001,2001,1,CM-00016
+law_justice,Law & Justice,committee,,0,tab: Law & Justice; chart: Law and Justice,Law & Justice (52); Law and Justice (15); Law and Order (2); Law and Justice/ Trust Reform (1),2001,2026,67,CM-00017
+mmiw,MMIW,subcommittee_or_topic,,0,tab: -; chart: -,MMIW (2),2024,2024,2,CM-00018
+native_vote,Native Vote,committee,,1,tab: Native Vote; chart: Native Vote,Native Vote (17); Culture & Elders; Native Vote (1),2008,2025,17,CM-00019
+natural_resources,Natural Resources,committee,,1,tab: Natural Resources; chart: Natural Resources,Natural Resources/Land (170); Natural Resources (79); Natural Resources & Land (3); Natural Resources & Lands (2); Natural Resources/Lands (2); Natural Resources/ Lands (1); Off the Floor Natural Resources (1),2004,2026,79,CM-00020
+philanthropy,Philanthropy,subcommittee_or_topic,,0,tab: -; chart: Philanthropy,Philanthropy (2),2022,2023,2,CM-00021
+tanf,TANF,committee,,1,tab: TANF; chart: TANF,TANF (31),2003,2024,31,CM-00022
+taxation,Taxation,committee,,1,tab: Taxation; chart: Taxation,"Taxation (36); Economic Development, Taxation (2); Taxation, Economic Development (1)",2009,2026,36,CM-00023
+telecom,Telecommunications and Technology,committee,,0,tab: Telecommunications & Utility; chart: Telecommunications and Technology,Telecommunications & Utility (48); Telecommunications and Technology (4); Telecommunication (2); Telecommunications & Tech (2); Telecommunications (1); Telecommunications & Utilitv (1); Utilities and Telecommunications (1),2023,2026,6,CM-00024
+tero,TERO,committee,,1,tab: TERO; chart: TERO,TERO (11); TERO+C496 (1),2011,2026,12,CM-00025
+tourism,Tourism,subcommittee_or_topic,economic_development,0,tab: -; chart: -,Tourism (3); Economic Development Sub-Committtee: Tourism (1),2003,2006,3,CM-00026
+transportation,Transportation,committee,,1,tab: Transportation; chart: Transportation,Transportation (131); Off the Floor - Transportation (1),2000,2025,131,CM-00027
+trust_reform,Trust Reform,committee,,0,tab: -; chart: Trust Reform,"Trust Reform (19); Law and Justice/ Trust Reform (1); Trust Reform, Gaming (1)",2010,2025,19,CM-00028
+veterans,Veterans,committee,,0,tab: Veterans; chart: Veteran Affairs,Veterans (40),2000,2023,40,CM-00029
+youth,Youth,committee,,1,tab: Youth; chart: Youth,Youth (10),2001,2025,10,CM-00030

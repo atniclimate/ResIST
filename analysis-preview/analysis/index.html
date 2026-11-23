@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:,">
+<title>ATNI Resolutions in Numbers (preview)</title>
+<link rel="stylesheet" href="atni.css">
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="analysis.css">
+<script type="module" src="analysis.js"></script>
+</head>
+<body>
+<svg class="defs" width="0" height="0" aria-hidden="true" focusable="false"><defs>
+  <pattern id="pat-hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(135)"><line class="pat-line" x1="0" y1="0" x2="0" y2="6"/></pattern>
+  <pattern id="pat-wait" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(135)"><line class="pat-wait" x1="0" y1="0" x2="0" y2="5"/></pattern>
+  <pattern id="tex45" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line class="pat-tex" x1="0" y1="0" x2="0" y2="5"/></pattern>
+  <pattern id="tex135" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(135)"><line class="pat-tex" x1="0" y1="0" x2="0" y2="5"/></pattern>
+  <pattern id="texv" width="5" height="5" patternUnits="userSpaceOnUse"><line class="pat-tex" x1="0" y1="0" x2="0" y2="5"/></pattern>
+</defs></svg>
+
+<a class="skip-link" href="#main">Skip to content</a>
+
+<div class="mock-banner" role="note">
+  <div class="wrap">
+    <strong>Preview, under review</strong>
+    <span>Counts are as recorded in The Resolution Library, built by Wyatt Ash-Milby at ATNI. Some committee names and spellings are still being reviewed, and wording may change. <a href="../../">Back to the ResIST site</a>.</span>
+    <label for="names-sw"><input type="checkbox" id="names-sw" checked> Show names</label>
+  </div>
+</div>
+
+<header class="site-header glass" id="site-header">
+  <div class="wrap bar">
+    <a class="brand" href="#/overview">
+      <img class="seal-dark" src="atni-seal-on-dark.svg" alt="" width="32" height="32">
+      <img class="seal-light" src="atni-seal.svg" alt="" width="32" height="32">
+      <b>ResIST</b><span class="words">Resolutions of the Affiliated Tribes of Northwest Indians</span>
+    </a>
+    <nav class="site-nav" aria-label="Site">
+      <span class="off" aria-hidden="true">Search</span>
+      <a class="cur" href="#/overview" aria-current="page">Analysis</a>
+      <span class="off" aria-hidden="true">Research</span>
+      <span class="off" aria-hidden="true">Draft</span>
+      <button type="button" id="theme-btn" class="btn small">Light theme</button>
+    </nav>
+  </div>
+</header>
+
+<div class="band">
+  <div class="wrap">
+    <h1 id="page-title">ATNI Resolutions in Numbers</h1>
+    <p class="lead">These counts describe ATNI's own record of its resolutions. ATNI governs which records ResIST holds and releases. Each chart says what it counts and what it leaves out.</p>
+    <p class="credit-line" id="credit-line"></p>
+    <p class="slot" role="note">[PERSONAL VOICE -- Patrick writes this section]</p>
+    <p class="source" id="band-source"></p>
+    <nav class="tabs tabs-band" aria-label="Analysis views">
+      <a data-tab="overview" href="#/overview">Overview</a>
+      <a data-tab="years" href="#/years">Years and Conventions</a>
+      <a data-tab="committees" href="#/committees">Committees</a>
+      <a data-tab="people" href="#/people">People</a>
+      <a data-tab="words" href="#/words">Words and Titles</a>
+      <a data-tab="record" href="#/record">The Record</a>
+    </nav>
+  </div>
+</div>
+
+<div class="fbar glass" id="fbar">
+  <div class="wrap fbar-in">
+    <p class="fbar-name" id="view-name">Overview</p>
+    <nav class="tabs tabs-bar" aria-label="Analysis views">
+      <a data-tab="overview" href="#/overview">Overview</a>
+      <a data-tab="years" href="#/years">Years and Conventions</a>
+      <a data-tab="committees" href="#/committees">Committees</a>
+      <a data-tab="people" href="#/people">People</a>
+      <a data-tab="words" href="#/words">Words and Titles</a>
+      <a data-tab="record" href="#/record">The Record</a>
+    </nav>
+    <button type="button" class="btn" id="filter-btn" aria-haspopup="dialog"><span>Filters:</span> <span id="filter-btn-text">2000 to 2026, all conventions, all committees</span></button>
+    <div id="filter-slot">
+      <form id="filters" class="filters" aria-label="Filters" onsubmit="return false">
+        <div class="fld"><label for="f-era">Years</label><select id="f-era"></select></div>
+        <div class="fld"><label for="f-y0">From</label><select id="f-y0"></select></div>
+        <div class="fld"><label for="f-y1">To</label><select id="f-y1"></select></div>
+        <div class="fld"><label for="f-k">Convention</label><select id="f-k"></select></div>
+        <div class="fld fld-c"><label for="f-c">Committee</label><select id="f-c"></select></div>
+        <button type="button" class="btn small quiet" id="clear-filters" hidden>Clear filters</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<main id="main" class="wrap" tabindex="-1">
+  <div id="loading" role="status"><p>Counting the resolutions</p><div class="loadbar"><i></i></div></div>
+  <div id="view"></div>
+</main>
+
+<footer class="mock-foot"><div class="wrap"><p>Preview, under review. Every count on this page is read from the files beside it; nothing is sent anywhere.</p></div></footer>
+
+<dialog id="list-dialog" class="sheet" aria-labelledby="list-title">
+  <div class="sheet-head"><h2 id="list-title"></h2><button type="button" class="btn small" id="list-close">Close</button></div>
+  <div class="sheet-body" id="list-body">
+    <p class="sheet-meta" id="list-date"></p>
+    <div class="sheet-acts"><button type="button" class="btn small" id="list-csv">Download this list (CSV)</button><span id="list-related"></span></div>
+    <div id="list-empty" class="empty-state" hidden><h3>No Resolutions Match</h3><p>No resolutions match these filters. Clear a filter or widen the years to see counts again.</p></div>
+    <ol class="lrows" id="list-rows"></ol>
+    <p><button type="button" class="btn small quiet" id="list-more" hidden></button></p>
+  </div>
+</dialog>
+
+<dialog id="filter-sheet" class="sheet" aria-labelledby="filter-title">
+  <div class="sheet-head"><h2 id="filter-title">Filters</h2><button type="button" class="btn small" id="filter-close">Close</button></div>
+  <div class="sheet-body sheet-fields"><div id="filter-sheet-slot"></div><p><button type="button" class="btn small quiet" id="clear-filters-2" hidden>Clear filters</button></p></div>
+</dialog>
+
+<div id="tip" role="tooltip" hidden></div>
+<div id="toast" hidden></div>
+<div id="announce" class="sr-only" role="status" aria-live="polite"></div>
+</body>
+</html>

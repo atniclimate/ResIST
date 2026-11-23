@@ -1,0 +1,44 @@
+{"ledger_id":"DU-00003","group_id":"G-T-2024-33","relation":"same_title","numbers":"2024-33 / 2023-51","members":"ml-0120;ml-0160","status":"proposed","note":"distinct resolutions"}
+{"ledger_id":"DU-00004","group_id":"G-T-2022-39","relation":"same_title","numbers":"2022-39 / 2006-98","members":"ml-0218;ml-1142","status":"proposed","note":"distinct resolutions"}
+{"ledger_id":"DU-00005","group_id":"G-T-2022-35","relation":"same_title","numbers":"2022-35 / 2020-11","members":"ml-0222;ml-0333","status":"proposed","note":"distinct resolutions"}
+{"ledger_id":"DU-00006","group_id":"G-T-2021-10","relation":"same_title","numbers":"2021-10 / 2020-46","members":"ml-0287;ml-0298","status":"kept","note":"distinct resolutions"}
+{"ledger_id":"DU-00007","group_id":"G-T-2018-19","relation":"same_title","numbers":"2018-19 / 2014-21","members":"ml-0416;ml-0669","status":"kept","note":"distinct resolutions"}
+{"ledger_id":"DU-00008","group_id":"G-T-2018-17","relation":"same_title","numbers":"2018-17 / 2015-01","members":"ml-0418;ml-0620","status":"kept","note":"distinct resolutions"}
+{"ledger_id":"DU-00009","group_id":"G-T-2017-33","relation":"same_title","numbers":"2017-33 / 2010-38","members":"ml-0465;ml-0913","status":"kept","note":"distinct resolutions"}
+{"ledger_id":"DU-00010","group_id":"G-T-2016-37","relation":"same_title","numbers":"2016-37 / 2016-16","members":"ml-0519;ml-0540","status":"proposed","note":"distinct resolutions"}
+{"ledger_id":"DU-00011","group_id":"G-T-2015-54","relation":"same_title","numbers":"2015-54 / 2011-66","members":"ml-0567;ml-0824","status":"kept","note":"distinct resolutions"}
+{"ledger_id":"DU-00012","group_id":"G-T-2015-24","relation":"same_title","numbers":"2015-24 / 2003-13","members":"ml-0597;ml-1517","status":"kept","note":"distinct resolutions"}
+{"ledger_id":"DU-00013","group_id":"G-T-2013-50","relation":"same_title","numbers":"2013-50 / 2013-11","members":"ml-0725;ml-0758","status":"proposed","note":"distinct resolutions"}
+{"ledger_id":"DU-00014","group_id":"G-T-2009-25","relation":"same_title","numbers":"2009-25 / 2008-29","members":"ml-1009;ml-1041","status":"kept","note":"distinct resolutions"}
+{"ledger_id":"DU-00015","group_id":"G-T-2007-53","relation":"same_title","numbers":"2007-53 / 2005-60","members":"ml-1090;ml-1264","status":"proposed","note":"distinct resolutions"}
+{"ledger_id":"DU-00016","group_id":"G-T-2007-37","relation":"same_title","numbers":"2007-37 / 2006-46","members":"ml-1106;ml-1194","status":"kept","note":"distinct resolutions"}
+{"ledger_id":"DU-00017","group_id":"G-T-2006-73","relation":"same_title","numbers":"2006-73 / 2006-37","members":"ml-1167;ml-1203","status":"proposed","note":"distinct resolutions"}
+{"ledger_id":"DU-00018","group_id":"G-T-2005-78","relation":"same_title","numbers":"2005-78 / 2004-78","members":"ml-1246;ml-1334","status":"proposed","note":"distinct resolutions"}
+{"ledger_id":"DU-00019","group_id":"G-T-2005-33","relation":"same_title","numbers":"2005-33 / 2004-50","members":"ml-1290;ml-1362","status":"kept","note":"distinct resolutions"}
+{"ledger_id":"DU-00020","group_id":"G-T-2003-74","relation":"same_title","numbers":"2003-74 / 2002-28","members":"ml-1456;ml-1582","status":"kept","note":"distinct resolutions"}
+{"ledger_id":"DU-00021","group_id":"G-T-2003-52","relation":"same_title","numbers":"2003-52 / 2002-77","members":"ml-1478;ml-1533","status":"kept","note":"distinct resolutions"}
+{"ledger_id":"DU-00022","group_id":"G-T-2003-34","relation":"same_title","numbers":"2003-34 / 2003-16","members":"ml-1496;ml-1514","status":"proposed","note":"distinct resolutions"}
+{"ledger_id":"DU-00023","group_id":"G-T-2002-53","relation":"same_title","numbers":"2002-53 / 2002-27","members":"ml-1557;ml-1583","status":"proposed","note":"distinct resolutions"}
+{"ledger_id":"DU-00024","group_id":"G-T-2002-09","relation":"same_title","numbers":"2002-09 / 2001-69","members":"ml-1601;ml-1638","status":"kept","note":"distinct resolutions"}
+{"ledger_id":"DU-00025","group_id":"G-T-2002-08","relation":"same_title","numbers":"2002-08 / 2001-70","members":"ml-1602;ml-1637","status":"kept","note":"distinct resolutions"}
+{"ledger_id":"DU-00026","group_id":"G-D-01","relation":"duplicates_tab_pair","numbers":"2024-33 / 2023-51","members":"ml-0120;ml-0160","status":"kept","note":"listed by Wyatt as one title under two numbers"}
+{"ledger_id":"DU-00027","group_id":"G-D-02","relation":"duplicates_tab_pair","numbers":"2022-39 / 2006-98","members":"ml-0218;ml-1142","status":"kept","note":"listed by Wyatt as one title under two numbers"}
+{"ledger_id":"DU-00028","group_id":"G-D-03","relation":"duplicates_tab_pair","numbers":"2018-19 / 2014-21","members":"ml-0416;ml-0669","status":"kept","note":"listed by Wyatt as one title under two numbers"}
+{"ledger_id":"DU-00029","group_id":"G-D-04","relation":"duplicates_tab_pair","numbers":"2018-17 / 2015-01","members":"ml-0418;ml-0620","status":"kept","note":"listed by Wyatt as one title under two numbers"}
+{"ledger_id":"DU-00030","group_id":"G-D-05","relation":"duplicates_tab_pair","numbers":"2017-33 / 2010-38","members":"ml-0465;ml-0913","status":"kept","note":"listed by Wyatt as one title under two numbers"}
+{"ledger_id":"DU-00031","group_id":"G-D-06","relation":"duplicates_tab_pair","numbers":"2016-37 / 2016-16","members":"ml-0519;ml-0540","status":"kept","note":"listed by Wyatt as one title under two numbers"}
+{"ledger_id":"DU-00032","group_id":"G-D-07","relation":"duplicates_tab_pair","numbers":"2015-54 / 2011-66","members":"ml-0567;ml-0824","status":"kept","note":"listed by Wyatt as one title under two numbers"}
+{"ledger_id":"DU-00033","group_id":"G-D-08","relation":"duplicates_tab_pair","numbers":"2015-24 / 2003-13","members":"ml-0597;ml-1517","status":"kept","note":"listed by Wyatt as one title under two numbers"}
+{"ledger_id":"DU-00034","group_id":"G-D-09","relation":"duplicates_tab_pair","numbers":"2013-50 / 2013-11","members":"ml-0725;ml-0758","status":"kept","note":"listed by Wyatt as one title under two numbers"}
+{"ledger_id":"DU-00035","group_id":"G-D-10","relation":"duplicates_tab_pair","numbers":"2009-25 / 2008-29","members":"ml-1009;ml-1041","status":"kept","note":"listed by Wyatt as one title under two numbers"}
+{"ledger_id":"DU-00036","group_id":"G-D-11","relation":"duplicates_tab_pair","numbers":"2007-37 / 2006-46","members":"ml-1106;ml-1194","status":"kept","note":"listed by Wyatt as one title under two numbers"}
+{"ledger_id":"DU-00037","group_id":"G-D-12","relation":"duplicates_tab_pair","numbers":"2006-73 / 2006-37","members":"ml-1167;ml-1203","status":"kept","note":"listed by Wyatt as one title under two numbers"}
+{"ledger_id":"DU-00038","group_id":"G-D-13","relation":"duplicates_tab_pair","numbers":"2005-60 / 2007-53","members":"ml-1264;ml-1090","status":"kept","note":"listed by Wyatt as one title under two numbers"}
+{"ledger_id":"DU-00039","group_id":"G-D-14","relation":"duplicates_tab_pair","numbers":"2005-19 / 2005-02","members":"ml-1304;ml-1321","status":"kept","note":"listed by Wyatt as one title under two numbers"}
+{"ledger_id":"DU-00040","group_id":"G-D-15","relation":"duplicates_tab_pair","numbers":"2003-88 / 2003-83","members":"ml-1442;ml-1447","status":"kept","note":"listed by Wyatt as one title under two numbers"}
+{"ledger_id":"DU-00041","group_id":"G-D-16","relation":"duplicates_tab_pair","numbers":"2003-74 / 2002-28","members":"ml-1456;ml-1582","status":"kept","note":"listed by Wyatt as one title under two numbers"}
+{"ledger_id":"DU-00042","group_id":"G-D-17","relation":"duplicates_tab_pair","numbers":"2003-52 / 2002-77","members":"ml-1478;ml-1533","status":"kept","note":"listed by Wyatt as one title under two numbers"}
+{"ledger_id":"DU-00043","group_id":"G-D-18","relation":"duplicates_tab_pair","numbers":"2003-34 / 2003-16","members":"ml-1496;ml-1514","status":"kept","note":"listed by Wyatt as one title under two numbers"}
+{"ledger_id":"DU-00044","group_id":"G-D-19","relation":"duplicates_tab_pair","numbers":"2002-53 / 2002-27","members":"ml-1557;ml-1583","status":"kept","note":"listed by Wyatt as one title under two numbers"}
+{"ledger_id":"DU-00045","group_id":"G-D-20","relation":"duplicates_tab_pair","numbers":"2002-09 / 2001-69","members":"ml-1601;ml-1638","status":"kept","note":"listed by Wyatt as one title under two numbers"}
+{"ledger_id":"DU-00046","group_id":"G-D-21","relation":"duplicates_tab_pair","numbers":"2002-08 / 2001-70","members":"ml-1602;ml-1637","status":"kept","note":"listed by Wyatt as one title under two numbers"}

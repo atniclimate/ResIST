@@ -1,0 +1,45 @@
+ledger_id,group_id,relation,numbers,members,status,note
+DU-00003,G-T-2024-33,same_title,2024-33 / 2023-51,ml-0120;ml-0160,proposed,distinct resolutions
+DU-00004,G-T-2022-39,same_title,2022-39 / 2006-98,ml-0218;ml-1142,proposed,distinct resolutions
+DU-00005,G-T-2022-35,same_title,2022-35 / 2020-11,ml-0222;ml-0333,proposed,distinct resolutions
+DU-00006,G-T-2021-10,same_title,2021-10 / 2020-46,ml-0287;ml-0298,kept,distinct resolutions
+DU-00007,G-T-2018-19,same_title,2018-19 / 2014-21,ml-0416;ml-0669,kept,distinct resolutions
+DU-00008,G-T-2018-17,same_title,2018-17 / 2015-01,ml-0418;ml-0620,kept,distinct resolutions
+DU-00009,G-T-2017-33,same_title,2017-33 / 2010-38,ml-0465;ml-0913,kept,distinct resolutions
+DU-00010,G-T-2016-37,same_title,2016-37 / 2016-16,ml-0519;ml-0540,proposed,distinct resolutions
+DU-00011,G-T-2015-54,same_title,2015-54 / 2011-66,ml-0567;ml-0824,kept,distinct resolutions
+DU-00012,G-T-2015-24,same_title,2015-24 / 2003-13,ml-0597;ml-1517,kept,distinct resolutions
+DU-00013,G-T-2013-50,same_title,2013-50 / 2013-11,ml-0725;ml-0758,proposed,distinct resolutions
+DU-00014,G-T-2009-25,same_title,2009-25 / 2008-29,ml-1009;ml-1041,kept,distinct resolutions
+DU-00015,G-T-2007-53,same_title,2007-53 / 2005-60,ml-1090;ml-1264,proposed,distinct resolutions
+DU-00016,G-T-2007-37,same_title,2007-37 / 2006-46,ml-1106;ml-1194,kept,distinct resolutions
+DU-00017,G-T-2006-73,same_title,2006-73 / 2006-37,ml-1167;ml-1203,proposed,distinct resolutions
+DU-00018,G-T-2005-78,same_title,2005-78 / 2004-78,ml-1246;ml-1334,proposed,distinct resolutions
+DU-00019,G-T-2005-33,same_title,2005-33 / 2004-50,ml-1290;ml-1362,kept,distinct resolutions
+DU-00020,G-T-2003-74,same_title,2003-74 / 2002-28,ml-1456;ml-1582,kept,distinct resolutions
+DU-00021,G-T-2003-52,same_title,2003-52 / 2002-77,ml-1478;ml-1533,kept,distinct resolutions
+DU-00022,G-T-2003-34,same_title,2003-34 / 2003-16,ml-1496;ml-1514,proposed,distinct resolutions
+DU-00023,G-T-2002-53,same_title,2002-53 / 2002-27,ml-1557;ml-1583,proposed,distinct resolutions
+DU-00024,G-T-2002-09,same_title,2002-09 / 2001-69,ml-1601;ml-1638,kept,distinct resolutions
+DU-00025,G-T-2002-08,same_title,2002-08 / 2001-70,ml-1602;ml-1637,kept,distinct resolutions
+DU-00026,G-D-01,duplicates_tab_pair,2024-33 / 2023-51,ml-0120;ml-0160,kept,listed by Wyatt as one title under two numbers
+DU-00027,G-D-02,duplicates_tab_pair,2022-39 / 2006-98,ml-0218;ml-1142,kept,listed by Wyatt as one title under two numbers
+DU-00028,G-D-03,duplicates_tab_pair,2018-19 / 2014-21,ml-0416;ml-0669,kept,listed by Wyatt as one title under two numbers
+DU-00029,G-D-04,duplicates_tab_pair,2018-17 / 2015-01,ml-0418;ml-0620,kept,listed by Wyatt as one title under two numbers
+DU-00030,G-D-05,duplicates_tab_pair,2017-33 / 2010-38,ml-0465;ml-0913,kept,listed by Wyatt as one title under two numbers
+DU-00031,G-D-06,duplicates_tab_pair,2016-37 / 2016-16,ml-0519;ml-0540,kept,listed by Wyatt as one title under two numbers
+DU-00032,G-D-07,duplicates_tab_pair,2015-54 / 2011-66,ml-0567;ml-0824,kept,listed by Wyatt as one title under two numbers
+DU-00033,G-D-08,duplicates_tab_pair,2015-24 / 2003-13,ml-0597;ml-1517,kept,listed by Wyatt as one title under two numbers
+DU-00034,G-D-09,duplicates_tab_pair,2013-50 / 2013-11,ml-0725;ml-0758,kept,listed by Wyatt as one title under two numbers
+DU-00035,G-D-10,duplicates_tab_pair,2009-25 / 2008-29,ml-1009;ml-1041,kept,listed by Wyatt as one title under two numbers
+DU-00036,G-D-11,duplicates_tab_pair,2007-37 / 2006-46,ml-1106;ml-1194,kept,listed by Wyatt as one title under two numbers
+DU-00037,G-D-12,duplicates_tab_pair,2006-73 / 2006-37,ml-1167;ml-1203,kept,listed by Wyatt as one title under two numbers
+DU-00038,G-D-13,duplicates_tab_pair,2005-60 / 2007-53,ml-1264;ml-1090,kept,listed by Wyatt as one title under two numbers
+DU-00039,G-D-14,duplicates_tab_pair,2005-19 / 2005-02,ml-1304;ml-1321,kept,listed by Wyatt as one title under two numbers
+DU-00040,G-D-15,duplicates_tab_pair,2003-88 / 2003-83,ml-1442;ml-1447,kept,listed by Wyatt as one title under two numbers
+DU-00041,G-D-16,duplicates_tab_pair,2003-74 / 2002-28,ml-1456;ml-1582,kept,listed by Wyatt as one title under two numbers
+DU-00042,G-D-17,duplicates_tab_pair,2003-52 / 2002-77,ml-1478;ml-1533,kept,listed by Wyatt as one title under two numbers
+DU-00043,G-D-18,duplicates_tab_pair,2003-34 / 2003-16,ml-1496;ml-1514,kept,listed by Wyatt as one title under two numbers
+DU-00044,G-D-19,duplicates_tab_pair,2002-53 / 2002-27,ml-1557;ml-1583,kept,listed by Wyatt as one title under two numbers
+DU-00045,G-D-20,duplicates_tab_pair,2002-09 / 2001-69,ml-1601;ml-1638,kept,listed by Wyatt as one title under two numbers
+DU-00046,G-D-21,duplicates_tab_pair,2002-08 / 2001-70,ml-1602;ml-1637,kept,listed by Wyatt as one title under two numbers

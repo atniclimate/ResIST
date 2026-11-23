@@ -1,0 +1,242 @@
+/* ResIST Analysis and convention screens: proposed local tokens (session 2026-11-22-AN, art direction).
+   Custom properties only. Load after pages/atni.css (the vendored design system, never edited here) and before any
+   view stylesheet. Every --resist-* token below is local until the ATNI design system adopts it in its own session;
+   art-direction.md section 12 names the upstream token each one would become. Contrast for every pair is measured
+   on its composited ground in art-direction.md section 7. Dark is the default, as in atni.css. */
+
+:root,
+[data-theme="dark"] {
+  /* Glass: chrome only (header, filter bar, sheet heads, dock, dialog heads, toolbars). Never under text blocks,
+     tables or charts. Overlay at 80% over the worst backdrop (#FFFFFF) still gives secondary text 5.00:1. */
+  --resist-glass: color-mix(in srgb, var(--atni-ground-overlay) 80%, transparent);
+  --resist-glass-solid: var(--atni-ground-overlay);
+  --resist-glass-filter: blur(20px) saturate(130%);
+  --resist-glass-edge: color-mix(in srgb, var(--atni-text-heading) 14%, transparent); /* lit top edge, decorative */
+  --resist-glass-ink: var(--atni-text-heading);          /* titles, values, links (underlined) on glass */
+  --resist-glass-ink-2: var(--atni-text-secondary);      /* labels and nav on glass; muted and red text never */
+  --resist-glass-control-edge: var(--atni-text-secondary);
+  --resist-glass-focus: var(--atni-text-heading);         /* focus ring and current-page bar on glass */
+  --resist-scrim: color-mix(in srgb, var(--atni-color-core-black-bg) 70%, transparent);
+
+  /* Gradients: grounds only, never on a data mark. Light falls from the top of the page band. */
+  --resist-band-top: var(--atni-ground-overlay);
+  --resist-band-depth: 28rem;
+  --resist-band: linear-gradient(180deg, var(--resist-band-top) 0, var(--atni-ground-base) var(--resist-band-depth));
+  --resist-glow: radial-gradient(48rem 24rem at 0 0, color-mix(in srgb, var(--atni-non-text-accent) 10%, transparent), transparent 72%);
+  --resist-quiet: linear-gradient(160deg, var(--atni-ground-raised), var(--atni-ground-base)); /* empty states */
+
+  /* Categorical series, fixed order, never cycled. Slots 1 to 6 are the design system's six chart hues in the
+     ResIST order (ATNI Red last); 7 to 12 are proposed and always carry direct labels. Same values in both themes. */
+  --resist-cat-1: var(--atni-color-chart-1);  /* #2F7FC1 steel blue */
+  --resist-cat-2: var(--atni-color-chart-6);  /* #A8673A umber */
+  --resist-cat-3: var(--atni-color-chart-5);  /* #6E6FD0 blue violet */
+  --resist-cat-4: var(--atni-color-chart-4);  /* #B8800E ochre */
+  --resist-cat-5: var(--atni-color-chart-3);  /* #1E9A6E green */
+  --resist-cat-6: var(--atni-color-chart-2);  /* #E13D33 ATNI Red */
+  --resist-cat-7: #2663C9;   /* royal blue (proposed) */
+  --resist-cat-8: #719C27;   /* moss (proposed) */
+  --resist-cat-9: #0094A9;   /* teal (proposed) */
+  --resist-cat-10: #706D06;  /* olive (proposed) */
+  --resist-cat-11: #D65997;  /* rose (proposed; 34 degrees of hue clear of the reserved Tribal Magenta) */
+  --resist-cat-12: #227E00;  /* leaf (proposed) */
+  --resist-cat-other: var(--atni-text-muted); /* the fold for a thirteenth series and beyond */
+
+  /* Sequential ramp (year-by-committee heatmap, person-by-committee matrix). One hue; more = further from the
+     ground. Bins: 1, 2-3, 4-6, 7-10, 11-15, 16 or more. Each step names the ink its printed count wears. */
+  --resist-seq-1: #2A6BAE;
+  --resist-seq-2: #4683C5;
+  --resist-seq-3: #679CD7;
+  --resist-seq-4: #8AB5E6;
+  --resist-seq-5: #AFCEF1;
+  --resist-seq-6: #D4E7FC;
+  --resist-seq-1-ink: var(--atni-color-core-white);
+  --resist-seq-2-ink: var(--atni-color-core-black-bg);
+  --resist-seq-3-ink: var(--atni-color-core-black-bg);
+  --resist-seq-4-ink: var(--atni-color-core-black-bg);
+  --resist-seq-5-ink: var(--atni-color-core-black-bg);
+  --resist-seq-6-ink: var(--atni-color-core-black-bg);
+  --resist-seq-0-ink: var(--atni-text-muted); /* a recorded zero: no fill, "0" printed */
+
+  /* Not recorded and coverage: first-class marks, not footnotes. One 135-degree line hatch, nothing else. */
+  --resist-hatch-ink: var(--atni-text-muted);
+  --resist-hatch: repeating-linear-gradient(135deg, var(--resist-hatch-ink) 0 1px, transparent 1px 6px);
+  --resist-coverage-ink: var(--atni-text-secondary);
+  --resist-coverage-edge: var(--atni-text-muted);
+
+  /* Chart anatomy */
+  --resist-grid: var(--atni-non-text-rule);     /* decorative gridlines */
+  --resist-axis: var(--atni-text-muted);        /* baseline and tick labels */
+  --resist-mark-gap: 2px;                       /* ground gap between adjacent fills and heatmap cells */
+  --resist-mark-ring: var(--atni-text-heading); /* hover, focus and selection ring, drawn in the gap */
+
+  /* Version diffs on the convention screens: tint plus a non-colour cue (underline or strike-through). */
+  --resist-ins-tint: color-mix(in srgb, var(--atni-color-chart-3) 22%, transparent);
+  --resist-ins-rule: var(--atni-text-heading);
+  --resist-del-tint: color-mix(in srgb, var(--atni-text-muted) 18%, transparent);
+  --resist-del-ink: var(--atni-text-secondary);
+
+  /* Type (families and sizes from atni.css; these name roles only) */
+  --resist-type-record-family: var(--atni-type-family-body); /* titles, names and committee labels as written */
+  --resist-type-numerals: tabular-nums lining-nums;          /* Noto Sans has tnum; League Spartan does not */
+  --resist-type-chart-title-size: var(--atni-type-heading-3-size);
+  --resist-type-chart-text-size: var(--atni-type-caption-size);
+  --resist-type-reading-size: 1.125rem;                      /* convention reading view */
+  --resist-type-reading-line-height: 1.65;
+  --resist-reading-ink: var(--atni-text-body);
+
+  /* Layout (360 px values; the 48rem and 64rem blocks below widen them) */
+  --resist-filter: 56px;
+  --resist-toolbar: 56px;
+  --resist-section-gap: var(--atni-space-step-6);
+  --resist-hero-height: 168px;
+  --resist-heat-label: 7.5rem;
+  --resist-heat-window: 9;
+  --resist-heat-row: 44px;
+  --resist-rail: 20rem;
+
+  /* Touch */
+  --resist-touch: var(--atni-space-touch-primary);  /* 44px: every control on a coarse pointer */
+  --resist-touch-reading: 48px;                     /* the primary action on the convention face */
+
+  /* Motion */
+  --resist-ease-out: cubic-bezier(0.2, 0, 0, 1);
+  --resist-ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --resist-dur-quick: 120ms;
+  --resist-dur-move: 200ms;
+  --resist-dur-sheet-in: 240ms;
+  --resist-dur-sheet-out: 180ms;
+  --resist-dur-rise: 320ms;
+  --resist-rise-stagger: 10ms;
+}
+
+[data-theme="light"] {
+  --resist-glass: color-mix(in srgb, var(--atni-ground-raised) 80%, transparent);
+  --resist-glass-solid: var(--atni-ground-raised);
+  --resist-glass-edge: color-mix(in srgb, var(--atni-text-heading) 10%, transparent);
+  --resist-scrim: color-mix(in srgb, var(--atni-color-core-black-bg) 45%, transparent);
+
+  --resist-band-top: var(--atni-ground-raised);
+  --resist-glow: radial-gradient(48rem 24rem at 0 0, color-mix(in srgb, var(--atni-non-text-accent) 6%, transparent), transparent 72%);
+
+  --resist-seq-1: #5590D0;
+  --resist-seq-2: #3B7CC0;
+  --resist-seq-3: #2268AE;
+  --resist-seq-4: #0E5596;
+  --resist-seq-5: #05437A;
+  --resist-seq-6: #04325D;
+  --resist-seq-1-ink: var(--atni-color-core-black-bg);
+  --resist-seq-2-ink: var(--atni-color-core-black-bg);
+  --resist-seq-3-ink: var(--atni-color-core-white);
+  --resist-seq-4-ink: var(--atni-color-core-white);
+  --resist-seq-5-ink: var(--atni-color-core-white);
+  --resist-seq-6-ink: var(--atni-color-core-white);
+
+  --resist-ins-tint: color-mix(in srgb, var(--atni-color-chart-3) 14%, transparent);
+  --resist-del-tint: color-mix(in srgb, var(--atni-text-muted) 14%, transparent);
+
+  /* Light body ink (#636363, 5.59:1) is the weakest reading ink in the system; long reading uses grey alt. */
+  --resist-reading-ink: var(--atni-text-secondary);
+}
+
+@media (min-width: 48rem) {
+  :root {
+    --resist-section-gap: var(--atni-space-step-7);
+    --resist-hero-height: 200px;
+    --resist-heat-label: 10rem;
+    --resist-heat-window: 14;
+    --resist-heat-row: 32px;
+  }
+}
+
+@media (min-width: 64rem) {
+  :root {
+    --resist-section-gap: var(--atni-space-step-8);
+    --resist-hero-height: 240px;
+    --resist-heat-label: 13rem;
+    --resist-heat-window: 27;
+    --resist-heat-row: 28px;
+  }
+}
+
+/* A coarse pointer keeps 44px rows in the heatmap at every width, so a whole row is the touch target. */
+@media (pointer: coarse) {
+  :root { --resist-heat-row: 44px; }
+}
+
+/* Glass falls back to its solid ground wherever blur is missing or unwanted. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  :root, [data-theme] { --resist-glass: var(--resist-glass-solid); --resist-glass-filter: none; }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  :root, [data-theme] { --resist-glass: var(--resist-glass-solid); --resist-glass-filter: none; }
+}
+
+@media (prefers-contrast: more) {
+  :root, [data-theme] {
+    --resist-glass: var(--resist-glass-solid);
+    --resist-glass-filter: none;
+    --resist-glass-edge: var(--atni-text-muted);
+    --resist-glow: none;
+  }
+}
+
+@media (forced-colors: active) {
+  :root, [data-theme] {
+    --resist-glass: Canvas;
+    --resist-glass-solid: Canvas;
+    --resist-glass-filter: none;
+    --resist-glass-edge: CanvasText;
+    --resist-glass-ink: CanvasText;
+    --resist-glass-ink-2: CanvasText;
+    --resist-glass-control-edge: ButtonText;
+    --resist-glass-focus: Highlight;
+    --resist-band: none;
+    --resist-glow: none;
+    --resist-quiet: none;
+    --resist-hatch-ink: GrayText;
+    --resist-coverage-ink: CanvasText;
+    --resist-coverage-edge: CanvasText;
+    --resist-mark-ring: Highlight;
+    --resist-ins-tint: transparent;
+    --resist-del-tint: transparent;
+    --resist-ins-rule: CanvasText;
+    --resist-del-ink: CanvasText;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --resist-dur-quick: 0ms;
+    --resist-dur-move: 0ms;
+    --resist-dur-sheet-in: 0ms;
+    --resist-dur-sheet-out: 0ms;
+    --resist-dur-rise: 0ms;
+    --resist-rise-stagger: 0ms;
+  }
+}
+
+/* Print is always light (atni.css), solid and flat. */
+@media print {
+  :root, [data-theme] {
+    --resist-glass: var(--atni-ground-raised);
+    --resist-glass-solid: var(--atni-ground-raised);
+    --resist-glass-filter: none;
+    --resist-band: none;
+    --resist-glow: none;
+    --resist-quiet: none;
+    --resist-seq-1: #5590D0;
+    --resist-seq-2: #3B7CC0;
+    --resist-seq-3: #2268AE;
+    --resist-seq-4: #0E5596;
+    --resist-seq-5: #05437A;
+    --resist-seq-6: #04325D;
+    --resist-seq-1-ink: var(--atni-color-core-black-bg);
+    --resist-seq-2-ink: var(--atni-color-core-black-bg);
+    --resist-seq-3-ink: var(--atni-color-core-white);
+    --resist-seq-4-ink: var(--atni-color-core-white);
+    --resist-seq-5-ink: var(--atni-color-core-white);
+    --resist-seq-6-ink: var(--atni-color-core-white);
+    --resist-reading-ink: var(--atni-text-secondary);
+  }
+}

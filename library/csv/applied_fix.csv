@@ -1,0 +1,221 @@
+ledger,ledger_id,rid,source_ref,field,old_value,new_value,rule
+row_fixes,RF-00037,,Sheet1!A134,row_role,,link_only,R-ROLE
+row_fixes,RF-00039,,Sheet1!A135,row_role,,link_only,R-ROLE
+row_fixes,RF-00041,,Sheet1!A136,row_role,,link_only,R-ROLE
+row_fixes,RF-00043,,Sheet1!A137,row_role,,link_only,R-ROLE
+row_fixes,RF-00045,,Sheet1!A138,row_role,,link_only,R-ROLE
+row_fixes,RF-00047,,Sheet1!A139,row_role,,link_only,R-ROLE
+row_fixes,RF-00049,,Sheet1!A140,row_role,,link_only,R-ROLE
+row_fixes,RF-00051,,Sheet1!A141,row_role,,link_only,R-ROLE
+row_fixes,RF-00053,,Sheet1!A142,row_role,,link_only,R-ROLE
+row_fixes,RF-00055,,Sheet1!A143,row_role,,link_only,R-ROLE
+row_fixes,RF-00057,,Sheet1!A144,row_role,,link_only,R-ROLE
+row_fixes,RF-00059,,Sheet1!A145,row_role,,link_only,R-ROLE
+row_fixes,RF-00061,,Sheet1!A146,row_role,,link_only,R-ROLE
+row_fixes,RF-00063,,Sheet1!A147,row_role,,link_only,R-ROLE
+row_fixes,RF-00065,,Sheet1!A148,row_role,,link_only,R-ROLE
+row_fixes,RF-00067,,Sheet1!A149,row_role,,link_only,R-ROLE
+row_fixes,RF-00069,,Sheet1!A150,row_role,,link_only,R-ROLE
+row_fixes,RF-00071,,Sheet1!A151,row_role,,link_only,R-ROLE
+row_fixes,RF-00073,,Sheet1!A152,row_role,,link_only,R-ROLE
+row_fixes,RF-00075,,Sheet1!A153,row_role,,link_only,R-ROLE
+row_fixes,RF-00077,,Sheet1!A154,row_role,,link_only,R-ROLE
+row_fixes,RF-00079,,Sheet1!A155,row_role,,link_only,R-ROLE
+row_fixes,RF-00081,,Sheet1!A156,row_role,,link_only,R-ROLE
+row_fixes,RF-00083,,Sheet1!A157,row_role,,link_only,R-ROLE
+row_fixes,RF-00085,,Sheet1!A158,row_role,,link_only,R-ROLE
+row_fixes,RF-00087,,Sheet1!A159,row_role,,link_only,R-ROLE
+row_fixes,RF-00089,,Sheet1!A160,row_role,,link_only,R-ROLE
+row_fixes,RF-00091,,Master Library!A2,row_role,,banner,R-ROLE
+row_fixes,RF-00093,,Master Library!A9,row_role,,formula_only,R-ROLE
+row_fixes,RF-00096,ml-0011,Master Library!B11,title,Calling On The Washington State Department Of Social And Health Services To Suspend Its Policy On Treatment Of Tribal General Welfare Benefits Pending Meaningful Government-To-Government Consultation With Affected Tribes And For The Governor Of Washington State To Intervene,Calling On The Washington State Department Of Social And Health Services To Suspend Its Policy On Treatment Of Tribal General Welfare Benefits Pending Meaningful Government-To-Government Consultation With Affected Tribes And For The Governor Of Washington State To Intervene,T-WS
+row_fixes,RF-00097,ml-0012,Master Library!B12,title,Calling On The Internal Revenue Service To Add Tribal Tax Priorities To Its Priority Guidance Plan,Calling On The Internal Revenue Service To Add Tribal Tax Priorities To Its Priority Guidance Plan,T-WS
+row_fixes,RF-00098,ml-0013,Master Library!B13,title,Standing With Tribal Nations Such As The Gwich'In People To Protect The Arctic National Wildlife Refuge And The Porcupine Caribou Herd From Oil And Gas Development,Standing With Tribal Nations Such As The Gwich'In People To Protect The Arctic National Wildlife Refuge And The Porcupine Caribou Herd From Oil And Gas Development,T-WS
+row_fixes,RF-00099,ml-0014,Master Library!B14,title,Re-Affirming Support For Oregon’S Climate Protection Program,Re-Affirming Support For Oregon’S Climate Protection Program,T-WS
+row_fixes,RF-00102,ml-0015,Master Library!B15,title,Calling On The United States Forest Service To Consult With Tribal Nations And Provide For Ecologically Guided Active Forest Stewardship Within The Northwest Forest Plan Amendment,Calling On The United States Forest Service To Consult With Tribal Nations And Provide For Ecologically Guided Active Forest Stewardship Within The Northwest Forest Plan Amendment,T-WS
+row_fixes,RF-00104,ml-0016,Master Library!B16,title,Request For The Department Of Justice To Reconstitute The U.S. Attorney General’S Advisory Committee (Agac)And Native American Issues Subcommittee(Nais)To Address Indian Country Public Safety,Request For The Department Of Justice To Reconstitute The U.S. Attorney General’S Advisory Committee (Agac)And Native American Issues Subcommittee(Nais)To Address Indian Country Public Safety,T-WS
+row_fixes,RF-00106,ml-0017,Master Library!B17,title,Supporting The Introduction And Swift Passage Of The Promoting Strong Native Families And Children Act”,Supporting The Introduction And Swift Passage Of The Promoting Strong Native Families And Children Act”,T-WS
+row_fixes,RF-00108,ml-0018,Master Library!B18,title,Encouraging Support Of The American Indian And Alaska Native Child Abuse Prevention And Treatment Act (Ai/An Capta),Encouraging Support Of The American Indian And Alaska Native Child Abuse Prevention And Treatment Act (Ai/An Capta),T-WS
+row_fixes,RF-00109,ml-0019,Master Library!B19,title,Support For Native American Housing Assistance And Self-Determination Reauthorization Act Of 2026,Support For Native American Housing Assistance And Self-Determination Reauthorization Act Of 2026,T-WS
+row_fixes,RF-00110,ml-0020,Master Library!B20,title,Call To Congress To Enact Legislation That Supports Reimbursement To Tribal Nations Who Have Purchased Commercialoff-The-Shelf Electronic Health Record Systems And For Ongoing Annual Appropriations,Call To Congress To Enact Legislation That Supports Reimbursement To Tribal Nations Who Have Purchased Commercialoff-The-Shelf Electronic Health Record Systems And For Ongoing Annual Appropriations,T-WS
+row_fixes,RF-00112,ml-0021,Master Library!B21,title,Supporting Cost-Free Medicare Coverage For American Indian And Alaska Native Veterans,Supporting Cost-Free Medicare Coverage For American Indian And Alaska Native Veterans,T-WS
+row_fixes,RF-00113,ml-0022,Master Library!B22,title,Protect And Increase Fiscal Year 2027 Sanitation Facilities Construction Funding In The Indian Health Service Budget,Protect And Increase Fiscal Year 2027 Sanitation Facilities Construction Funding In The Indian Health Service Budget,T-WS
+row_fixes,RF-00114,ml-0023,Master Library!B23,title,Support For 2026 Oral History Project With The National Native American Boarding School Healing Coalition And Department Of The Interior,Support For 2026 Oral History Project With The National Native American Boarding School Healing Coalition And Department Of The Interior,T-WS
+row_fixes,RF-00116,ml-0025,Master Library!B25,title,Request For Department Of Homeland Security To Conduct Tribal Consultation On Technical Training Of Tribal Identification Card Authentication,Request For Department Of Homeland Security To Conduct Tribal Consultation On Technical Training Of Tribal Identification Card Authentication,T-WS
+row_fixes,RF-00119,ml-0026,Master Library!B26,title,Protecting The Federal Subsistence Board’S Public Members And The Location Of The Office Of Subsistence Management,Protecting The Federal Subsistence Board’S Public Members And The Location Of The Office Of Subsistence Management,T-WS
+row_fixes,RF-00127,ml-0030,Master Library!B30,title,Support Of Annual Recurring Federal Funding For The National Telecommunications And Information Administration’S Tribal Broadband Connectivity Program And Tribal-Driven Broadband Infrastructure,Support Of Annual Recurring Federal Funding For The National Telecommunications And Information Administration’S Tribal Broadband Connectivity Program And Tribal-Driven Broadband Infrastructure,T-WS
+row_fixes,RF-00129,ml-0031,Master Library!B31,title,Calling On State Agencies To Respect Federal Tribal General Welfare Regulations When Making Income-Based Program Eligibility Determinations,Calling On State Agencies To Respect Federal Tribal General Welfare Regulations When Making Income-Based Program Eligibility Determinations,T-WS
+row_fixes,RF-00132,ml-0033,Master Library!B33,title,"Calling On The United States Environmental Protection Agency And Army Corps Of Engineers To Withdraw The 2025 Proposed 'Updated Definition Of Waters Of The United States' Rule And To Strengthen Clean Water Act Protections For Tribal Waters, Treaty Rights, And Tribal Sovereignty","Calling On The United States Environmental Protection Agency And Army Corps Of Engineers To Withdraw The 2025 Proposed 'Updated Definition Of Waters Of The United States' Rule And To Strengthen Clean Water Act Protections For Tribal Waters, Treaty Rights, And Tribal Sovereignty",T-WS
+row_fixes,RF-00135,ml-0035,Master Library!A35,number,2026-9,2026-09,N-PAD
+row_fixes,RF-00138,ml-0036,Master Library!A36,number,2026-8,2026-08,N-PAD
+row_fixes,RF-00140,ml-0037,Master Library!A37,number,2026-7,2026-07,N-PAD
+row_fixes,RF-00141,ml-0037,Master Library!B37,title,"Supporting The Establishment Of A Tribal Nation Climate Finance Authority And Tribal Nations Global Climate Fund To Secure Direct Access To Climate Finance For Tribal Nations And Advance Tribal Nation-Led Climate Solutions, And Designating An Ambassador For Tribal Nations And Global Climate Finance On Behalf Of Atni","Supporting The Establishment Of A Tribal Nation Climate Finance Authority And Tribal Nations Global Climate Fund To Secure Direct Access To Climate Finance For Tribal Nations And Advance Tribal Nation-Led Climate Solutions, And Designating An Ambassador For Tribal Nations And Global Climate Finance On Behalf Of Atni",T-WS
+row_fixes,RF-00143,ml-0038,Master Library!A38,number,2026-6,2026-06,N-PAD
+row_fixes,RF-00144,ml-0038,Master Library!B38,title,Improving Communication And Consultation On The Impact To Tribal Human Service Operations From Deregulation And State Fraud Investigations”,Improving Communication And Consultation On The Impact To Tribal Human Service Operations From Deregulation And State Fraud Investigations”,T-WS
+row_fixes,RF-00146,ml-0039,Master Library!A39,number,2026-5,2026-05,N-PAD
+row_fixes,RF-00147,ml-0039,Master Library!B39,title,Recommending The U.S. Forest Service Permanently Cease Its Commercial Huckleberry Harvest Program,Recommending The U.S. Forest Service Permanently Cease Its Commercial Huckleberry Harvest Program,T-WS
+row_fixes,RF-00150,ml-0040,Master Library!A40,number,2026-4,2026-04,N-PAD
+row_fixes,RF-00151,ml-0040,Master Library!B40,title,"Calling On Congress To Passthe “Haskell Indian Nations University Improvement Act,” And To Ensure Haskell’S Autonomy, Financial Stability, And Capacity To Provide A Culturally Grounded, High-Quality Education For Native Students","Calling On Congress To Passthe “Haskell Indian Nations University Improvement Act,” And To Ensure Haskell’S Autonomy, Financial Stability, And Capacity To Provide A Culturally Grounded, High-Quality Education For Native Students",T-WS
+row_fixes,RF-00154,ml-0041,Master Library!A41,number,2026-3,2026-03,N-PAD
+row_fixes,RF-00155,ml-0041,Master Library!B41,title,Resolution Calling on the Washington State Department of Licensing to Rescind its Untaxed Fuel Station Notice and the Attorney General's Office to Engage in Urgent Consultation to Halt Violations of Tribal Sovereignty and Intertribal Commerce,Resolution Calling on the Washington State Department of Licensing to Rescind its Untaxed Fuel Station Notice and the Attorney General's Office to Engage in Urgent Consultation to Halt Violations of Tribal Sovereignty and Intertribal Commerce,T-WS
+row_fixes,RF-00157,ml-0042,Master Library!A42,number,2026-2,2026-02,N-PAD
+row_fixes,RF-00159,ml-0043,Master Library!A43,number,2026-1,2026-01,N-PAD
+row_fixes,RF-00160,ml-0043,Master Library!B43,title,"Calling Upon All Idaho, Oregon, and Washington Institutions of Higher Education to Adopt a Culturally Responsive Smudging and Ceremonial Policy to Support American Indian and Alaska Native Students, Employees, and Tribal Community Members","Calling Upon All Idaho, Oregon, and Washington Institutions of Higher Education to Adopt a Culturally Responsive Smudging and Ceremonial Policy to Support American Indian and Alaska Native Students, Employees, and Tribal Community Members",T-WS
+row_fixes,RF-00178,ml-0054,Master Library!F54,permalink,https://atnitribes.org/wp-content/uploads/2025/11/20251016_25-45_AMERICA’S CHILDREN AND FAMILIES ACT (P.I. 118-258).pdf,https://atnitribes.org/wp-content/uploads/2025/11/20251016_25-45_AMERICA%E2%80%99S%20CHILDREN%20AND%20FAMILIES%20ACT%20(P.I.%20118-258).pdf,L-ENC
+row_fixes,RF-00192,ml-0063,Master Library!B63,title,Calling on the Administration and Congress to Protect the Community Development Financial Institutions Fund (CDFI) and Native American CDFI Assistance Program from Termination and Staffing Cuts ,Calling on the Administration and Congress to Protect the Community Development Financial Institutions Fund (CDFI) and Native American CDFI Assistance Program from Termination and Staffing Cuts,T-WS
+row_fixes,RF-00215,ml-0124,Master Library!G124,passed, ,,O-WS
+row_fixes,RF-00233,ml-0188,Master Library!B188,title,Support For The Secure and Fair Enforcement (SAFE)  Banking Act of 2023 (S. 1323),Support For The Secure and Fair Enforcement (SAFE) Banking Act of 2023 (S. 1323),T-WS
+row_fixes,RF-00238,ml-0211,Master Library!G211,passed, ,,O-WS
+row_fixes,RF-00239,ml-0212,Master Library!G212,passed, ,,O-WS
+row_fixes,RF-00240,ml-0213,Master Library!G213,passed, ,,O-WS
+row_fixes,RF-00241,ml-0214,Master Library!G214,passed, ,,O-WS
+row_fixes,RF-00243,ml-0215,Master Library!G215,passed, ,,O-WS
+row_fixes,RF-00244,ml-0216,Master Library!G216,passed, ,,O-WS
+row_fixes,RF-00245,ml-0217,Master Library!B217,title,Appointment To Tribal Transportation Program  Coordinating Committee,Appointment To Tribal Transportation Program Coordinating Committee,T-WS
+row_fixes,RF-00246,ml-0217,Master Library!G217,passed, ,,O-WS
+row_fixes,RF-00247,ml-0218,Master Library!G218,passed, ,,O-WS
+row_fixes,RF-00248,ml-0222,Master Library!G222,passed, ,,O-WS
+row_fixes,RF-00253,ml-0244,Master Library!B244,title,Calling Upon Congress to Recognize a Right of Indigenous Economy,Calling Upon Congress to Recognize a Right of Indigenous Economy,T-WS
+row_fixes,RF-00254,ml-0247,Master Library!K247,to_ncai,yes,Yes,O-CASE
+row_fixes,RF-00273,ml-0282,Master Library!B282,title,Support For A Doctoral Program In The U.S. Department  Of Education Office Of Indian Education Indian Professional Development Grant Program,Support For A Doctoral Program In The U.S. Department Of Education Office Of Indian Education Indian Professional Development Grant Program,T-WS
+row_fixes,RF-00278,ml-0287,Master Library!B287,title,Support for the Washington State  Community Economic Revitalization Board,Support for the Washington State Community Economic Revitalization Board,T-WS
+row_fixes,RF-00280,ml-0291,Master Library!B291,title,Request To Restore Key Federal Environmental Laws  To Protect Tribes,Request To Restore Key Federal Environmental Laws To Protect Tribes,T-WS
+row_fixes,RF-00385,ml-0481,Master Library!B481,title,Reaffirming Support for the Implementation of  Indian Trust Asset Reform act,Reaffirming Support for the Implementation of Indian Trust Asset Reform act,T-WS
+row_fixes,RF-00386,ml-0490,Master Library!B490,title,United Nations Framework Convention on Climate Change (UNFCCC) Conference of Parties (COP) 21 Paris Agreement on the  Local Communities and Indigenous Peoples' Platform,United Nations Framework Convention on Climate Change (UNFCCC) Conference of Parties (COP) 21 Paris Agreement on the Local Communities and Indigenous Peoples' Platform,T-WS
+row_fixes,RF-00387,ml-0491,Master Library!B491,title,Support Washington State Legislation Addressing Criminal Liability For Police Misuse of Deadly Force  and Increase Tribal Involvement,Support Washington State Legislation Addressing Criminal Liability For Police Misuse of Deadly Force and Increase Tribal Involvement,T-WS
+row_fixes,RF-00388,ml-0492,Master Library!B492,title,Port Gamble S’Klallam Tribe Supplemental Nutrition Assistance Program (SNAP) Tribal Eligibility Determinations  Demonstration Project (EDDP),Port Gamble S’Klallam Tribe Supplemental Nutrition Assistance Program (SNAP) Tribal Eligibility Determinations Demonstration Project (EDDP),T-WS
+row_fixes,RF-00391,ml-0499,Master Library!B499,title,Protection and Maximization of Hatchery Production to Provide  for the Treaty Reserved Right to Harvest Fish,Protection and Maximization of Hatchery Production to Provide for the Treaty Reserved Right to Harvest Fish,T-WS
+row_fixes,RF-00397,ml-0522,Master Library!B522,title,Combatting Non-Indian Domestic Violence and Sexual Assault:  A Call for a Full Oliphant Fix,Combatting Non-Indian Domestic Violence and Sexual Assault: A Call for a Full Oliphant Fix,T-WS
+row_fixes,RF-00398,ml-0532,Master Library!B532,title,"Opposition to Voucher Programs;  Education Savings Accounts, in Bureau of Indian Education Schools","Opposition to Voucher Programs; Education Savings Accounts, in Bureau of Indian Education Schools",T-WS
+row_fixes,RF-00415,ml-0591,Master Library!B591,title,In Full Support to Increase the Funding Level of the Bureau of Indian Affairs Roads Maintenance Program  within the Interior Department,In Full Support to Increase the Funding Level of the Bureau of Indian Affairs Roads Maintenance Program within the Interior Department,T-WS
+row_fixes,RF-00416,ml-0598,Master Library!B598,title,"Supporting H.R. 2270, Re-designating the Nisqually National Wildlife Refuge as the \\\""Billy Frank, Jr.  Nisqually  National Wildlife Refuge”","Supporting H.R. 2270, Re-designating the Nisqually National Wildlife Refuge as the \\\""Billy Frank, Jr. Nisqually National Wildlife Refuge”",T-WS
+row_fixes,RF-00417,ml-0600,Master Library!B600,title,Support for American Indian/Alaskan Natives Medicaid Managed Care  Protections in State Waivers,Support for American Indian/Alaskan Natives Medicaid Managed Care Protections in State Waivers,T-WS
+row_fixes,RF-00421,ml-0614,Master Library!B614,title,Calling for Executive Order  by President Barack Obama to Require all Federal Agencies to Recognize and Adhere to Tribal Employment Rights Laws when Hiring for Federal Projects on Or Near Reservations and Ceded Areas of Each Tribe,Calling for Executive Order by President Barack Obama to Require all Federal Agencies to Recognize and Adhere to Tribal Employment Rights Laws when Hiring for Federal Projects on Or Near Reservations and Ceded Areas of Each Tribe,T-WS
+row_fixes,RF-00444,ml-0658,Master Library!B658,title,Approval of Indian General Assistance Program FY 2015 Grant  Application,Approval of Indian General Assistance Program FY 2015 Grant Application,T-WS
+row_fixes,RF-00445,ml-0660,Master Library!B660,title,Pass Senate Bill 1352: Reauthorization of NAHASDA and  Increase in Congressional Appropriations over its Five Year Term,Pass Senate Bill 1352: Reauthorization of NAHASDA and Increase in Congressional Appropriations over its Five Year Term,T-WS
+row_fixes,RF-00447,ml-0663,Master Library!B663,title,"Recommendation for Idaho, Oregon and Washington State-Based Exchanges to Provide Tribal Enrollment Data in Order to Evaluate AI/AN Enrollment  and I/T/U Participation in Qualified Health Plan Contracting","Recommendation for Idaho, Oregon and Washington State-Based Exchanges to Provide Tribal Enrollment Data in Order to Evaluate AI/AN Enrollment and I/T/U Participation in Qualified Health Plan Contracting",T-WS
+row_fixes,RF-00451,ml-0680,Master Library!B680,title,Opposing the Introduction of Genetically  Engineered Salmon,Opposing the Introduction of Genetically Engineered Salmon,T-WS
+row_fixes,RF-00454,ml-0690,Master Library!B690,title,Request for the Washington  State Department of Veteran Affairs To Be Exempt of Sequester for the Purpose of Support of a Tribal Veteran Representative,Request for the Washington State Department of Veteran Affairs To Be Exempt of Sequester for the Purpose of Support of a Tribal Veteran Representative,T-WS
+row_fixes,RF-00456,ml-0703,Master Library!B703,title,Support for an Advanced Appropriation  for the Indian Health Service,Support for an Advanced Appropriation for the Indian Health Service,T-WS
+row_fixes,RF-00477,ml-0752,Master Library!B752,title,Urge the White House To Host  A White House Conference on Language Revitalization,Urge the White House To Host A White House Conference on Language Revitalization,T-WS
+row_fixes,RF-00484,ml-0800,Master Library!B800,title,12-34 SUPPORT FOR ESTABLISHING A 10-YEAR ENERGY PLAN FOR OREGON THAT INCLUDES A STATEWIDE FEED-IN-TARIFF PROGRAM,SUPPORT FOR ESTABLISHING A 10-YEAR ENERGY PLAN FOR OREGON THAT INCLUDES A STATEWIDE FEED-IN-TARIFF PROGRAM,T-PREFIX
+row_fixes,RF-00486,ml-0808,Master Library!B808,title,12-26 SUPPORT FOR THE REAUTHORIZATION OF THE SPECIAL DIABETES PROGRAM FOR INDIANS IN THE 112TH CONGRESS,SUPPORT FOR THE REAUTHORIZATION OF THE SPECIAL DIABETES PROGRAM FOR INDIANS IN THE 112TH CONGRESS,T-PREFIX
+row_fixes,RF-00494,ml-0865,Master Library!B865,title,Intertribal  Trade,Intertribal Trade,T-WS
+row_fixes,RF-00501,ml-0887,Master Library!B887,title,To Reaffirm Support for the  Construction of A Longhouse Style  Facility at the University of  Washington Seattle Campus,To Reaffirm Support for the Construction of A Longhouse Style Facility at the University of Washington Seattle Campus,T-WS
+row_fixes,RF-00506,ml-0897,Master Library!B897,title,"Supporting S.3752, the Indian  Energy Promotion and Parity Act of 2010","Supporting S.3752, the Indian Energy Promotion and Parity Act of 2010",T-WS
+row_fixes,RF-00510,ml-0937,Master Library!B937,title,Supporting the Selection and Hiring of a  New NCAI Executive Director,Supporting the Selection and Hiring of a New NCAI Executive Director,T-WS
+row_fixes,RF-00520,ml-0958,Master Library!B958,title,Tribal TANF Access to American Recovery  & Reinvestment ACT (ARRA) Emergency Funds on Timely Basis,Tribal TANF Access to American Recovery & Reinvestment ACT (ARRA) Emergency Funds on Timely Basis,T-WS
+row_fixes,RF-00521,ml-0959,Master Library!B959,title,The Full Funding of Tribal TANF  in the Reauthorization of Tribal TANF in 2010,The Full Funding of Tribal TANF in the Reauthorization of Tribal TANF in 2010,T-WS
+row_fixes,RF-00613,ml-1293,Master Library!B1293,title,John Gonzales Endorsement ,John Gonzales Endorsement,T-WS
+row_fixes,RF-00617,ml-1323,Master Library!B1323,title,Finding_NOAA_Fisheries_Draft_BiOp_Inadequate,Finding NOAA Fisheries Draft BiOp Inadequate,T-SLUG
+row_fixes,RF-00619,ml-1324,Master Library!B1324,title,A_Call_to_Action,A Call to Action,T-SLUG
+row_fixes,RF-00621,ml-1325,Master Library!B1325,title,Request_Tulalip_NEPA_Consultation_Process_for_Transportation_Projects,Request Tulalip NEPA Consultation Process for Transportation Projects,T-SLUG
+row_fixes,RF-00622,ml-1326,Master Library!B1326,title,Reintroduction_of_the_American_Indian_Welfare_Reform_Act,Reintroduction of the American Indian Welfare Reform Act,T-SLUG
+row_fixes,RF-00623,ml-1327,Master Library!B1327,title,Medicaid_Encounter_Rate,Medicaid Encounter Rate,T-SLUG
+row_fixes,RF-00624,ml-1328,Master Library!B1328,title,Request_Special_Appropriations_to_Address_Illegal_Drug_Use,Request Special Appropriations to Address Illegal Drug Use,T-SLUG
+row_fixes,RF-00625,ml-1329,Master Library!B1329,title,Support_Exempting_IHS_Budget_from_Across-the-Board_Rescissions,Support Exempting IHS Budget from Across-the-Board Rescissions,T-SLUG
+row_fixes,RF-00626,ml-1330,Master Library!B1330,title,Recommendation_on_Revising_IHS_Policy_on_Serving_Ineligibles,Recommendation on Revising IHS Policy on Serving Ineligibles,T-SLUG
+row_fixes,RF-00627,ml-1331,Master Library!B1331,title,Support_Portland_Area_Position_on_IHS_Health_Facilities_Construction_Priority_System,Support Portland Area Position on IHS Health Facilities Construction Priority System,T-SLUG
+row_fixes,RF-00628,ml-1332,Master Library!B1332,title,Support_Funding_Methamphetamine_Treatment_Center,Support Funding Methamphetamine Treatment Center,T-SLUG
+row_fixes,RF-00629,ml-1333,Master Library!B1333,title,Support_of_Grid_West,Support of Grid West,T-SLUG
+row_fixes,RF-00630,ml-1334,Master Library!B1334,title,Guidelines_for_Tribal_Telecommunications_Public_Policy_Discourse,Guidelines for Tribal Telecommunications Public Policy Discourse,T-SLUG
+row_fixes,RF-00631,ml-1335,Master Library!B1335,title,Support_Tribal_Amendments_to_Interstate_Placement_of_Foster_Children_Act_of_2004,Support Tribal Amendments to Interstate Placement of Foster Children Act of 2004,T-SLUG
+row_fixes,RF-00632,ml-1336,Master Library!B1336,title,Support_Designation_of_the_Bear_Paw_National_Battlefield,Support Designation of the Bear Paw National Battlefield,T-SLUG
+row_fixes,RF-00633,ml-1337,Master Library!B1337,title,Support_National_Tribal_Meeting_to_Discuss_Modifying_NAGPRA,Support National Tribal Meeting to Discuss Modifying NAGPRA,T-SLUG
+row_fixes,RF-00634,ml-1338,Master Library!B1338,title,Support_Recovery_and_Rebuilding_of_NW_Fish_and_Wildlife_Populations,Support Recovery and Rebuilding of NW Fish and Wildlife Populations,T-SLUG
+row_fixes,RF-00635,ml-1339,Master Library!B1339,title,Funding_for_Fish_Passage_Center_and_Opposing_Undermining_Efforts,Funding for Fish Passage Center and Opposing Undermining Efforts,T-SLUG
+row_fixes,RF-00636,ml-1340,Master Library!B1340,title,BPA_to_Honor_its_Initial_Communications_to_the_Tribes,BPA to Honor its Initial Communications to the Tribes,T-SLUG
+row_fixes,RF-00637,ml-1341,Master Library!B1341,title,Remove_WA_State_Assessment_of_Student_Learning_as_Graduation_Requirement,Remove WA State Assessment of Student Learning as Graduation Requirement,T-SLUG
+row_fixes,RF-00638,ml-1342,Master Library!B1342,title,Local_Education_Agency_(LEA),Local Education Agency (LEA),T-SLUG
+row_fixes,RF-00639,ml-1343,Master Library!B1343,title,Native_American_Land_and_Mitigation_Program,Native American Land and Mitigation Program,T-SLUG
+row_fixes,RF-00640,ml-1344,Master Library!B1344,title,Protection_of_Tribal_Sovereignty,Protection of Tribal Sovereignty,T-SLUG
+row_fixes,RF-00641,ml-1345,Master Library!B1345,title,American_Indians_Veterans_Federal_Recognition,American Indians Veterans Federal Recognition,T-SLUG
+row_fixes,RF-00642,ml-1346,Master Library!B1346,title,Washington_State_University_Recognition,Washington State University Recognition,T-SLUG
+row_fixes,RF-00644,ml-1347,Master Library!B1347,title,The_Examination_of_Indian_Law_on_State_Bar_Examinations,The Examination of Indian Law on State Bar Examinations,T-SLUG
+row_fixes,RF-00646,ml-1348,Master Library!B1348,title,Support_for_an_International_Forum_of_Indigenous_Nations_on_Self-Determination_Strategies_and_for_Developing_an_International_Treaty_of_Indigenous_Nations_of_the_Pacific_Rim,Support for an International Forum of Indigenous Nations on Self-Determination Strategies and for Developing an International Treaty of Indigenous Nations of the Pacific Rim,T-SLUG
+row_fixes,RF-00648,ml-1349,Master Library!B1349,title,Support_of_the_Direct_Home_Loan_Program,Support of the Direct Home Loan Program,T-SLUG
+row_fixes,RF-00649,ml-1350,Master Library!B1350,title,Support_of_the_IRR_Funding_to_be_Determined_by_a_Percentage_of_the_TEA-21_Reauthorization,Support of the IRR Funding to be Determined by a Percentage of the TEA-21 Reauthorization,T-SLUG
+row_fixes,RF-00650,ml-1351,Master Library!B1351,title,Transportation_Capacity_Building,Transportation Capacity Building,T-SLUG
+row_fixes,RF-00651,ml-1352,Master Library!B1352,title,Elimination_of_the_Regional_Two_Percent_Annual_Cap_on_Road,Elimination of the Regional Two Percent Annual Cap on Road,T-SLUG
+row_fixes,RF-00652,ml-1353,Master Library!B1353,title,Elimination_of_the_Branch_of_Engineering_and_Operations,Elimination of the Branch of Engineering and Operations,T-SLUG
+row_fixes,RF-00653,ml-1354,Master Library!B1354,title,2003_BIA_Branch_of_Roads_Inventory_Management_System,2003 BIA Branch of Roads Inventory Management System,T-SLUG
+row_fixes,RF-00654,ml-1355,Master Library!B1355,title,Reaffirmation_of_TANF_Resolution_03-97,Reaffirmation of TANF Resolution 03-97,T-SLUG
+row_fixes,RF-00655,ml-1356,Master Library!B1356,title,Endorsing_National_Academy_of_Sciences_Study_of_Columbia_River_Water_Management,Endorsing National Academy of Sciences Study of Columbia River Water Management,T-SLUG
+row_fixes,RF-00656,ml-1357,Master Library!B1357,title,Opposing_BPA's_Efforts_to_Reduce_Summer_Spill_and_Kill_More_Fish,Opposing BPA's Efforts to Reduce Summer Spill and Kill More Fish,T-SLUG
+row_fixes,RF-00657,ml-1358,Master Library!B1358,title,Calling_for_the_Creation_of_a_National_Marine_Sanctuary_on_the_Oregon_Coast,Calling for the Creation of a National Marine Sanctuary on the Oregon Coast,T-SLUG
+row_fixes,RF-00658,ml-1359,Master Library!B1359,title,Support_for_Increased_Tribal_Input_into_the_Government_Accounting_Office's_Study_on_the_ICWA,Support for Increased Tribal Input into the Government Accounting Office's Study on the ICWA,T-SLUG
+row_fixes,RF-00659,ml-1360,Master Library!B1360,title,Improve_and_Streamline_the_Section_184_Loan_Guarantee_Program,Improve and Streamline the Section 184 Loan Guarantee Program,T-SLUG
+row_fixes,RF-00660,ml-1361,Master Library!B1361,title,Exclude_Applicability_of_Section_504_Requirements_to_New_Projects_in_Indian_Country_Under_24_CFR_8122(b),Exclude Applicability of Section 504 Requirements to New Projects in Indian Country Under 24 CFR 8122(b),T-SLUG
+row_fixes,RF-00661,ml-1362,Master Library!B1362,title,Prohibit_Regional_ONAP_Offices_from_Circumventing_the_Negotiated_Rulemaking_Process,Prohibit Regional ONAP Offices from Circumventing the Negotiated Rulemaking Process,T-SLUG
+row_fixes,RF-00662,ml-1363,Master Library!B1363,title,Support_of_Reducing_the_Scope_and_Breadth_of_Grants_Monitoring_Activities_Conducted_by_ONAP,Support of Reducing the Scope and Breadth of Grants Monitoring Activities Conducted by ONAP,T-SLUG
+row_fixes,RF-00663,ml-1364,Master Library!B1364,title,Support_of_Increasing_Program_Funding_Levels_for_the_Indian_Housing_Block_Grant,Support of Increasing Program Funding Levels for the Indian Housing Block Grant,T-SLUG
+row_fixes,RF-00664,ml-1365,Master Library!B1365,title,Opposition_to_the_rescission_of_Section_184_and_Title_VI_accumulated_loan_authority_of_approximately_$1.2_billion,Opposition to the rescission of Section 184 and Title VI accumulated loan authority of approximately $1.2 billion,T-SLUG
+row_fixes,RF-00665,ml-1366,Master Library!B1366,title,Support_for_NPAIHB_FY_2005_Budget_Analysis_and_Recommendations,Support for NPAIHB FY 2005 Budget Analysis and Recommendations,T-SLUG
+row_fixes,RF-00666,ml-1367,Master Library!B1367,title,Support_Implementation_of_the_Veterans_Administration_and_Indian_Health_Service_MOU,Support Implementation of the Veterans Administration and Indian Health Service MOU,T-SLUG
+row_fixes,RF-00667,ml-1368,Master Library!B1368,title,Support_for_American_Indian_and_Alaska_Native_Participation_in_Prescription_Drug_Discount_Program,Support for American Indian and Alaska Native Participation in Prescription Drug Discount Program,T-SLUG
+row_fixes,RF-00668,ml-1369,Master Library!B1369,title,Support_for_the_PASS_Act_Initiative,Support for the PASS Act Initiative,T-SLUG
+row_fixes,RF-00669,ml-1370,Master Library!B1370,title,Oppose_Washington_Assessment_of_Student_Learning_Options,Oppose Washington Assessment of Student Learning Options,T-SLUG
+row_fixes,RF-00670,ml-1371,Master Library!B1371,title,Support_For_Native_Hawaiian_Education,Support For Native Hawaiian Education,T-SLUG
+row_fixes,RF-00671,ml-1372,Master Library!B1372,title,Education_Health_and_Social_Service_Collaboration,Education Health and Social Service Collaboration,T-SLUG
+row_fixes,RF-00672,ml-1373,Master Library!B1373,title,Congratulations_Students_and_Families,Congratulations Students and Families,T-SLUG
+row_fixes,RF-00673,ml-1374,Master Library!B1374,title,Chemawa_Indian_School_Anniversary,Chemawa Indian School Anniversary,T-SLUG
+row_fixes,RF-00674,ml-1375,Master Library!B1375,title,To_Establish_a_Northwest_Tribal_'Think_Tank',To Establish a Northwest Tribal 'Think Tank',T-SLUG
+row_fixes,RF-00676,ml-1376,Master Library!B1376,title,Approving_a_MOU_between_ATNI-EDC_and_the_Native_Networking,Approving a MOU between ATNI-EDC and the Native Networking,T-SLUG
+row_fixes,RF-00677,ml-1377,Master Library!B1377,title,ATNI_Appointment_to_the_Federal_Commission_Consumer_Advisory_Committee,ATNI Appointment to the Federal Commission Consumer Advisory Committee,T-SLUG
+row_fixes,RF-00678,ml-1378,Master Library!B1378,title,Tax_and_Finance_Incentives_for_Economic_Development,Tax and Finance Incentives for Economic Development,T-SLUG
+row_fixes,RF-00679,ml-1379,Master Library!B1379,title,ATNI_Cultural_Mediator,ATNI Cultural Mediator,T-SLUG
+row_fixes,RF-00680,ml-1380,Master Library!B1380,title,Support_Senate_Joint_Resolution_37,Support Senate Joint Resolution 37,T-SLUG
+row_fixes,RF-00681,ml-1381,Master Library!B1381,title,Support_to_the_GOIA_to_Increase_its_Budget_to_Provide_Separate_Office_Facilities,Support to the GOIA to Increase its Budget to Provide Separate Office Facilities,T-SLUG
+row_fixes,RF-00683,ml-1382,Master Library!B1382,title,Support_to_Maintain_Even_Start_Funding,Support to Maintain Even Start Funding,T-SLUG
+row_fixes,RF-00685,ml-1383,Master Library!B1383,title,Opposing_the_Federal_Office_of_Management_and_Budgets_Decision_to_Amend_Census_2000,Opposing the Federal Office of Management and Budgets Decision to Amend Census 2000,T-SLUG
+row_fixes,RF-00686,ml-1384,Master Library!B1384,title,Support_and_Request_for_Increased_Funding_for_Law_Enforcement_Through_Special_Appropriations,Support and Request for Increased Funding for Law Enforcement Through Special Appropriations,T-SLUG
+row_fixes,RF-00687,ml-1385,Master Library!B1385,title,Opposition_to_the_Nomination_of_William_Meyers_to_the_9th_Circuit_Appeals_Judge_Position,Opposition to the Nomination of William Meyers to the 9th Circuit Appeals Judge Position,T-SLUG
+row_fixes,RF-00688,ml-1386,Master Library!B1386,title,Begin_Process_to_Draft_Document_on_Weaknesses_and_Loopholes_in_Indian_Country_Criminal_Jurisdiction,Begin Process to Draft Document on Weaknesses and Loopholes in Indian Country Criminal Jurisdiction,T-SLUG
+row_fixes,RF-00689,ml-1387,Master Library!B1387,title,Letter_to_the_Senate_Committee_on_Indian_Affairs,Letter to the Senate Committee on Indian Affairs,T-SLUG
+row_fixes,RF-00690,ml-1388,Master Library!B1388,title,"Letter_to_the_Senate_Committee_on_Indian_Affairs,_Ranking_Member,_Daniel_K._Inouye","Letter to the Senate Committee on Indian Affairs, Ranking Member, Daniel K. Inouye",T-SLUG
+row_fixes,RF-00691,ml-1389,Master Library!B1389,title,"Letter_to_the_Senate_Committee_on_Indian_Affairs,_Chairman_Ben_Nighthorse-Campbell","Letter to the Senate Committee on Indian Affairs, Chairman Ben Nighthorse-Campbell",T-SLUG
+row_fixes,RF-00692,ml-1390,Master Library!B1390,title,"Letter_to_the_Senate_Committee_on_Government_Operations,_Chairman","Letter to the Senate Committee on Government Operations, Chairman",T-SLUG
+row_fixes,RF-00693,ml-1391,Master Library!B1391,title,Support_for_Intertribal_Transportation_Association,Support for Intertribal Transportation Association,T-SLUG
+row_fixes,RF-00694,ml-1392,Master Library!B1392,title,To_Improve_the_Quality_of_Services_for_Chemawa_Indian_School,To Improve the Quality of Services for Chemawa Indian School,T-SLUG
+row_fixes,RF-00695,ml-1393,Master Library!B1393,title,In_Support_of_HB_2406_Requiring_History_and_Culture_Curriculum,In Support of HB 2406 Requiring History and Culture Curriculum,T-SLUG
+row_fixes,RF-00696,ml-1394,Master Library!B1394,title,Fort_Vancouver_Historic_St._James_Cemetery_NAGPRA_Violation,Fort Vancouver Historic St. James Cemetery NAGPRA Violation,T-SLUG
+row_fixes,RF-00697,ml-1395,Master Library!B1395,title,Enforcement_of_Tribe_and_Tribal_Member_Exemption_to_State_Taxation,Enforcement of Tribe and Tribal Member Exemption to State Taxation,T-SLUG
+row_fixes,RF-00698,ml-1396,Master Library!B1396,title,Culturally_Appropriate_Tribal_Tourism_Development,Culturally Appropriate Tribal Tourism Development,T-SLUG
+row_fixes,RF-00699,ml-1397,Master Library!B1397,title,Acknowledging_the_Importance_of_Guidance_and_Blessings_from_the_Divine_Creator,Acknowledging the Importance of Guidance and Blessings from the Divine Creator,T-SLUG
+row_fixes,RF-00700,ml-1398,Master Library!B1398,title,Native_American_Small_Business_Development_Programs,Native American Small Business Development Programs,T-SLUG
+row_fixes,RF-00701,ml-1399,Master Library!B1399,title,Support_a_Grant_Proposal_to_the_National_Science_Foundation_for_the_Northwest_Native_American_Online_Community_Portal_Project,Support a Grant Proposal to the National Science Foundation for the Northwest Native American Online Community Portal Project,T-SLUG
+row_fixes,RF-00702,ml-1400,Master Library!B1400,title,Veterans_Administration_Cultural_Sensitivity_Training,Veterans Administration Cultural Sensitivity Training,T-SLUG
+row_fixes,RF-00703,ml-1401,Master Library!B1401,title,Support_for_a_National_Indian_Health_Media_Campaign,Support for a National Indian Health Media Campaign,T-SLUG
+row_fixes,RF-00704,ml-1402,Master Library!B1402,title,Support_for_a_$300_Million_Increase_to_the_FY_2005_IHS_Budget_Request_that_Reflects_Mandatory_Cost_Increases,Support for a $300 Million Increase to the FY 2005 IHS Budget Request that Reflects Mandatory Cost Increases,T-SLUG
+row_fixes,RF-00705,ml-1403,Master Library!B1403,title,Support_for_Northwest_Epi_Center_to_Participate_in_WA_Tribal_Emergency_Preparedness_Assessments,Support for Northwest Epi Center to Participate in WA Tribal Emergency Preparedness Assessments,T-SLUG
+row_fixes,RF-00706,ml-1404,Master Library!B1404,title,Support_for_Northwest_Portland_Area_Indian_Health_Board_FY2004_Legislative_Plan,Support for Northwest Portland Area Indian Health Board FY2004 Legislative Plan,T-SLUG
+row_fixes,RF-00707,ml-1405,Master Library!B1405,title,Opposing_the_Elimination_or_Reduction_of_the_Summer_Spill_Program_that_Benefits_Migrating_Salmon_and_Other_Anadromous_Fish_in_the_Columbia_and_Snake_Rivers,Opposing the Elimination or Reduction of the Summer Spill Program that Benefits Migrating Salmon and Other Anadromous Fish in the Columbia and Snake Rivers,T-SLUG
+row_fixes,RF-00708,ml-1406,Master Library!B1406,title,Support_for_Equitable_Settlement_of_the_Priest_Rapids_Hydroelectric_Project,Support for Equitable Settlement of the Priest Rapids Hydroelectric Project,T-SLUG
+row_fixes,RF-00709,ml-1407,Master Library!B1407,title,Supporting_the_Creation_of_a_National_Marine_Sanctuary_on_the_Oregon_Coast,Supporting the Creation of a National Marine Sanctuary on the Oregon Coast,T-SLUG
+row_fixes,RF-00710,ml-1408,Master Library!B1408,title,Recommending_the_Preservation_of_Fee-to-Trust_Function_within_the_BIA,Recommending the Preservation of Fee-to-Trust Function within the BIA,T-SLUG
+row_fixes,RF-00711,ml-1409,Master Library!B1409,title,Support_the_Hoh_Indian_Tribe_Land_Acquisition_Efforts_to_Remove_the_Risk_of_River_Flooding_to_its_Community,Support the Hoh Indian Tribe Land Acquisition Efforts to Remove the Risk of River Flooding to its Community,T-SLUG
+row_fixes,RF-00712,ml-1410,Master Library!B1410,title,Support_for_Funding_Under_Indian_Child_Protection_and_Family_Violence_Prevention_Act_(S.1601),Support for Funding Under Indian Child Protection and Family Violence Prevention Act (S.1601),T-SLUG
+row_fixes,RF-00713,ml-1411,Master Library!B1411,title,Support_for_Native_Hawaiian_Self-Determination_and_Federal_Recognition_for_Native_Hawaiians_by_the_USA,Support for Native Hawaiian Self-Determination and Federal Recognition for Native Hawaiians by the USA,T-SLUG
+session_map,SM-00021,ml-0011,Master Library!H11,session,,midyear:2026,S-DERIVE
+session_map,SM-00022,ml-0012,Master Library!H12,session,,midyear:2026,S-DERIVE
+session_map,SM-00023,ml-0013,Master Library!H13,session,,midyear:2026,S-DERIVE
+session_map,SM-00024,ml-0014,Master Library!H14,session,,midyear:2026,S-DERIVE
+session_map,SM-00025,ml-0015,Master Library!H15,session,,midyear:2026,S-DERIVE
+session_map,SM-00026,ml-0016,Master Library!H16,session,,midyear:2026,S-DERIVE
+session_map,SM-00027,ml-0017,Master Library!H17,session,,midyear:2026,S-DERIVE
+session_map,SM-00028,ml-0018,Master Library!H18,session,,midyear:2026,S-DERIVE
+session_map,SM-00029,ml-0019,Master Library!H19,session,,midyear:2026,S-DERIVE
+session_map,SM-00030,ml-0020,Master Library!H20,session,,midyear:2026,S-DERIVE
+session_map,SM-00031,ml-0021,Master Library!H21,session,,midyear:2026,S-DERIVE
+session_map,SM-00032,ml-0022,Master Library!H22,session,,midyear:2026,S-DERIVE
+session_map,SM-00033,ml-0023,Master Library!H23,session,,midyear:2026,S-DERIVE
+session_map,SM-00035,ml-0025,Master Library!H25,session,,winter:2026,S-DERIVE
+session_map,SM-00037,ml-0123,Master Library!H123,session,,annual:2024,S-DERIVE
+session_map,SM-00038,ml-0202,Master Library!H202,session,,winter:2023,S-DERIVE
+session_map,SM-00047,ml-0402,Master Library!H402,session,,midyear:2018,S-DERIVE
+session_map,SM-00048,ml-0426,Master Library!H426,session,Annual,winter:2018,S-CONFLICT3
+session_map,SM-00049,ml-0432,Master Library!H432,session,Annual,winter:2018,S-CONFLICT3
+session_map,SM-00051,ml-0498,Master Library!H498,session,Annual,executive:2016,S-CONFLICT3
+session_map,SM-00052,ml-0555,Master Library!H555,session,Winter,executive:2016,S-CONFLICT3
+session_map,SM-00055,ml-0688,Master Library!H688,session,,executive:2013,S-DERIVE
+session_map,SM-00056,ml-0744,Master Library!H744,session,,executive:2013,S-DERIVE
