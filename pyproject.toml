@@ -39,6 +39,7 @@ dependencies = [
   "nltk>=3.8,<4",                # offline; no nltk.download at runtime (DG-9)
   "python-docx>=1.1,<2",         # used by src/export and by intake (R1.25)
   "pillow>=12.3,<13",            # 12.3 clears all 25 of the 2026 advisories; the old <12 cap blocked every fix
+  "openpyxl>=3.1.5,<4",          # MIT; reads and writes the Resolution Library workbook (owner-approved 2026-11-22, D-081); uses the pinned defusedxml
 ]
 
 [project.optional-dependencies]

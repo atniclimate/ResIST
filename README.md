@@ -28,6 +28,10 @@ The repository includes the software and test fixtures. The corpus lives separat
 
 Open [the local workspace](http://127.0.0.1:8000/app/). For packet generation and saved-packet verification from the command line, run `.\.venv\Scripts\python.exe scripts/precedent_packet.py --help`.
 
+## Acknowledgements
+
+Patrick Freeland and Wyatt Ash-Milby, at ATNI. Wyatt Ash-Milby built The Resolution Library, a workbook that lists ATNI's numbered resolutions from 2001 to 2026 with their committee, preparer, convention and outcome. That sorting work inspired ResIST.
+
 ## License
 
 Copyright © 2026 Affiliated Tribes of Northwest Indians. ATNI reserves all rights it holds except as expressly granted under the PolyForm Noncommercial License 1.0.0 or otherwise permitted by law. Access to and reuse of Tribal records are governed by the applicable source terms and Tribal authority. [License](LICENSE) · [Notices and third-party terms](NOTICE).
