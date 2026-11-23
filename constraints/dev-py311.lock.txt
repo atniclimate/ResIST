@@ -283,6 +283,10 @@ docopt-ng==0.9.0 \
     --hash=sha256:91c6da10b5bb6f2e9e25345829fb8278c78af019f6fc40887ad49b060483b1d7 \
     --hash=sha256:bfe4c8b03f9fca424c24ee0b4ffa84bf7391cb18c29ce0f6a8227a3b01b81ff9
     # via sumy
+et-xmlfile==2.0.0 \
+    --hash=sha256:7a91720bc756843502c3b7504c77b8fe44217c85c537d85037f0f536151b2caa \
+    --hash=sha256:dab3f4764309081ce75662649be815c4c9081e88f0837825f90fd28317d4da54
+    # via openpyxl
 eyecite==2.7.8 \
     --hash=sha256:0fa970f0171b36d4f50eeb95ce4d36cb706cb3534524d74e61f02186d2f5a5a8 \
     --hash=sha256:ee07fe770ecac0e8b3b800cf1fb398ea6c6e3e195a10c8095f1db46ebe58c304
@@ -828,6 +832,10 @@ nltk==3.10.3 \
     # via
     #   atni-resist (pyproject.toml)
     #   sumy
+openpyxl==3.1.5 \
+    --hash=sha256:5282c12b107bffeef825f4617dc029afaf41d0ea60823bbb665ef3079dc79de2 \
+    --hash=sha256:cf0e3cf56142039133628b5acffe8ef0c12bc902d2aadd3e0fe5878dc08d1050
+    # via atni-resist (pyproject.toml)
 packaging==26.3 \
     --hash=sha256:94edc256424af38762eb31306eed28beb9f0efc50a8837492c9d6fd6004aed79 \
     --hash=sha256:d7193f7c8e4e93f444fde0262bf90af30e16fa0ad0ad44cb553c87339b23cd1c
