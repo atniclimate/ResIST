@@ -1,9 +1,11 @@
-/* The Analysis page mockup: router, shared filter, list panel, events. The filter lives in the URL hash so a view can
-   be linked and Back restores it. Nothing is sent anywhere: no request after the two data files, no storage but two
-   per-viewer conveniences (theme, collected keys) behind try/catch. */
+/* The Analysis preview: router, shared filter, list panel, events. The filter lives in the URL hash so a view can
+   be linked and Back restores it. Nothing is sent anywhere: no request after the two data files (and, on the first
+   visit to Issues, Laws and Wording, its module and its data), no storage but two per-viewer conveniences (theme,
+   collected keys) behind try/catch. */
 import { esc, fmt, plural } from "./charts.js";
 import * as DT from "./data.js";
 import * as V from "./views.js";
+import { toggleAw, basisKey } from "./basis.js";
 const { D, KINDS, ERAS } = DT;
 
 const VIEWS = [
@@ -12,6 +14,7 @@ const VIEWS = [
   ["committees", "Committees"],
   ["people", "People"],
   ["words", "Words and Titles"],
+  ["topics", "Issues, Laws and Wording"],
   ["record", "The Record"],
 ];
 const FILTER_KEYS = ["y0", "y1", "k", "c", "names"];
@@ -19,7 +22,7 @@ const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const mqWide = matchMedia("(min-width: 48rem)"), mqFull = matchMedia("(min-width: 64rem)");
 
-let S = null, prevKey = "", prevFilterKey = "", pendingFocus = null, pendingScroll = null, lastTrigger = null, closingByRoute = false;
+let S = null, prevKey = "", prevFilterKey = "", pendingFocus = null, pendingScroll = null, lastTrigger = null, lastKey = null, closingByRoute = false;
 let collected = new Set();
 try { collected = new Set(JSON.parse(localStorage.getItem("resist-mockup-collected") || "[]")); } catch { /* storage unavailable */ }
 
@@ -50,7 +53,7 @@ function buildHash(view, q, patch = {}) {
 }
 function makeS() {
   const { view, q } = parse();
-  const s = { view, q, f: readFilters(q), names: q.get("names") !== "0", wide: mqWide.matches, full: mqFull.matches };
+  const s = { view, q, f: readFilters(q), names: q.get("names") !== "0", wide: mqWide.matches, full: mqFull.matches, sm: q.get("sm") === "1", ru: q.get("ru") === "1", wy: q.get("wy") === "1" };
   s.href = patch => buildHash(view, q, patch);
   s.hrefView = (v, patch = {}) => {
     const keep = new URLSearchParams(); for (const k of FILTER_KEYS) if (q.has(k)) keep.set(k, q.get(k));
@@ -80,6 +83,8 @@ function updateChrome() {
   document.title = `${vname}, ATNI Resolutions in Numbers (preview)`;
 }
 function announce(msg) { const a = $("#announce"); a.textContent = ""; setTimeout(() => { a.textContent = msg; }, 30); }
+/** Resolutions in the filter, recorded and likely together, for the announcement of a filter change. */
+const countFor = f => DT.sumBy(DT.kindMatrix(f.c), f, r => (f.k ? r.s[f.k] + r.l[f.k] : r.sT + r.lT));
 let toastTimer = 0;
 function toast(msg) { const t = $("#toast"); t.textContent = msg; t.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => { t.hidden = true; }, 7000); announce(msg); }
 
@@ -93,6 +98,9 @@ function setStick() {
 }
 function fillStatic() {
   $("#credit-line").textContent = D.agg.meta.credit;
+  $("#banner-key").innerHTML = basisKey(["likely", "open", "nr"], true);
+  const bid = D.agg.meta.inputs && D.agg.meta.inputs.library_build_id;
+  $("#build-id").textContent = bid ? `Library build ${String(bid).slice(0, 12)}.` : "";
   setStick();
   $("#band-source").innerHTML = `Source: The Resolution Library, an ATNI spreadsheet of ${fmt(D.total)} numbered resolutions, ${D.yMin} to ${D.yMax}, built by Wyatt Ash-Milby at ATNI.${D.builtAt ? ` Counted ${esc(D.builtAt)}.` : ""}`;
   const opt = (v, l, sel) => `<option value="${esc(v)}"${sel ? " selected" : ""}>${esc(l)}</option>`;
@@ -116,6 +124,34 @@ function renderView() {
   const fn = V["view_" + S.view];
   $("#view").innerHTML = fn(S);
   mountCharts();
+  if (S.view === "topics") mountTopics();
+}
+
+/* Issues, Laws and Wording. Nothing about it is requested before the first visit. On the first visit its module and its
+   data load together; then topics.js draws inside #topics-root and owns every click inside it. Without the module or
+   the data the tab says so and nothing else happens. */
+let topicsMod = null, topicsData = null, topicsCss = false, topicsSeq = 0;
+const siteBase = () => (location.pathname.includes("/analysis-preview/analysis/") ? "../../" : null);
+async function loadTopics() {
+  if (topicsMod && topicsData) return;
+  const [mod, res] = await Promise.all([import("./topics.js"), fetch("../data/topics.json")]);
+  if (!res.ok) throw new Error("topics.json not available");
+  topicsData = await res.json(); topicsMod = mod;
+  if (!topicsCss) { const l = document.createElement("link"); l.rel = "stylesheet"; l.href = "topics.css"; document.head.appendChild(l); topicsCss = true; }
+}
+async function mountTopics() {
+  const root = $("#topics-root");
+  if (!root) return;
+  const seq = ++topicsSeq;
+  try { await loadTopics(); }
+  catch { if (seq === topicsSeq && root.isConnected) { root.innerHTML = `<div class="empty-state"><p>Not built yet.</p></div>`; root.dataset.state = "absent"; } return; }
+  if (seq !== topicsSeq || !root.isConnected) return;
+  root.innerHTML = ""; delete root.dataset.state;
+  try {
+    const f = S.f;
+    await topicsMod.render(root, { data: topicsData, rows: D.rows, filters: { y0: f.y0, y1: f.y1, k: f.k, c: f.c }, names: S.names, listSpec: DT.makeSpec, esc, fmt, plural, siteBase: siteBase(), announce });
+    root.dataset.state = "ready";
+  } catch (e) { console.error(e); if (root.isConnected) root.innerHTML = `<div class="empty-state"><p>Not built yet.</p></div>`; }
 }
 /* A redraw replaces the elements it draws. Around a redraw that is not a change of view (a resize, a zoom, a change
    of breakpoint), remember the focused control, the open "Show table" panels and a typed name search, and put them
@@ -186,7 +222,7 @@ function route(force = false) {
     } else if (pendingFocus) {
       const el = $(pendingFocus); if (el) el.focus({ preventScroll: true });
     }
-    if (prev && !viewChanged && !S.q.get("list") && filterKey !== prevFilterKey) announce(`Filters: ${filterSummary(S.f)}. ${plural(DT.sumBy(DT.kindMatrix(S.f.c), S.f, r => (S.f.k ? r[S.f.k] : r.total - r.wait)), "resolution", "resolutions")}.`);
+    if (prev && !viewChanged && !S.q.get("list") && filterKey !== prevFilterKey) announce(`Filters: ${filterSummary(S.f)}. ${plural(countFor(S.f), "resolution", "resolutions")}.`);
     pendingFocus = null; pendingScroll = null;
   }
   prevFilterKey = filterKey;
@@ -201,8 +237,8 @@ function listActions(spec, rows) {
   const out = [];
   if (spec.has) { const m = DT.rowsFor({ ...spec, has: undefined, hasnt: spec.has }).length; if (m) out.push([`Show the ${fmt(m)} where ${DT.FIELDS[spec.has].name} is not recorded`, { ...spec, has: undefined, hasnt: spec.has }]); }
   if (spec.hasnt) { const m = DT.rowsFor({ ...spec, hasnt: undefined, has: spec.hasnt }).length; if (m) out.push([`Show the ${fmt(m)} where ${DT.FIELDS[spec.hasnt].name} is recorded`, { ...spec, hasnt: undefined, has: spec.hasnt }]); }
-  if (spec.c && spec.ly === "c") { const m = DT.rowsFor({ ...spec, ly: "w" }).length; if (m) out.push([`Show the ${fmt(m)} with labels waiting for ATNI`, { ...spec, ly: "w" }]); }
-  if (spec.c && spec.ly === "w") { const m = DT.rowsFor({ ...spec, ly: "c" }).length; if (m) out.push([`Show the ${fmt(m)} confirmed`, { ...spec, ly: "c" }]); }
+  if (spec.c && (spec.ly === "c" || !spec.ly)) { const m = DT.rowsFor({ ...spec, ly: "l" }).length; if (m) out.push([`Show the ${fmt(m)} likely`, { ...spec, ly: "l" }]); }
+  if (spec.c && (spec.ly === "l" || spec.ly === "w")) { const m = DT.rowsFor({ ...spec, ly: "c" }).length; if (m) out.push([`Show the ${fmt(m)} recorded`, { ...spec, ly: "c" }]); }
   return out.map(([label, sp]) => `<button type="button" class="btn small quiet" data-list="${esc(DT.makeSpec(Object.fromEntries(Object.entries(sp).filter(([, v]) => v !== undefined))))}">${esc(label)}</button>`).join("");
 }
 function syncList() {
@@ -218,7 +254,7 @@ function syncList() {
   $("#list-empty").hidden = listRows.length > 0;
   $("#list-csv").hidden = listRows.length === 0;
   moreRows();
-  if (!dlg.open) { lastTrigger = document.activeElement; dlg.showModal(); }
+  if (!dlg.open) { lastTrigger = document.activeElement; lastKey = focusKey(lastTrigger); dlg.showModal(); }
   announce(`List opened: ${heading}.`);
   $("#list-body").scrollTop = 0;
 }
@@ -251,9 +287,12 @@ function tableCsv(table) {
   return [...table.querySelectorAll("tr")].map(tr => [...tr.children].map(c => csvCell(cellText(c))).join(",")).join("\n") + "\n";
 }
 function listCsv() {
-  const head = ["Number", "Title", "Committee as written", "Convention as recorded", ...(S.names ? ["Prepared By as written"] : []), "Text on this site", "ATNI permalink"];
+  const head = ["Number", "Title", "Title as written, where marked", "Committee as written", "Counted under", "Convention as recorded", ...(S.names ? ["Prepared By as written"] : []), "Origin", "Marks", "Text on this site", "ATNI permalink"];
   const lines = [head.join(",")];
-  for (const r of listRows) lines.push([r.n, DT.titleText(r) ?? "No title in the record", r.cl ?? "not recorded", r.cv ?? "not recorded", ...(S.names ? [r.pb ?? ""] : []), r.s ? "yes" : "no", r.u ?? ""].map(csvCell).join(","));
+  for (const r of listRows) {
+    const mk = DT.marksOf(r), marks = [mk.likely && "likely", mk.open && "open"].filter(Boolean).join(" and ");
+    lines.push([r.n, DT.titleText(r) ?? "No title in the record", r.tb ? (r.tw ?? "No title in the record") : "", r.cl ?? "not recorded", r.cs.map(([k, b]) => D.cm[k].name + (b === "l" ? " (likely)" : "")).join("; "), r.cv ?? "not recorded", ...(S.names ? [r.pb ?? ""] : []), r.og ? DT.ORIGIN_LABEL[r.og] + (r.ogb === "l" ? " (likely)" : "") : r.ogb === "o" ? "open" : "", marks, r.s ? "yes" : "no", r.u ?? ""].map(csvCell).join(","));
+  }
   lines.push(csvCell(`Counted${D.builtAt ? ` ${D.builtAt}` : ""} from The Resolution Library. ${$("#list-title").textContent}`));
   return lines.join("\n") + "\n";
 }
@@ -271,6 +310,12 @@ function showTip(el, ev) {
 function bind() {
   document.addEventListener("click", ev => {
     const t = ev.target;
+    // Inside the Issues, Laws and Wording root the module owns every click. Only an element that asks for the list
+    // panel by data-list (the contract of TopicsCtx.listSpec) is handled here; nothing else is touched.
+    const tr = t.closest("#topics-root");
+    if (tr) { const l = t.closest("[data-list]"); if (l && tr.contains(l)) { ev.preventDefault(); lastTrigger = l.closest("button, a") || l; go(S.listHref(l.dataset.list)); } return; }
+    const aw = t.closest("button.aw");
+    if (aw) { toggleAw(aw); return; }
     const lst = t.closest("[data-list]");
     if (lst) { ev.preventDefault(); lastTrigger = lst.closest("button, a") || lst; go(S.listHref(lst.dataset.list)); return; }
     const setc = t.closest("[data-setc]");
@@ -350,6 +395,7 @@ function bind() {
   $("#list-dialog").addEventListener("close", () => {
     if (!closingByRoute && S.q.get("list")) { history.pushState(null, "", S.href({ list: undefined })); S = makeS(); $("#list-rows").innerHTML = ""; listRows = []; }
     if (lastTrigger && document.contains(lastTrigger)) lastTrigger.focus();
+    else if (lastKey) setTimeout(() => refocus(lastKey, null), 0); // the chart was redrawn while the list was open: find the control again
     else $("#view h2")?.focus();
   });
   window.addEventListener("hashchange", () => route());

@@ -579,7 +579,7 @@
 {"copy_ref":"Health!A49","sheet":"Health","row":49,"rid":"ml-0429","differs":"","status":"applied","ledger_id":"DU-00627"}
 {"copy_ref":"Health!A5","sheet":"Health","row":5,"rid":"ml-0079","differs":"","status":"applied","ledger_id":"DU-00583"}
 {"copy_ref":"Health!A50","sheet":"Health","row":50,"rid":"ml-0430","differs":"","status":"applied","ledger_id":"DU-00628"}
-{"copy_ref":"Health!A51","sheet":"Health","row":51,"rid":"ml-0434","differs":"","status":"proposed","ledger_id":"DU-00629"}
+{"copy_ref":"Health!A51","sheet":"Health","row":51,"rid":"ml-0434","differs":"","status":"applied","ledger_id":"DU-00629"}
 {"copy_ref":"Health!A52","sheet":"Health","row":52,"rid":"ml-0436","differs":"","status":"applied","ledger_id":"DU-00630"}
 {"copy_ref":"Health!A53","sheet":"Health","row":53,"rid":"ml-0437","differs":"","status":"applied","ledger_id":"DU-00631"}
 {"copy_ref":"Health!A54","sheet":"Health","row":54,"rid":"ml-0438","differs":"","status":"applied","ledger_id":"DU-00632"}
@@ -1385,7 +1385,7 @@
 {"copy_ref":"Veterans!A17","sheet":"Veterans","row":17,"rid":"ml-0631","differs":"","status":"applied","ledger_id":"DU-01439"}
 {"copy_ref":"Veterans!A18","sheet":"Veterans","row":18,"rid":"ml-0632","differs":"","status":"applied","ledger_id":"DU-01440"}
 {"copy_ref":"Veterans!A19","sheet":"Veterans","row":19,"rid":"ml-0633","differs":"","status":"applied","ledger_id":"DU-01441"}
-{"copy_ref":"Veterans!A2","sheet":"Veterans","row":2,"rid":"ml-0066","differs":"title,committee,prepared_by,passed,conf,to_ncai","status":"proposed","ledger_id":"DU-01424"}
+{"copy_ref":"Veterans!A2","sheet":"Veterans","row":2,"rid":"ml-0066","differs":"title,committee,prepared_by,passed,conf,to_ncai","status":"applied","ledger_id":"DU-01424"}
 {"copy_ref":"Veterans!A20","sheet":"Veterans","row":20,"rid":"ml-0690","differs":"","status":"applied","ledger_id":"DU-01442"}
 {"copy_ref":"Veterans!A21","sheet":"Veterans","row":21,"rid":"ml-0691","differs":"","status":"applied","ledger_id":"DU-01443"}
 {"copy_ref":"Veterans!A22","sheet":"Veterans","row":22,"rid":"ml-0692","differs":"","status":"applied","ledger_id":"DU-01444"}

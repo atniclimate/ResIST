@@ -185,9 +185,9 @@ details.tbl[open] > summary { color: var(--atni-text-heading); }
 .s-total, .s-winter, .s-yes, .s-adopted { --seg: var(--resist-cat-1); }
 .s-midyear, .s-no, .s-not_adopted { --seg: var(--resist-cat-2); }
 .s-annual, .s-na, .s-tabled { --seg: var(--resist-cat-3); }
-.s-executive { --seg: var(--resist-cat-4); }
+.s-executive { --seg: var(--resist-cat-5); }
+.s-special { --seg: var(--resist-cat-9); }
 .seg.s-none { fill: url(#pat-hatch); }
-.seg.s-waiting { fill: url(#pat-wait); stroke: var(--resist-cat-1); stroke-width: 1; }
 .seg.s-siteonly { fill: none; stroke: var(--resist-coverage-edge); stroke-width: 1.5; }
 a:hover > .seg, a:focus-visible > .seg { stroke: var(--resist-mark-ring); stroke-width: 2px; }
 .ylab { cursor: pointer; }
@@ -215,7 +215,6 @@ a:hover > .dot-sq, a:focus-visible > .dot-sq { stroke: var(--resist-mark-ring); 
 .key li { display: inline-flex; align-items: center; }
 .sw { display: inline-block; width: 14px; height: 14px; margin-right: 8px; flex: none; background: var(--seg, transparent); }
 .sw.s-none { background: var(--resist-hatch); border: 1px solid var(--resist-coverage-edge); }
-.sw.s-waiting { background: var(--hatch-s1); border: 1px solid var(--resist-cat-1); }
 .sw.s-siteonly { border: 1.5px solid var(--resist-coverage-edge); background: none; }
 .sw.cov-full { background: var(--resist-coverage-ink); }
 .sw.cov-part { background: linear-gradient(to top, var(--resist-coverage-ink) 50%, transparent 50%); border: 1px solid var(--resist-coverage-edge); }
@@ -235,7 +234,6 @@ a:hover > .dot-sq, a:focus-visible > .dot-sq { stroke: var(--resist-mark-ring); 
 .hseg { display: block; flex: 0 0 auto; min-width: 3px; height: 100%; padding: 0; border: 0; border-right: var(--resist-mark-gap) solid var(--atni-ground-base); background: var(--seg, var(--resist-cat-1)); cursor: pointer; }
 span.hseg { cursor: default; }
 .hseg.s-none { background: var(--resist-hatch); border: 1px solid var(--resist-coverage-edge); }
-.hseg.s-waiting { background: var(--hatch-s1); outline: 1px solid var(--resist-cat-1); outline-offset: -1px; }
 .hseg.s-siteonly { background: none; border: 1.5px solid var(--resist-coverage-edge); }
 .hseg:hover, .hseg:focus-visible { outline: 2px solid var(--resist-mark-ring); outline-offset: 0; }
 .rb-text { font-size: 0.8125rem; font-weight: 500; color: var(--atni-text-secondary); font-variant-numeric: var(--resist-type-numerals); white-space: nowrap; text-align: right; }
@@ -271,7 +269,6 @@ span.hseg { cursor: default; }
 .step-1 { background: var(--resist-seq-1); color: var(--resist-seq-1-ink); } .step-2 { background: var(--resist-seq-2); color: var(--resist-seq-2-ink); }
 .step-3 { background: var(--resist-seq-3); color: var(--resist-seq-3-ink); } .step-4 { background: var(--resist-seq-4); color: var(--resist-seq-4-ink); }
 .step-5 { background: var(--resist-seq-5); color: var(--resist-seq-5-ink); } .step-6 { background: var(--resist-seq-6); color: var(--resist-seq-6-ink); }
-.hc-w { margin-left: auto; padding: 1px 2px; background: var(--atni-ground-base); color: var(--atni-text-secondary); box-shadow: 0 0 0 1px var(--resist-hatch-ink); background-image: none; }
 .hc.step-none { justify-content: center; }
 .hc-hatch { position: absolute; inset: 0; background: var(--resist-hatch); }
 .hc-n-chip { position: relative; padding: 1px 3px; background: var(--atni-ground-base); color: var(--atni-text-secondary); }
@@ -417,7 +414,7 @@ footer.mock-foot { border-top: 1px solid var(--atni-non-text-rule); padding: var
   .seg.s-midyear, .seg.s-no, .seg.s-not_adopted { fill: url(#tex45); }
   .seg.s-annual, .seg.s-na, .seg.s-tabled { fill: url(#tex135); }
   .seg.s-executive { fill: url(#texv); }
-  .seg.s-none, .seg.s-waiting { fill: url(#tex135); stroke: GrayText; }
+  .seg.s-none { fill: url(#tex135); stroke: GrayText; }
   .seg.s-siteonly { fill: none; stroke: CanvasText; }
   .cov-full, .cov-fill { fill: CanvasText; } rect.cov-none { fill: url(#tex135); stroke: CanvasText; } rect.cov-part { stroke: CanvasText; }
   .hseg, .sw, .cov-cell, .pstrip i, .lab-strip i, .gridcell, .hc, .cg { forced-color-adjust: none; }
@@ -425,7 +422,7 @@ footer.mock-foot { border-top: 1px solid var(--atni-non-text-rule); padding: var
   .hseg.s-midyear, .hseg.s-no, .hseg.s-not_adopted { background: repeating-linear-gradient(45deg, CanvasText 0 2px, Canvas 2px 5px); }
   .hseg.s-annual, .hseg.s-na, .hseg.s-tabled { background: repeating-linear-gradient(135deg, CanvasText 0 2px, Canvas 2px 5px); }
   .hseg.s-executive { background: repeating-linear-gradient(90deg, CanvasText 0 2px, Canvas 2px 5px); }
-  .hseg.s-none, .hseg.s-waiting { background: repeating-linear-gradient(135deg, GrayText 0 1px, Canvas 1px 6px); border: 1px solid CanvasText; }
+  .hseg.s-none { background: repeating-linear-gradient(135deg, GrayText 0 1px, Canvas 1px 6px); border: 1px solid CanvasText; }
   .hseg.s-siteonly { background: Canvas; border: 1.5px solid CanvasText; }
   .sw { background: CanvasText; border: 1px solid CanvasText; }
   .sw.s-executive { background: repeating-linear-gradient(90deg, CanvasText 0 2px, Canvas 2px 5px); }
@@ -455,3 +452,116 @@ footer.mock-foot { border-top: 1px solid var(--atni-non-text-rule); padding: var
   /* Bars, swatches and cells are backgrounds: keep them when a reader prints without "Background graphics". */
   .hseg, .sw, .cov-cell, .hc, .gridcell, .cg, .pstrip i, .lab-strip i, .rb-track, .cb-track { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 }
+
+/* ================================================================================================================
+   Likely and open (D-083 item 5, design D18). Recorded and decided by ATNI: solid. Likely: the second colour (ochre,
+   --resist-cat-4), a 45-degree hatch and the word "likely". Open: no fill, a dashed outline and the word "open".
+   Not recorded keeps the grey 135-degree hatch. Never colour alone: every mark carries its word.
+   ================================================================================================================ */
+:root, [data-theme] {
+  --lk: var(--resist-cat-4);
+  --lk-tint: color-mix(in srgb, var(--lk) 28%, transparent);
+  --lk-hatch: repeating-linear-gradient(45deg, var(--lk) 0 1.5px, transparent 1.5px 5px);
+  --lk-hatch-soft: repeating-linear-gradient(45deg, color-mix(in srgb, var(--lk) 60%, transparent) 0 1.5px, transparent 1.5px 5px);
+  --lk-fill: var(--lk-hatch), linear-gradient(var(--lk-tint), var(--lk-tint));
+  --lk-fill-soft: var(--lk-hatch-soft), linear-gradient(var(--lk-tint), var(--lk-tint));
+}
+.pat-lk-bg { fill: var(--lk-tint); }
+.pat-lk { stroke: var(--lk); stroke-width: 1.5; }
+.seg.s-likely { fill: url(#pat-likely); stroke: var(--lk); stroke-width: 1; }
+.seg.s-open { fill: none; stroke: var(--resist-coverage-edge); stroke-width: 1.5; stroke-dasharray: 4 3; }
+.hseg.s-likely { background: var(--lk-fill); outline: 1px solid var(--lk); outline-offset: -1px; }
+.hseg.s-open { background: none; border: 1.5px dashed var(--resist-coverage-edge); }
+.sw.s-likely { background: var(--lk-fill); border: 1px solid var(--lk); }
+.sw.s-open { background: none; border: 1.5px dashed var(--resist-coverage-edge); }
+.sw.s-solid { background: var(--resist-cat-1); }
+.sw.s-tick { height: 0; border-top: 3px solid var(--atni-text-heading); margin-top: 0; }
+.sw.s-smooth { height: 2px; background: var(--atni-text-heading); }
+.sw.s-special { background: var(--resist-cat-9); } .sw.s-executive { background: var(--resist-cat-5); }
+.banner-keyrow { padding-top: 0 !important; padding-bottom: 8px !important; min-height: 0 !important; }
+.banner-keyrow .key { margin: 0; }
+
+/* uncertain text: the likely reading in a mark, the word, and the text as written one step away */
+mark.likely { background: var(--lk-tint); color: inherit; padding: 0 3px; box-shadow: inset 0 -2px 0 var(--lk); }
+.lk-w, .op-w { display: inline-block; padding: 0 5px; font-family: var(--atni-type-family-display); font-weight: var(--atni-type-weight-display-medium); font-size: 0.75rem; line-height: 1.55; color: var(--atni-text-secondary); vertical-align: 1px; white-space: nowrap; }
+.lk-w { border: 1px solid var(--lk); background: var(--lk-tint); }
+.op-w { border: 1.5px dashed var(--resist-coverage-edge); }
+.open-text { font-family: var(--resist-type-record-family); }
+.unc { display: inline; }
+.aw { background: none; border: 0; padding: 0 2px; margin: 0; min-height: 24px; font: inherit; font-size: 0.8125rem; font-weight: 500; color: var(--atni-text-link); text-decoration: underline; text-underline-offset: 0.18em; text-decoration-thickness: 1px; cursor: pointer; }
+.aw:hover { color: var(--atni-text-link-hover); }
+.aw[aria-expanded="true"] { color: var(--atni-text-heading); }
+.aw-text { display: block; margin: 2px 0 4px; padding: 4px 8px; border-left: 3px solid var(--lk); background: var(--atni-ground-raised); color: var(--atni-text-secondary); font-size: 0.8125rem; font-family: var(--resist-type-record-family); font-weight: 400; max-width: 40rem; }
+.aw-text[hidden] { display: none; }
+.lkn { white-space: nowrap; }
+.pl-bar { display: flex; height: 18px; max-width: 40rem; margin: 0 0 var(--atni-space-step-3); }
+
+/* The chart marks: the highest number of the year (a bar across the column) and the moving average */
+.num-tick { stroke: var(--atni-text-heading); stroke-width: 2.5; }
+.smooth-line { fill: none; stroke: var(--atni-text-heading); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.smooth-dot { fill: var(--atni-ground-base); stroke: var(--atni-text-heading); stroke-width: 1.5; }
+.sm-note { flex: 1 1 18rem; max-width: 34rem; align-self: center; color: var(--atni-text-secondary); font-size: 0.8125rem; line-height: 1.4; }
+.pl-bar .hseg { min-width: 0; }
+
+/* Special kind; Executive Board moved off the second colour so that colour means "likely" alone */
+.seg.s-special { fill: var(--resist-cat-9); }
+.seg.s-executive { fill: var(--resist-cat-5); }
+
+/* Heat cells: the likely count beside the recorded count, on a hatched chip */
+.hc-l { position: relative; isolation: isolate; margin-left: auto; padding: 1px 3px; background: var(--atni-ground-base); color: var(--atni-text-heading); outline: 1px solid var(--lk); }
+.hc-l::before { content: ""; position: absolute; inset: 0; z-index: -1; background: var(--lk-fill-soft); }
+.hc.step-none .hc-l, .hc.step-0 .hc-l { margin-left: auto; }
+.gridcell.lk { background: var(--lk-fill-soft); box-shadow: inset 0 0 0 1px var(--lk); }
+.gc-w { font-size: 0.6875rem; font-family: var(--atni-type-family-display); }
+.lab-strip.lk i.u { background: var(--lk-fill); outline: 1px solid var(--lk); outline-offset: -1px; }
+.lab-strip.lk i.b { background: var(--lk); opacity: 0.45; }
+
+/* People */
+.pl-name { font-weight: 500; }
+.pl-sub { margin: 2px 0 0; }
+.pl-inc { font-family: var(--atni-type-family-body); font-weight: 400; font-size: 0.8125rem; color: var(--atni-text-secondary); }
+
+/* Wyatt's grid: his number, the Library's, a letter for the reason */
+.wy .wd b { font-weight: 600; }
+.wy .wd i::before { content: "/ "; }
+.wy sup.wr { margin-left: 2px; font-size: 0.6875rem; font-weight: 600; color: var(--atni-text-heading); }
+.wy-reasons { list-style: none; margin: var(--atni-space-step-2) 0 0; padding: 0; font-size: 0.8125rem; color: var(--atni-text-secondary); }
+.wy-reasons li { margin: 2px 0; }
+.wy-reasons b { display: inline-block; min-width: 1.2em; color: var(--atni-text-heading); }
+
+/* Topics frame */
+#topics-root { min-height: 4rem; }
+
+@media (forced-colors: active) {
+  .seg.s-likely { fill: url(#tex45); stroke: CanvasText; }
+  .seg.s-open { fill: Canvas; stroke: CanvasText; stroke-dasharray: 4 3; }
+  .seg.s-special { fill: url(#texh); } .seg.s-executive { fill: url(#texv); }
+  .hseg.s-likely { background: repeating-linear-gradient(45deg, CanvasText 0 2px, Canvas 2px 5px); border: 1px solid CanvasText; outline: none; }
+  .hseg.s-open { background: Canvas; border: 1.5px dashed CanvasText; }
+  .sw.s-likely { background: repeating-linear-gradient(45deg, CanvasText 0 2px, Canvas 2px 5px); border: 1px solid CanvasText; }
+  .sw.s-open { background: Canvas; border: 1.5px dashed CanvasText; }
+  .sw.s-special { background: repeating-linear-gradient(0deg, CanvasText 0 2px, Canvas 2px 5px); }
+  .sw.s-tick { border-top-color: CanvasText; } .sw.s-smooth { background: CanvasText; }
+  .lk-w, .op-w { forced-color-adjust: none; color: CanvasText; border-color: CanvasText; background: Canvas; }
+  .op-w { border-style: dashed; }
+  mark.likely { forced-color-adjust: auto; box-shadow: none; border-bottom: 2px solid CanvasText; }
+  .hc-l, .gridcell.lk { forced-color-adjust: none; background: Canvas; color: CanvasText; outline: 1px dashed CanvasText; }
+  .hc-l::before { display: none; }
+  .lab-strip.lk i.u { background: repeating-linear-gradient(45deg, CanvasText 0 2px, Canvas 2px 5px); }
+  .num-tick, .smooth-line { stroke: CanvasText; } .smooth-dot { fill: Canvas; stroke: CanvasText; }
+  .aw-text { border-left-color: CanvasText; background: Canvas; }
+}
+@media print {
+  .hseg.s-likely, .sw.s-likely, .hc-l::before, .gridcell.lk, .lab-strip.lk i, mark.likely, .lk-w { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .aw { display: none; } .aw-text { display: block !important; }
+}
+
+.wy td.um { box-shadow: inset 0 0 0 2px var(--resist-coverage-edge); }
+.wy .wd-um b { font-style: italic; }
+@media (forced-colors: active) { .wy td.um { box-shadow: none; outline: 2px dotted CanvasText; outline-offset: -2px; } }
+
+.chart-tools { display: flex; flex-wrap: wrap; gap: 4px 16px; align-items: center; margin: 0 0 var(--atni-space-step-2); }
+.key.basis-key { margin-top: 6px; }
+
+.tbl-wrap.tall { max-height: 30rem; overflow-y: auto; border-bottom: 1px solid var(--atni-non-text-rule); }
+.tbl-wrap.tall thead th { position: sticky; top: 0; background: var(--atni-ground-base); }

@@ -1,0 +1,626 @@
+ref,row_label,year,value_as_written,value
+B10,Gaming,2001,1,1
+B11,Health and Drug Prevention,2001,27,27
+B12,Housing,2001,7,7
+B13,Human Resources,2001,0,0
+B14,ICWA,2001,1,1
+B15,International Affairs,2001,0,0
+B16,Law and Justice,2001,3,3
+B17,Native Vote,2001,0,0
+B18,Natural Resources,2001,11,11
+B19,Philanthropy,2001,0,0
+B20,TANF,2001,0,0
+B21,Taxation,2001,0,0
+B22,Telecommunications and Technology,2001,0,0
+B23,TERO,2001,0,0
+B24,Transportation,2001,7,7
+B25,Trust Reform,2001,0,0
+B26,Veteran Affairs,2001,1,1
+B27,Youth,2001,1,1
+B3,Climate Resiliency,2001,0,0
+B4,Culture and Elders,2001,8,8
+B5,Economic Development,2001,16,16
+B6,Education (K-12),2001,6,6
+B7,Education (Higher),2001,6,6
+B8,Energy,2001,0,0
+B9,Food Sovereignty,2001,0,0
+C10,Gaming,2002,1,1
+C11,Health and Drug Prevention,2002,9,9
+C12,Housing,2002,3,3
+C13,Human Resources,2002,0,0
+C14,ICWA,2002,5,5
+C15,International Affairs,2002,0,0
+C16,Law and Justice,2002,1,1
+C17,Native Vote,2002,0,0
+C18,Natural Resources,2002,10,10
+C19,Philanthropy,2002,0,0
+C20,TANF,2002,0,0
+C21,Taxation,2002,0,0
+C22,Telecommunications and Technology,2002,0,0
+C23,TERO,2002,0,0
+C24,Transportation,2002,8,8
+C25,Trust Reform,2002,0,0
+C26,Veteran Affairs,2002,1,1
+C27,Youth,2002,0,0
+C3,Climate Resiliency,2002,0,0
+C4,Culture and Elders,2002,7,7
+C5,Economic Development,2002,19,19
+C6,Education (K-12),2002,9,9
+C7,Education (Higher),2002,9,9
+C8,Energy,2002,0,0
+C9,Food Sovereignty,2002,0,0
+D10,Gaming,2003,2,2
+D11,Health and Drug Prevention,2003,22,22
+D12,Housing,2003,8,8
+D13,Human Resources,2003,0,0
+D14,ICWA,2003,2,2
+D15,International Affairs,2003,0,0
+D16,Law and Justice,2003,6,6
+D17,Native Vote,2003,0,0
+D18,Natural Resources,2003,17,17
+D19,Philanthropy,2003,0,0
+D20,TANF,2003,2,2
+D21,Taxation,2003,0,0
+D22,Telecommunications and Technology,2003,0,0
+D23,TERO,2003,0,0
+D24,Transportation,2003,2,2
+D25,Trust Reform,2003,,
+D26,Veteran Affairs,2003,2,2
+D27,Youth,2003,0,0
+D3,Climate Resiliency,2003,0,0
+D4,Culture and Elders,2003,3,3
+D5,Economic Development,2003,25,25
+D6,Education (K-12),2003,14,14
+D7,Education (Higher),2003,14,14
+D8,Energy,2003,0,0
+D9,Food Sovereignty,2003,0,0
+E10,Gaming,2004,1,1
+E11,Health and Drug Prevention,2004,11,11
+E12,Housing,2004,7,7
+E13,Human Resources,2004,0,0
+E14,ICWA,2004,3,3
+E15,International Affairs,2004,0,0
+E16,Law and Justice,2004,8,8
+E17,Native Vote,2004,0,0
+E18,Natural Resources,2004,12,12
+E19,Philanthropy,2004,0,0
+E20,TANF,2004,3,3
+E21,Taxation,2004,0,0
+E22,Telecommunications and Technology,2004,0,0
+E23,TERO,2004,0,0
+E24,Transportation,2004,4,4
+E25,Trust Reform,2004,,
+E26,Veteran Affairs,2004,3,3
+E27,Youth,2004,0,0
+E3,Climate Resiliency,2004,0,0
+E4,Culture and Elders,2004,5,5
+E5,Economic Development,2004,11,11
+E6,Education (K-12),2004,10,10
+E7,Education (Higher),2004,10,10
+E8,Energy,2004,0,0
+E9,Food Sovereignty,2004,0,0
+F10,Gaming,2005,2,2
+F11,Health and Drug Prevention,2005,10,10
+F12,Housing,2005,7,7
+F13,Human Resources,2005,0,0
+F14,ICWA,2005,2,2
+F15,International Affairs,2005,0,0
+F16,Law and Justice,2005,2,2
+F17,Native Vote,2005,0,0
+F18,Natural Resources,2005,7,7
+F19,Philanthropy,2005,0,0
+F20,TANF,2005,4,4
+F21,Taxation,2005,0,0
+F22,Telecommunications and Technology,2005,1,1
+F23,TERO,2005,0,0
+F24,Transportation,2005,11,11
+F25,Trust Reform,2005,,
+F26,Veteran Affairs,2005,2,2
+F27,Youth,2005,1,1
+F3,Climate Resiliency,2005,0,0
+F4,Culture and Elders,2005,6,6
+F5,Economic Development,2005,14,14
+F6,Education (K-12),2005,5,5
+F7,Education (Higher),2005,5,5
+F8,Energy,2005,0,0
+F9,Food Sovereignty,2005,0,0
+G10,Gaming,2006,3,3
+G11,Health and Drug Prevention,2006,15,15
+G12,Housing,2006,12,12
+G13,Human Resources,2006,0,0
+G14,ICWA,2006,2,2
+G15,International Affairs,2006,0,0
+G16,Law and Justice,2006,0,0
+G17,Native Vote,2006,0,0
+G18,Natural Resources,2006,13,13
+G19,Philanthropy,2006,0,0
+G20,TANF,2006,7,7
+G21,Taxation,2006,0,0
+G22,Telecommunications and Technology,2006,1,1
+G23,TERO,2006,0,0
+G24,Transportation,2006,12,12
+G25,Trust Reform,2006,,
+G26,Veteran Affairs,2006,0,0
+G27,Youth,2006,0,0
+G3,Climate Resiliency,2006,0,0
+G4,Culture and Elders,2006,7,7
+G5,Economic Development,2006,5,5
+G6,Education (K-12),2006,11,11
+G7,Education (Higher),2006,11,11
+G8,Energy,2006,0,0
+G9,Food Sovereignty,2006,0,0
+H10,Gaming,2007,0,0
+H11,Health and Drug Prevention,2007,14,14
+H12,Housing,2007,4,4
+H13,Human Resources,2007,0,0
+H14,ICWA,2007,0,0
+H15,International Affairs,2007,0,0
+H16,Law and Justice,2007,2,2
+H17,Native Vote,2007,0,0
+H18,Natural Resources,2007,13,13
+H19,Philanthropy,2007,0,0
+H20,TANF,2007,2,2
+H21,Taxation,2007,0,0
+H22,Telecommunications and Technology,2007,0,0
+H23,TERO,2007,0,0
+H24,Transportation,2007,1,1
+H25,Trust Reform,2007,,
+H26,Veteran Affairs,2007,1,1
+H27,Youth,2007,0,0
+H3,Climate Resiliency,2007,0,0
+H4,Culture and Elders,2007,7,7
+H5,Economic Development,2007,8,8
+H6,Education (K-12),2007,9,9
+H7,Education (Higher),2007,9,9
+H8,Energy,2007,0,0
+H9,Food Sovereignty,2007,0,0
+I10,Gaming,2008,2,2
+I11,Health and Drug Prevention,2008,3,3
+I12,Housing,2008,5,5
+I13,Human Resources,2008,0,0
+I14,ICWA,2008,2,2
+I15,International Affairs,2008,0,0
+I16,Law and Justice,2008,0,0
+I17,Native Vote,2008,1,1
+I18,Natural Resources,2008,5,5
+I19,Philanthropy,2008,0,0
+I20,TANF,2008,0,0
+I21,Taxation,2008,0,0
+I22,Telecommunications and Technology,2008,0,0
+I23,TERO,2008,0,0
+I24,Transportation,2008,2,2
+I25,Trust Reform,2008,,
+I26,Veteran Affairs,2008,0,0
+I27,Youth,2008,0,0
+I3,Climate Resiliency,2008,0,0
+I4,Culture and Elders,2008,1,1
+I5,Economic Development,2008,7,7
+I6,Education (K-12),2008,6,6
+I7,Education (Higher),2008,6,6
+I8,Energy,2008,0,0
+I9,Food Sovereignty,2008,0,0
+J10,Gaming,2009,2,2
+J11,Health and Drug Prevention,2009,10,10
+J12,Housing,2009,4,4
+J13,Human Resources,2009,0,0
+J14,ICWA,2009,3,3
+J15,International Affairs,2009,0,0
+J16,Law and Justice,2009,6,6
+J17,Native Vote,2009,1,1
+J18,Natural Resources,2009,13,13
+J19,Philanthropy,2009,0,0
+J20,TANF,2009,3,3
+J21,Taxation,2009,5,5
+J22,Telecommunications and Technology,2009,4,4
+J23,TERO,2009,0,0
+J24,Transportation,2009,1,1
+J25,Trust Reform,2009,,
+J26,Veteran Affairs,2009,0,0
+J27,Youth,2009,1,1
+J3,Climate Resiliency,2009,0,0
+J4,Culture and Elders,2009,4,4
+J5,Economic Development,2009,8,8
+J6,Education (K-12),2009,11,11
+J7,Education (Higher),2009,11,11
+J8,Energy,2009,0,0
+J9,Food Sovereignty,2009,0,0
+K10,Gaming,2010,3,3
+K11,Health and Drug Prevention,2010,8,8
+K12,Housing,2010,1,1
+K13,Human Resources,2010,1,1
+K14,ICWA,2010,0,0
+K15,International Affairs,2010,0,0
+K16,Law and Justice,2010,3,3
+K17,Native Vote,2010,0,0
+K18,Natural Resources,2010,9,9
+K19,Philanthropy,2010,0,0
+K20,TANF,2010,1,1
+K21,Taxation,2010,1,1
+K22,Telecommunications and Technology,2010,3,3
+K23,TERO,2010,0,0
+K24,Transportation,2010,6,6
+K25,Trust Reform,2010,,
+K26,Veteran Affairs,2010,3,3
+K27,Youth,2010,0,0
+K3,Climate Resiliency,2010,0,0
+K4,Culture and Elders,2010,0,0
+K5,Economic Development,2010,6,6
+K6,Education (K-12),2010,12,12
+K7,Education (Higher),2010,12,12
+K8,Energy,2010,0,0
+K9,Food Sovereignty,2010,0,0
+L10,Gaming,2011,1,1
+L11,Health and Drug Prevention,2011,12,12
+L12,Housing,2011,2,2
+L13,Human Resources,2011,0,0
+L14,ICWA,2011,0,0
+L15,International Affairs,2011,0,0
+L16,Law and Justice,2011,2,2
+L17,Native Vote,2011,2,2
+L18,Natural Resources,2011,5,5
+L19,Philanthropy,2011,0,0
+L20,TANF,2011,3,3
+L21,Taxation,2011,0,0
+L22,Telecommunications and Technology,2011,11,11
+L23,TERO,2011,1,1
+L24,Transportation,2011,7,7
+L25,Trust Reform,2011,,
+L26,Veteran Affairs,2011,2,2
+L27,Youth,2011,0,0
+L3,Climate Resiliency,2011,0,0
+L4,Culture and Elders,2011,1,1
+L5,Economic Development,2011,3,3
+L6,Education (K-12),2011,18,18
+L7,Education (Higher),2011,18,18
+L8,Energy,2011,0,0
+L9,Food Sovereignty,2011,0,0
+M10,Gaming,2012,1,1
+M11,Health and Drug Prevention,2012,5,5
+M12,Housing,2012,4,4
+M13,Human Resources,2012,0,0
+M14,ICWA,2012,0,0
+M15,International Affairs,2012,0,0
+M16,Law and Justice,2012,3,3
+M17,Native Vote,2012,0,0
+M18,Natural Resources,2012,7,7
+M19,Philanthropy,2012,0,0
+M20,TANF,2012,0,0
+M21,Taxation,2012,1,1
+M22,Telecommunications and Technology,2012,1,1
+M23,TERO,2012,0,0
+M24,Transportation,2012,8,8
+M25,Trust Reform,2012,,
+M26,Veteran Affairs,2012,2,2
+M27,Youth,2012,1,1
+M3,Climate Resiliency,2012,0,0
+M4,Culture and Elders,2012,3,3
+M5,Economic Development,2012,0,0
+M6,Education (K-12),2012,2,2
+M7,Education (Higher),2012,2,2
+M8,Energy,2012,0,0
+M9,Food Sovereignty,2012,0,0
+N10,Gaming,2013,1,1
+N11,Health and Drug Prevention,2013,13,13
+N12,Housing,2013,4,4
+N13,Human Resources,2013,0,0
+N14,ICWA,2013,0,0
+N15,International Affairs,2013,0,0
+N16,Law and Justice,2013,6,6
+N17,Native Vote,2013,1,1
+N18,Natural Resources,2013,6,6
+N19,Philanthropy,2013,0,0
+N20,TANF,2013,0,0
+N21,Taxation,2013,2,2
+N22,Telecommunications and Technology,2013,6,6
+N23,TERO,2013,1,1
+N24,Transportation,2013,8,8
+N25,Trust Reform,2013,,
+N26,Veteran Affairs,2013,4,4
+N27,Youth,2013,1,1
+N3,Climate Resiliency,2013,0,0
+N4,Culture and Elders,2013,1,1
+N5,Economic Development,2013,3,3
+N6,Education (K-12),2013,12,12
+N7,Education (Higher),2013,12,12
+N8,Energy,2013,0,0
+N9,Food Sovereignty,2013,0,0
+O10,Gaming,2014,2,2
+O11,Health and Drug Prevention,2014,4,4
+O12,Housing,2014,6,6
+O13,Human Resources,2014,0,0
+O14,ICWA,2014,1,1
+O15,International Affairs,2014,0,0
+O16,Law and Justice,2014,3,3
+O17,Native Vote,2014,0,0
+O18,Natural Resources,2014,10,10
+O19,Philanthropy,2014,0,0
+O20,TANF,2014,0,0
+O21,Taxation,2014,3,3
+O22,Telecommunications and Technology,2014,6,6
+O23,TERO,2014,0,0
+O24,Transportation,2014,5,5
+O25,Trust Reform,2014,,
+O26,Veteran Affairs,2014,3,3
+O27,Youth,2014,1,1
+O3,Climate Resiliency,2014,0,0
+O4,Culture and Elders,2014,2,2
+O5,Economic Development,2014,3,3
+O6,Education (K-12),2014,11,11
+O7,Education (Higher),2014,11,11
+O8,Energy,2014,0,0
+O9,Food Sovereignty,2014,0,0
+P10,Gaming,2015,1,1
+P11,Health and Drug Prevention,2015,6,6
+P12,Housing,2015,5,5
+P13,Human Resources,2015,0,0
+P14,ICWA,2015,1,1
+P15,International Affairs,2015,0,0
+P16,Law and Justice,2015,0,0
+P17,Native Vote,2015,0,0
+P18,Natural Resources,2015,6,6
+P19,Philanthropy,2015,0,0
+P20,TANF,2015,4,4
+P21,Taxation,2015,5,5
+P22,Telecommunications and Technology,2015,7,7
+P23,TERO,2015,3,3
+P24,Transportation,2015,9,9
+P25,Trust Reform,2015,,
+P26,Veteran Affairs,2015,3,3
+P27,Youth,2015,0,0
+P3,Climate Resiliency,2015,0,0
+P4,Culture and Elders,2015,5,5
+P5,Economic Development,2015,1,1
+P6,Education (K-12),2015,1,1
+P7,Education (Higher),2015,1,1
+P8,Energy,2015,0,0
+P9,Food Sovereignty,2015,0,0
+Q10,Gaming,2016,0,0
+Q11,Health and Drug Prevention,2016,4,4
+Q12,Housing,2016,4,4
+Q13,Human Resources,2016,0,0
+Q14,ICWA,2016,1,1
+Q15,International Affairs,2016,0,0
+Q16,Law and Justice,2016,4,4
+Q17,Native Vote,2016,0,0
+Q18,Natural Resources,2016,14,14
+Q19,Philanthropy,2016,0,0
+Q20,TANF,2016,0,0
+Q21,Taxation,2016,1,1
+Q22,Telecommunications and Technology,2016,4,4
+Q23,TERO,2016,0,0
+Q24,Transportation,2016,5,5
+Q25,Trust Reform,2016,,
+Q26,Veteran Affairs,2016,2,2
+Q27,Youth,2016,0,0
+Q3,Climate Resiliency,2016,0,0
+Q4,Culture and Elders,2016,5,5
+Q5,Economic Development,2016,5,5
+Q6,Education (K-12),2016,2,2
+Q7,Education (Higher),2016,2,2
+Q8,Energy,2016,0,0
+Q9,Food Sovereignty,2016,0,0
+R10,Gaming,2017,1,1
+R11,Health and Drug Prevention,2017,11,11
+R12,Housing,2017,0,0
+R13,Human Resources,2017,0,0
+R14,ICWA,2017,1,1
+R15,International Affairs,2017,0,0
+R16,Law and Justice,2017,2,2
+R17,Native Vote,2017,1,1
+R18,Natural Resources,2017,15,15
+R19,Philanthropy,2017,0,0
+R20,TANF,2017,0,0
+R21,Taxation,2017,1,1
+R22,Telecommunications and Technology,2017,3,3
+R23,TERO,2017,1,1
+R24,Transportation,2017,5,5
+R25,Trust Reform,2017,,
+R26,Veteran Affairs,2017,2,2
+R27,Youth,2017,0,0
+R3,Climate Resiliency,2017,0,0
+R4,Culture and Elders,2017,1,1
+R5,Economic Development,2017,4,4
+R6,Education (K-12),2017,8,8
+R7,Education (Higher),2017,8,8
+R8,Energy,2017,0,0
+R9,Food Sovereignty,2017,0,0
+S10,Gaming,2018,0,0
+S11,Health and Drug Prevention,2018,8,8
+S12,Housing,2018,0,0
+S13,Human Resources,2018,0,0
+S14,ICWA,2018,1,1
+S15,International Affairs,2018,0,0
+S16,Law and Justice,2018,1,1
+S17,Native Vote,2018,1,1
+S18,Natural Resources,2018,11,11
+S19,Philanthropy,2018,0,0
+S20,TANF,2018,0,0
+S21,Taxation,2018,0,0
+S22,Telecommunications and Technology,2018,5,5
+S23,TERO,2018,0,0
+S24,Transportation,2018,9,9
+S25,Trust Reform,2018,,
+S26,Veteran Affairs,2018,2,2
+S27,Youth,2018,0,0
+S3,Climate Resiliency,2018,0,0
+S4,Culture and Elders,2018,1,1
+S5,Economic Development,2018,1,1
+S6,Education (K-12),2018,5,5
+S7,Education (Higher),2018,5,5
+S8,Energy,2018,2,2
+S9,Food Sovereignty,2018,0,0
+T10,Gaming,2019,0,0
+T11,Health and Drug Prevention,2019,1,1
+T12,Housing,2019,0,0
+T13,Human Resources,2019,0,0
+T14,ICWA,2019,0,0
+T15,International Affairs,2019,0,0
+T16,Law and Justice,2019,1,1
+T17,Native Vote,2019,1,1
+T18,Natural Resources,2019,5,5
+T19,Philanthropy,2019,0,0
+T20,TANF,2019,0,0
+T21,Taxation,2019,2,2
+T22,Telecommunications and Technology,2019,0,0
+T23,TERO,2019,0,0
+T24,Transportation,2019,1,1
+T25,Trust Reform,2019,,
+T26,Veteran Affairs,2019,1,1
+T27,Youth,2019,1,1
+T3,Climate Resiliency,2019,0,0
+T4,Culture and Elders,2019,0,0
+T5,Economic Development,2019,0,0
+T6,Education (K-12),2019,3,3
+T7,Education (Higher),2019,3,3
+T8,Energy,2019,1,1
+T9,Food Sovereignty,2019,0,0
+U10,Gaming,2020,0,0
+U11,Health and Drug Prevention,2020,7,7
+U12,Housing,2020,2,2
+U13,Human Resources,2020,0,0
+U14,ICWA,2020,0,0
+U15,International Affairs,2020,0,0
+U16,Law and Justice,2020,1,1
+U17,Native Vote,2020,2,2
+U18,Natural Resources,2020,12,12
+U19,Philanthropy,2020,0,0
+U20,TANF,2020,0,0
+U21,Taxation,2020,3,3
+U22,Telecommunications and Technology,2020,0,0
+U23,TERO,2020,0,0
+U24,Transportation,2020,0,0
+U25,Trust Reform,2020,,
+U26,Veteran Affairs,2020,0,0
+U27,Youth,2020,0,0
+U3,Climate Resiliency,2020,0,0
+U4,Culture and Elders,2020,0,0
+U5,Economic Development,2020,0,0
+U6,Education (K-12),2020,7,7
+U7,Education (Higher),2020,7,7
+U8,Energy,2020,0,0
+U9,Food Sovereignty,2020,0,0
+V10,Gaming,2021,0,0
+V11,Health and Drug Prevention,2021,6,6
+V12,Housing,2021,2,2
+V13,Human Resources,2021,0,0
+V14,ICWA,2021,0,0
+V15,International Affairs,2021,0,0
+V16,Law and Justice,2021,3,3
+V17,Native Vote,2021,2,2
+V18,Natural Resources,2021,5,5
+V19,Philanthropy,2021,0,0
+V20,TANF,2021,0,0
+V21,Taxation,2021,1,1
+V22,Telecommunications and Technology,2021,0,0
+V23,TERO,2021,0,0
+V24,Transportation,2021,5,5
+V25,Trust Reform,2021,,
+V26,Veteran Affairs,2021,1,1
+V27,Youth,2021,0,0
+V3,Climate Resiliency,2021,0,0
+V4,Culture and Elders,2021,0,0
+V5,Economic Development,2021,4,4
+V6,Education (K-12),2021,6,6
+V7,Education (Higher),2021,6,6
+V8,Energy,2021,0,0
+V9,Food Sovereignty,2021,0,0
+W10,Gaming,2022,2,2
+W11,Health and Drug Prevention,2022,5,5
+W12,Housing,2022,0,0
+W13,Human Resources,2022,0,0
+W14,ICWA,2022,0,0
+W15,International Affairs,2022,0,0
+W16,Law and Justice,2022,5,5
+W17,Native Vote,2022,0,0
+W18,Natural Resources,2022,11,11
+W19,Philanthropy,2022,1,1
+W20,TANF,2022,0,0
+W21,Taxation,2022,0,0
+W22,Telecommunications and Technology,2022,0,0
+W23,TERO,2022,3,3
+W24,Transportation,2022,4,4
+W25,Trust Reform,2022,,
+W26,Veteran Affairs,2022,2,2
+W27,Youth,2022,0,0
+W3,Climate Resiliency,2022,0,0
+W4,Culture and Elders,2022,2,2
+W5,Economic Development,2022,2,2
+W6,Education (K-12),2022,3,3
+W7,Education (Higher),2022,3,3
+W8,Energy,2022,0,0
+W9,Food Sovereignty,2022,0,0
+X10,Gaming,2023,0,0
+X11,Health and Drug Prevention,2023,12,12
+X12,Housing,2023,1,1
+X13,Human Resources,2023,0,0
+X14,ICWA,2023,0,0
+X15,International Affairs,2023,0,0
+X16,Law and Justice,2023,2,2
+X17,Native Vote,2023,2,2
+X18,Natural Resources,2023,10,10
+X19,Philanthropy,2023,1,1
+X20,TANF,2023,0,0
+X21,Taxation,2023,6,6
+X22,Telecommunications and Technology,2023,3,3
+X23,TERO,2023,2,2
+X24,Transportation,2023,0,0
+X25,Trust Reform,2023,,
+X26,Veteran Affairs,2023,1,1
+X27,Youth,2023,2,2
+X3,Climate Resiliency,2023,2,2
+X4,Culture and Elders,2023,1,1
+X5,Economic Development,2023,5,5
+X6,Education (K-12),2023,5,5
+X7,Education (Higher),2023,2,2
+X8,Energy,2023,2,2
+X9,Food Sovereignty,2023,0,0
+Y10,Gaming,2024,0,0
+Y11,Health and Drug Prevention,2024,5,5
+Y12,Housing,2024,1,1
+Y13,Human Resources,2024,0,0
+Y14,ICWA,2024,1,1
+Y15,International Affairs,2024,0,0
+Y16,Law and Justice,2024,2,2
+Y17,Native Vote,2024,2,2
+Y18,Natural Resources,2024,16,16
+Y19,Philanthropy,2024,0,0
+Y20,TANF,2024,2,2
+Y21,Taxation,2024,3,3
+Y22,Telecommunications and Technology,2024,2,2
+Y23,TERO,2024,0,0
+Y24,Transportation,2024,0,0
+Y25,Trust Reform,2024,,
+Y26,Veteran Affairs,2024,0,0
+Y27,Youth,2024,0,0
+Y3,Climate Resiliency,2024,3,3
+Y4,Culture and Elders,2024,2,2
+Y5,Economic Development,2024,3,3
+Y6,Education (K-12),2024,0,0
+Y7,Education (Higher),2024,5,5
+Y8,Energy,2024,2,2
+Y9,Food Sovereignty,2024,0,0
+Z10,Gaming,2025,0,0
+Z11,Health and Drug Prevention,2025,6,6
+Z12,Housing,2025,0,0
+Z13,Human Resources,2025,0,0
+Z14,ICWA,2025,0,0
+Z15,International Affairs,2025,0,0
+Z16,Law and Justice,2025,0,0
+Z17,Native Vote,2025,2,2
+Z18,Natural Resources,2025,3,3
+Z19,Philanthropy,2025,0,0
+Z20,TANF,2025,0,0
+Z21,Taxation,2025,1,1
+Z22,Telecommunications and Technology,2025,0,0
+Z23,TERO,2025,0,0
+Z24,Transportation,2025,0,0
+Z25,Trust Reform,2025,,
+Z26,Veteran Affairs,2025,1,1
+Z27,Youth,2025,0,0
+Z3,Climate Resiliency,2025,1,1
+Z4,Culture and Elders,2025,3,3
+Z5,Economic Development,2025,3,3
+Z6,Education (K-12),2025,0,0
+Z7,Education (Higher),2025,2,2
+Z8,Energy,2025,1,1
+Z9,Food Sovereignty,2025,0,0

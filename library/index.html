@@ -27,17 +27,23 @@ td.h { font-family: ui-monospace, Consolas, monospace; font-size: .75rem; word-b
 <h1>The Resolution Library (clean copy)</h1>
 <p><strong>The Resolution Library was built by Wyatt Ash-Milby at ATNI.</strong> It is a workbook that lists ATNI's
 numbered resolutions with their committee, preparer, convention and outcome.</p>
-<p>This folder holds a cleaned copy of that workbook, built on November 23, 2026: 1,724 resolutions from 2000 to 2026.
-Every value is kept as the workbook writes it, beside a tidied form (spacing, number format, file-name titles). The
-workbook itself was not changed.</p>
+<p>This folder holds a cleaned copy of that workbook, built on November 23, 2026: 1,724 resolutions from 2000 to
+2026. Every value is kept as the workbook writes it, beside a tidied form. The workbook itself was not changed.</p>
 <div class="note">
-<p><strong>Preview, under review.</strong> Please read these limits before using the numbers.</p>
+<p><strong>Preview, under review. This is not a finished release.</strong> Please read these limits before using the
+numbers.</p>
 <ul>
-<li>An outcome is recorded for 781 of the 1,724 resolutions, and a preparer for 1,211. A blank means "not recorded".
-It never means No.</li>
-<li>A preparer is the name the workbook records in "Prepared By". Names are shown as written; spellings of one
-person's name have not been merged.</li>
-<li>Some committee names changed over the years. Those labels are kept as written and are still being reviewed.</li>
+<li><strong>Likely and open.</strong> Where the workbook does not say something outright, this copy shows the most
+likely answer and marks it "likely" in a basis column. Where nothing is likely enough, the value stays as written and
+is marked "open". There are 269 likely items and 99 open items, all listed in the
+<a href="verify/to-verify.xlsx" download>list to verify</a> for Wyatt Ash-Milby to check.</li>
+<li>An outcome is recorded for 782 of the 1,724 resolutions, and a preparer for 1,211. A blank
+means "not recorded". It never means No.</li>
+<li>A preparer is the name the workbook records in "Prepared By". Spellings of one person's name are joined only
+where that is likely, and the join is marked: 202 people are listed, 17 of them with a
+likely join. Names that differ by Jr. or Sr. are never joined without someone who knows.</li>
+<li>Some committee names changed over the years. An earlier or variant name is counted with its committee as likely
+(166 links), and every label is kept as written.</li>
 <li>This is a working list, not ATNI's official record. The resolutions themselves are on the
 <a href="../">ResIST site</a> and at atnitribes.org.</li>
 </ul>
@@ -48,37 +54,53 @@ person's name have not been merged.</li>
 <table>
 <thead><tr><th scope="col">File</th><th scope="col">What it is</th><th scope="col">Bytes</th><th scope="col">SHA-256</th></tr></thead>
 <tbody>
-<tr><td><a href="csv/applied_fix.csv" download>csv/applied_fix.csv</a></td><td>One table as CSV</td><td class="n">41,214</td><td class="h">969ec6a6f5e9c71be7d76fc2100ac5039e2a544633cb76283c043b75afd5c8c7</td></tr>
-<tr><td><a href="csv/committee.csv" download>csv/committee.csv</a></td><td>One table as CSV</td><td class="n">5,303</td><td class="h">b1e5b064d90d124453e17ebc9b7b52b70aa63fe95e4ff17916b10eb80c8d916d</td></tr>
-<tr><td><a href="csv/committee_alias.csv" download>csv/committee_alias.csv</a></td><td>One table as CSV</td><td class="n">8,650</td><td class="h">083be8ac55159cf1e6025c01000c8a7a56e62dc1ad613bb0e0dfd1fb23ab0a4e</td></tr>
-<tr><td><a href="csv/copy.csv" download>csv/copy.csv</a></td><td>One table as CSV</td><td class="n">84,328</td><td class="h">d1e79dbbd81c7bd8ecead132b67c5932f77db504219fe2a57b9cc2426fc39051</td></tr>
-<tr><td><a href="csv/coverage.csv" download>csv/coverage.csv</a></td><td>One table as CSV</td><td class="n">1,215</td><td class="h">074470ab7ccc60f07469c57d6a6ab759963fd835b5b18e2ec07ef4567104164a</td></tr>
-<tr><td><a href="csv/crosswalk.csv" download>csv/crosswalk.csv</a></td><td>One table as CSV</td><td class="n">474,446</td><td class="h">9a34e3a81b3db2dd1527168e9cbf5214cad6c69d788af6955ce13023cc256bbe</td></tr>
-<tr><td><a href="csv/duplicate_group.csv" download>csv/duplicate_group.csv</a></td><td>One table as CSV</td><td class="n">4,774</td><td class="h">1306ef79512eb56f26715f52a137dbfa1da4ffe16ddcc3476a3aa8dcc50ffc0e</td></tr>
+<tr><td><a href="csv/applied_fix.csv" download>csv/applied_fix.csv</a></td><td>One table as CSV</td><td class="n">61,893</td><td class="h">ff1db3f1d2dae690acf2b8b194d4e800f8f03e6ae7e58050dcf03edeb7b0ca4f</td></tr>
+<tr><td><a href="csv/committee.csv" download>csv/committee.csv</a></td><td>One table as CSV</td><td class="n">5,865</td><td class="h">6093374f1f429120c7b342e9d918f05b6d1c94fb2065b2c6c8e0e362cd2c8cee</td></tr>
+<tr><td><a href="csv/committee_alias.csv" download>csv/committee_alias.csv</a></td><td>One table as CSV</td><td class="n">9,479</td><td class="h">20d882514726192ad05408d856ca8436262ce93108d91a8c1940ec899e814de1</td></tr>
+<tr><td><a href="csv/copy.csv" download>csv/copy.csv</a></td><td>One table as CSV</td><td class="n">84,326</td><td class="h">5e338502da622a657e85e564e493721431e46a85e197aaaf512e93000b43e363</td></tr>
+<tr><td><a href="csv/coverage.csv" download>csv/coverage.csv</a></td><td>One table as CSV</td><td class="n">1,216</td><td class="h">7ca38e1367a7d0ec332dd5eb92cf70318621ffc820a9c7809ebddd3bdc62065f</td></tr>
+<tr><td><a href="csv/coverage_limit.csv" download>csv/coverage_limit.csv</a></td><td>One table as CSV</td><td class="n">1,409</td><td class="h">150f24d30bb30d00e6a2520861c6a8b8f56b6de866f7b499cc04e9384409e9cb</td></tr>
+<tr><td><a href="csv/crosswalk.csv" download>csv/crosswalk.csv</a></td><td>One table as CSV</td><td class="n">492,899</td><td class="h">34d723c52927ecd2a606990dca5ddd2056770ac7c9c09a0b22bafd86502304a9</td></tr>
+<tr><td><a href="csv/duplicate_group.csv" download>csv/duplicate_group.csv</a></td><td>One table as CSV</td><td class="n">4,734</td><td class="h">2ad69afb24ca8072a805b6d0f7fca25eeb8be2a8aa0c7bd02472090686001e61</td></tr>
+<tr><td><a href="csv/named.csv" download>csv/named.csv</a></td><td>One table as CSV</td><td class="n">1,132</td><td class="h">bdcdfa884e5da072427c2afb1bf4d669bb9d69c1ff6c9b2030f7af43e937acd7</td></tr>
 <tr><td><a href="csv/number_gap.csv" download>csv/number_gap.csv</a></td><td>One table as CSV</td><td class="n">686</td><td class="h">4a38917ad1d101ef9c5267a1699b1224f5c5b91e6ba370f15763cd4f08a42266</td></tr>
-<tr><td><a href="csv/person.csv" download>csv/person.csv</a></td><td>One table as CSV</td><td class="n">16,028</td><td class="h">ac8c17c58cce4e207bbf4db6c69db8f3d619ccbee68b9133afe9e4c82d0f6537</td></tr>
-<tr><td><a href="csv/person_form.csv" download>csv/person_form.csv</a></td><td>One table as CSV</td><td class="n">7,206</td><td class="h">cf8aaf4893871c86789497bbfeacd74e559cde2c97af3aa358845d7e52da2c46</td></tr>
-<tr><td><a href="csv/preparer.csv" download>csv/preparer.csv</a></td><td>One table as CSV</td><td class="n">143,301</td><td class="h">106c88475712a557e8b074873787dab4a4a02a2cba070be0bff854bab71f974e</td></tr>
-<tr><td><a href="csv/resolution.csv" download>csv/resolution.csv</a></td><td>One table as CSV</td><td class="n">1,145,763</td><td class="h">8faf66a16cfad03420159bec75344a03e05edb9a421918e05bad104cf17da3fc</td></tr>
-<tr><td><a href="csv/resolution_committee.csv" download>csv/resolution_committee.csv</a></td><td>One table as CSV</td><td class="n">103,654</td><td class="h">23f9e5cbfd487152ec5d08df4f33205ea1f4049cc37aef00f33b02463ff9cd06</td></tr>
-<tr><td><a href="csv/session.csv" download>csv/session.csv</a></td><td>One table as CSV</td><td class="n">7,709</td><td class="h">30a413def2e33be2e481fe8b5e752b6203da981f735e739dc53b6d7cf5ecfb8f</td></tr>
-<tr><td><a href="datapackage.json" download>datapackage.json</a></td><td>Frictionless Data Package description of the CSV files</td><td class="n">37,252</td><td class="h">26d155947158a6f6d58629ae05ae8b8261e23e5f9fc060dfd2bc6d7570a29436</td></tr>
-<tr><td><a href="jsonl/applied_fix.jsonl" download>jsonl/applied_fix.jsonl</a></td><td>One table as JSON Lines</td><td class="n">62,511</td><td class="h">16f0e20c4bedb0fe475214a87c679165ac67e6e7a6f4186de0a6e58fcfd8fc3a</td></tr>
-<tr><td><a href="jsonl/committee.jsonl" download>jsonl/committee.jsonl</a></td><td>One table as JSON Lines</td><td class="n">10,060</td><td class="h">469bb6c1966cdfa066fabd86affb5488929cf4518dd84c237558a8e05f7e9ff4</td></tr>
-<tr><td><a href="jsonl/committee_alias.jsonl" download>jsonl/committee_alias.jsonl</a></td><td>One table as JSON Lines</td><td class="n">24,438</td><td class="h">84e70e62cc65a13720eb067ae260e98f15b78167d864386f45925dbd41814ebe</td></tr>
-<tr><td><a href="jsonl/copy.jsonl" download>jsonl/copy.jsonl</a></td><td>One table as JSON Lines</td><td class="n">192,346</td><td class="h">89793ed7d58e14de84ab3c181806e23a99e59f98a51a92c992e907d50d3fd747</td></tr>
-<tr><td><a href="jsonl/coverage.jsonl" download>jsonl/coverage.jsonl</a></td><td>One table as JSON Lines</td><td class="n">6,495</td><td class="h">6740cae047722bfd89d6b9fd9422ab6254a9b262f12bc9d87abf138aafb03a65</td></tr>
-<tr><td><a href="jsonl/crosswalk.jsonl" download>jsonl/crosswalk.jsonl</a></td><td>One table as JSON Lines</td><td class="n">887,888</td><td class="h">3fef867fa5a52ba31c629de922886a873822daf414e82b490688a8957c3d9146</td></tr>
-<tr><td><a href="jsonl/duplicate_group.jsonl" download>jsonl/duplicate_group.jsonl</a></td><td>One table as JSON Lines</td><td class="n">8,502</td><td class="h">ee7ebd32cdab2a13167f35903c127a79f108fac21f4fd51a873f59254e22300a</td></tr>
+<tr><td><a href="csv/person.csv" download>csv/person.csv</a></td><td>One table as CSV</td><td class="n">17,176</td><td class="h">2a5f53ecf5bb4eb182c48d6847213a5ef78befac11e7691965e36a0ce8bc08f6</td></tr>
+<tr><td><a href="csv/person_form.csv" download>csv/person_form.csv</a></td><td>One table as CSV</td><td class="n">9,274</td><td class="h">05367e5c87b30280badcbb058552d6d3b54a81ed9abd803dd4de194c86955785</td></tr>
+<tr><td><a href="csv/preparer.csv" download>csv/preparer.csv</a></td><td>One table as CSV</td><td class="n">154,617</td><td class="h">e6f61be09595344c545925bca4583b33d1c4498a942675a65444283d3c6ccd2d</td></tr>
+<tr><td><a href="csv/resolution.csv" download>csv/resolution.csv</a></td><td>One table as CSV</td><td class="n">1,151,509</td><td class="h">21cf3d85718c242aa9ecf67e3f7995377d2e0ead4bf6d6a66c1c4d82a8b2fda2</td></tr>
+<tr><td><a href="csv/resolution_committee.csv" download>csv/resolution_committee.csv</a></td><td>One table as CSV</td><td class="n">147,255</td><td class="h">148c7e3bad917464df649955f0b1a584d406a5b97b5eb02f65e9e4088c6a8075</td></tr>
+<tr><td><a href="csv/session.csv" download>csv/session.csv</a></td><td>One table as CSV</td><td class="n">9,894</td><td class="h">274edbbf6612971cecd8a8dae5778daca2822a35b4dd920e370776145e7ff493</td></tr>
+<tr><td><a href="csv/value_basis.csv" download>csv/value_basis.csv</a></td><td>One table as CSV</td><td class="n">6,172</td><td class="h">99296476a8d5f0b1580764ddc748fee1edc3393b768be92d10be15e2fe867a6b</td></tr>
+<tr><td><a href="csv/witness_cell.csv" download>csv/witness_cell.csv</a></td><td>One table as CSV</td><td class="n">17,198</td><td class="h">a589a3bf4b82c337a681f290d51b95be92b4e19f1c78279b3147b29272642a56</td></tr>
+<tr><td><a href="datapackage.json" download>datapackage.json</a></td><td>Frictionless Data Package description of the CSV files</td><td class="n">47,146</td><td class="h">dd8d2afefdd47cffd8bd0363940af4528b35daa636f4b80dd89f68ccf31f2c47</td></tr>
+<tr><td><a href="jsonl/applied_fix.jsonl" download>jsonl/applied_fix.jsonl</a></td><td>One table as JSON Lines</td><td class="n">102,774</td><td class="h">cca35fc74800e9bea2724e53636efd1e2071275f95d1d1076d61b12ed49fe49f</td></tr>
+<tr><td><a href="jsonl/committee.jsonl" download>jsonl/committee.jsonl</a></td><td>One table as JSON Lines</td><td class="n">12,153</td><td class="h">0025466513a6751bead3df02bd4af776e42ec90e512985458592df9cc50fdf02</td></tr>
+<tr><td><a href="jsonl/committee_alias.jsonl" download>jsonl/committee_alias.jsonl</a></td><td>One table as JSON Lines</td><td class="n">26,371</td><td class="h">b23c4e31441fa81dceb920ae19a9fe817b43fad0af94355f4ad7a59666963532</td></tr>
+<tr><td><a href="jsonl/copy.jsonl" download>jsonl/copy.jsonl</a></td><td>One table as JSON Lines</td><td class="n">192,344</td><td class="h">a28c1758d72ced2876ed22ec5452357957292812f63c153ba01e59282375bf14</td></tr>
+<tr><td><a href="jsonl/coverage.jsonl" download>jsonl/coverage.jsonl</a></td><td>One table as JSON Lines</td><td class="n">6,496</td><td class="h">9417637dc50908d8a8727143fbc427edbac6005061e21cd9fd2adf5482e5cca9</td></tr>
+<tr><td><a href="jsonl/coverage_limit.jsonl" download>jsonl/coverage_limit.jsonl</a></td><td>One table as JSON Lines</td><td class="n">1,583</td><td class="h">c29dfbcebb6d434f314d363309d3a14ce1a1cac57b7ae5db45159536630e8a9a</td></tr>
+<tr><td><a href="jsonl/crosswalk.jsonl" download>jsonl/crosswalk.jsonl</a></td><td>One table as JSON Lines</td><td class="n">924,031</td><td class="h">7fa462cd3b767580c8c4eefc6ece706ef9ec2e64592f5f1edab945c01c661fc8</td></tr>
+<tr><td><a href="jsonl/duplicate_group.jsonl" download>jsonl/duplicate_group.jsonl</a></td><td>One table as JSON Lines</td><td class="n">8,462</td><td class="h">c06ecea8d68aa0fae2472e0692066de9721b4da8cd9cc17968099f4ac3ed5f5a</td></tr>
+<tr><td><a href="jsonl/named.jsonl" download>jsonl/named.jsonl</a></td><td>One table as JSON Lines</td><td class="n">2,248</td><td class="h">63215ee45212b4aaf7493f3753fb3813c93191b51d23c78329a779d1c532c70a</td></tr>
 <tr><td><a href="jsonl/number_gap.jsonl" download>jsonl/number_gap.jsonl</a></td><td>One table as JSON Lines</td><td class="n">2,174</td><td class="h">edfd2dfbf9521b954a9f9a38ca790b023a50586bdf3f60088a3dfc4ec0cf214d</td></tr>
-<tr><td><a href="jsonl/person.jsonl" download>jsonl/person.jsonl</a></td><td>One table as JSON Lines</td><td class="n">41,796</td><td class="h">e9bf8a4ac46216c3719028465430cc6882b294ee309a0d11b96ba6ef4edb4c15</td></tr>
-<tr><td><a href="jsonl/person_form.jsonl" download>jsonl/person_form.jsonl</a></td><td>One table as JSON Lines</td><td class="n">16,828</td><td class="h">9aa2a0fd73f18652f8bbde3ce510c06789b672ce511ff16cd0d68ba24c809c4a</td></tr>
-<tr><td><a href="jsonl/preparer.jsonl" download>jsonl/preparer.jsonl</a></td><td>One table as JSON Lines</td><td class="n">339,979</td><td class="h">127dbd4e1692bb511dc9f31d774132ef401e82f9ac216dfa1766a5776f0165d2</td></tr>
-<tr><td><a href="jsonl/resolution.jsonl" download>jsonl/resolution.jsonl</a></td><td>One table as JSON Lines</td><td class="n">2,340,439</td><td class="h">a58d96f879a12bae47d8037922cb0e8756f48d05dd26c91345c657778341da24</td></tr>
-<tr><td><a href="jsonl/resolution_committee.jsonl" download>jsonl/resolution_committee.jsonl</a></td><td>One table as JSON Lines</td><td class="n">249,276</td><td class="h">90ecfaac89458773d2fbea09ab8592ae3c6666baf1372c4511af0d50bcd06f3a</td></tr>
-<tr><td><a href="jsonl/session.jsonl" download>jsonl/session.jsonl</a></td><td>One table as JSON Lines</td><td class="n">22,505</td><td class="h">139c1bef3b816b2329d90b502f8fcca31d4a7ab1efd4af40db6649459e8edcd9</td></tr>
-<tr><td><a href="library.sqlite" download>library.sqlite</a></td><td>SQLite database with the same tables</td><td class="n">2,547,712</td><td class="h">bbafda6501e9d9ec418a1fbd6c382adbe11f062850ae55c1bf8f86186cd0b994</td></tr>
-<tr><td><a href="library.xlsx" download>library.xlsx</a></td><td>Excel workbook: About, Resolutions, People, Committees, Conventions, Preparers, Crosswalk</td><td class="n">755,954</td><td class="h">0aa19f7a744d88805c330aeac2b4910207c5fc98aa35b3703a56d1755ba0f23a</td></tr>
+<tr><td><a href="jsonl/person.jsonl" download>jsonl/person.jsonl</a></td><td>One table as JSON Lines</td><td class="n">45,740</td><td class="h">e1cf8020fac367c407e06c79c0a32d648c6c8f25015f99aad859049d99b28649</td></tr>
+<tr><td><a href="jsonl/person_form.jsonl" download>jsonl/person_form.jsonl</a></td><td>One table as JSON Lines</td><td class="n">21,242</td><td class="h">a51bb6a87a4ea9d0996f36048a820a477b3a050a9e911566909d042ba9479594</td></tr>
+<tr><td><a href="jsonl/preparer.jsonl" download>jsonl/preparer.jsonl</a></td><td>One table as JSON Lines</td><td class="n">363,903</td><td class="h">3fac9cc20722d0db1da218b605d38038c45361721c5cbbd18d8f2e03878e601e</td></tr>
+<tr><td><a href="jsonl/resolution.jsonl" download>jsonl/resolution.jsonl</a></td><td>One table as JSON Lines</td><td class="n">2,319,388</td><td class="h">9e9bf695b252709c224251493ceb1130584d45a5f48c5d57c333efd44c49f4c2</td></tr>
+<tr><td><a href="jsonl/resolution_committee.jsonl" download>jsonl/resolution_committee.jsonl</a></td><td>One table as JSON Lines</td><td class="n">343,251</td><td class="h">0c97066305b70644917e7dddec28fb4af9d4867a83a02cc0e4ce446b3615d2be</td></tr>
+<tr><td><a href="jsonl/session.jsonl" download>jsonl/session.jsonl</a></td><td>One table as JSON Lines</td><td class="n">32,145</td><td class="h">31060f5e98f5a51f7ba19fc2ef21dfb85e97c84bb9e14e613576225b8a1fc755</td></tr>
+<tr><td><a href="jsonl/value_basis.jsonl" download>jsonl/value_basis.jsonl</a></td><td>One table as JSON Lines</td><td class="n">14,744</td><td class="h">bd9283f472407ce721840af6751efded3c6ef55a913aae136fdd0d844c6f1b07</td></tr>
+<tr><td><a href="jsonl/witness_cell.jsonl" download>jsonl/witness_cell.jsonl</a></td><td>One table as JSON Lines</td><td class="n">54,794</td><td class="h">75479d75391c1094a7c0e8a319d2b0838fdc6f1f412ca5cd8e0913359eb2de94</td></tr>
+<tr><td><a href="library.sqlite" download>library.sqlite</a></td><td>SQLite database with the same tables</td><td class="n">2,744,320</td><td class="h">96b0966cab5b18d3ee92aa2e9b01621d4a18fae4d28a1092abd238afef9b844a</td></tr>
+<tr><td><a href="library.xlsx" download>library.xlsx</a></td><td>Excel workbook: About, Resolutions, People, Committees, Conventions, Preparers, Crosswalk</td><td class="n">782,766</td><td class="h">a41918e940644b139caa779a52015327f5272a840080aa62d26db89de4acd80c</td></tr>
+<tr><td><a href="verify/committees.csv" download>verify/committees.csv</a></td><td>One sheet of the list to verify, as CSV</td><td class="n">10,721</td><td class="h">2a1e9c73b5c7505421b2c3d552db006b55a97a35133d7cc255f68b1d60899718</td></tr>
+<tr><td><a href="verify/origin.csv" download>verify/origin.csv</a></td><td>One sheet of the list to verify, as CSV</td><td class="n">10,214</td><td class="h">40a8f8f7c0ead05b5f7de407407867e124837a977cd48e85d82c500300b1def6</td></tr>
+<tr><td><a href="verify/other.csv" download>verify/other.csv</a></td><td>One sheet of the list to verify, as CSV</td><td class="n">20,057</td><td class="h">c40fcd354c8c0ad46c7cbb41831e489a9901f2f4d70e880e5b99085349823849</td></tr>
+<tr><td><a href="verify/people.csv" download>verify/people.csv</a></td><td>One sheet of the list to verify, as CSV</td><td class="n">19,286</td><td class="h">e76058c4f4010c31ca824fc90f585372165fd41ee0adeaa3d457a63ed7fd78f9</td></tr>
+<tr><td><a href="verify/places.csv" download>verify/places.csv</a></td><td>One sheet of the list to verify, as CSV</td><td class="n">12,484</td><td class="h">33527498ffc2f418cb69ca8e5bfc72de8b6ea882257c51e50079db12001d2e3f</td></tr>
+<tr><td><a href="verify/sessions.csv" download>verify/sessions.csv</a></td><td>One sheet of the list to verify, as CSV</td><td class="n">690</td><td class="h">309cb82abd56935b4cae49da7056942a3f7b6ee3b5e748dae681525536290ff3</td></tr>
+<tr><td><a href="verify/titles.csv" download>verify/titles.csv</a></td><td>One sheet of the list to verify, as CSV</td><td class="n">6,785</td><td class="h">6329b73a0af782c95e87d562da3002ef5090320af1d61a5d7acad20f6c48a677</td></tr>
+<tr><td><a href="verify/to-verify.xlsx" download>verify/to-verify.xlsx</a></td><td>The list to verify, as an Excel workbook: About, People, Committees, Origin, Sessions, Titles, Places, Other</td><td class="n">32,043</td><td class="h">e70f9dcd933776b78cb19246eaba84061a836146ecb27df8e440818cc5b912fb</td></tr>
 </tbody>
 </table>
 </div>

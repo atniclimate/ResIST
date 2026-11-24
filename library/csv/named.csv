@@ -1,0 +1,10 @@
+rid,part_order,source_ref,text_as_written,part_text,part_kind,role,person_key,basis,ledger_id
+ml-1347,2,Master Library!C1347,Off the Floor - Jewell James,Jewell James,person,not_stated,jewell-james,recorded,PM-00563
+ml-1348,2,Master Library!C1348,Off the Floor - Umatilla Tribe,Umatilla Tribe,tribe_or_org,not_stated,,recorded,PM-00564
+ml-1450,2,Master Library!C1450,Off the Floor - Nooksack Tribe,Nooksack Tribe,tribe_or_org,not_stated,,recorded,PM-00565
+ml-1639,1,Master Library!C1639,Ernie Stensgar,Ernie Stensgar,person,not_stated,ernie-stensgar,recorded,PM-00314
+ml-1641,1,Master Library!C1641,Ernie Stensgar,Ernie Stensgar,person,not_stated,ernie-stensgar,recorded,PM-00314
+ml-1667,1,Master Library!C1667,"Ken Leask, Tlingit & Haida",Ken Leask,person,not_stated,,recorded,PM-00382
+ml-1667,2,Master Library!C1667,"Ken Leask, Tlingit & Haida",Tlingit & Haida,tribe_or_org,not_stated,,recorded,PM-00383
+ml-1668,1,Master Library!C1668,"Ken Leask, Tlingit & Haida",Ken Leask,person,not_stated,,recorded,PM-00382
+ml-1668,2,Master Library!C1668,"Ken Leask, Tlingit & Haida",Tlingit & Haida,tribe_or_org,not_stated,,recorded,PM-00383

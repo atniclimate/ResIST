@@ -1,0 +1,135 @@
+/* Topics tab ("Issues, Laws and Wording"). Classes are prefixed .tp-; colours, type and spacing come only from the
+   --atni-* and --resist-* tokens, so both themes hold. No import rule, no font file, no resource reference. Nothing animates. */
+
+.tp { color: var(--atni-text-body); font-variant-numeric: var(--resist-type-numerals, tabular-nums lining-nums); }
+.tp :focus-visible { outline: 2px solid var(--atni-non-text-accent); outline-offset: 2px; }
+.tp-sr { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.tp-defs { position: absolute; width: 0; height: 0; overflow: hidden; }
+.tp-hatch-bg { fill: var(--atni-ground-base); }
+.tp-hatch-line { stroke: var(--atni-text-secondary); stroke-width: 1.5; }
+
+/* Text blocks */
+.tp-lead { font-family: var(--atni-type-family-display); font-weight: var(--atni-type-weight-display-medium); font-size: var(--atni-type-lead-size); line-height: 1.3; color: var(--atni-text-secondary); max-width: var(--atni-space-measure); margin: 0 0 var(--atni-space-step-4); }
+.tp-sub, .tp-cov, .tp-method { color: var(--atni-text-secondary); font-size: 0.9375rem; line-height: 1.5; max-width: var(--atni-space-measure); margin: 0 0 var(--atni-space-step-4); }
+.tp-caveat { color: var(--atni-text-secondary); font-size: 0.875rem; line-height: 1.5; max-width: var(--atni-space-measure); margin: var(--atni-space-step-3) 0 0; }
+.tp-source { color: var(--atni-text-muted); font-size: 0.8125rem; line-height: 1.45; max-width: var(--atni-space-measure); margin: var(--atni-space-step-5) 0 0; overflow-wrap: anywhere; }
+.tp-note { color: var(--atni-text-secondary); max-width: var(--atni-space-measure); }
+.tp-fail { border-left: 3px solid var(--atni-non-text-accent); background: var(--atni-ground-raised); color: var(--atni-text-heading); padding: var(--atni-space-step-3) var(--atni-space-step-4); max-width: var(--atni-space-measure); }
+.tp-meta { color: var(--atni-text-secondary); font-size: 0.875rem; margin: 2px 0 var(--atni-space-step-3); }
+.tp-sline { color: var(--atni-text-secondary); font-size: 0.9375rem; line-height: 1.5; max-width: var(--atni-space-measure); margin: var(--atni-space-step-3) 0 0; }
+.tp-zero-note { color: var(--atni-text-secondary); font-size: 0.875rem; margin: var(--atni-space-step-2) 0 0; }
+.tp-summary { font-size: 1.0625rem; margin: 0 0 var(--atni-space-step-4); }
+.tp-inline { color: var(--atni-text-secondary); font-size: 0.9375rem; }
+
+/* Headings */
+.tp-h2 { font-family: var(--atni-type-family-display); font-weight: var(--atni-type-weight-display-semibold); font-size: var(--atni-type-heading-2-size); line-height: var(--atni-type-heading-2-line-height); letter-spacing: var(--atni-type-heading-2-tracking); color: var(--atni-text-heading); margin: 0 0 var(--atni-space-step-3); scroll-margin-top: 8rem; }
+.tp-h3, .tp-issue h3 { font-family: var(--atni-type-family-display); font-weight: var(--atni-type-weight-display-semibold); font-size: var(--atni-type-heading-3-size); line-height: 1.2; letter-spacing: -0.01em; color: var(--atni-text-heading); margin: 0; }
+.tp-h4 { font-family: var(--atni-type-family-display); font-weight: var(--atni-type-weight-display-medium); font-size: 0.9375rem; color: var(--atni-text-heading); margin: var(--atni-space-step-4) 0 var(--atni-space-step-2); }
+
+/* Sections: a heavy rule above each part says where the part starts */
+.tp-section { margin-top: var(--atni-space-step-7); padding-top: var(--atni-space-step-5); border-top: 1px solid var(--atni-text-muted); }
+.tp-jump { display: flex; flex-wrap: wrap; gap: var(--atni-space-step-2); margin: 0 0 var(--atni-space-step-2); }
+
+/* Buttons and controls */
+.tp-btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 var(--atni-space-step-4); border: 1px solid var(--atni-text-muted); border-radius: var(--atni-space-radius); background: var(--atni-ground-raised); color: var(--atni-text-heading); font: var(--atni-type-weight-display-medium) var(--atni-type-button-size)/1.2 var(--atni-type-family-display); cursor: pointer; text-align: center; }
+.tp-btn:hover { border-color: var(--atni-text-secondary); }
+.tp-btn[aria-pressed="true"] { background: var(--atni-non-text-button-fill); border-color: var(--atni-non-text-button-border); color: var(--atni-non-text-button-text); }
+.tp-btn-sm { min-height: 32px; padding: 0 var(--atni-space-step-3); }
+.tp-controls { display: flex; flex-wrap: wrap; gap: var(--atni-space-step-3) var(--atni-space-step-5); align-items: flex-end; margin: var(--atni-space-step-4) 0; }
+.tp-fld { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.tp-fld label, .tp-lab { font-family: var(--atni-type-family-display); font-weight: var(--atni-type-weight-display-medium); font-size: 0.875rem; color: var(--atni-text-secondary); }
+.tp-fld select { min-height: 44px; max-width: 100%; padding: 8px 12px; border: 1px solid var(--atni-text-muted); border-radius: var(--atni-space-radius); background: var(--atni-ground-raised); color: var(--atni-text-heading); font: inherit; }
+.tp-seg { display: flex; flex-wrap: wrap; gap: var(--atni-space-step-2); }
+
+/* Counts: a number that opens its list. Underlined, so it never rests on colour. */
+.tp-count { background: none; border: 0; padding: 0 2px; min-width: 24px; min-height: 24px; font: inherit; font-weight: 500; font-variant-numeric: var(--resist-type-numerals, tabular-nums lining-nums); color: var(--atni-text-link); text-decoration: underline; text-underline-offset: 0.18em; text-decoration-thickness: 1px; cursor: pointer; }
+.tp-count:hover { color: var(--atni-text-link-hover); text-decoration-thickness: 2px; }
+.tp-big { font-family: var(--atni-type-family-display); font-weight: var(--atni-type-weight-display-semibold); font-size: 2rem; line-height: 1; padding: 0 4px; min-height: 40px; vertical-align: -3px; }
+.tp-big-sm { font-size: 1.25rem; }
+.tp-zeroval { color: var(--atni-text-muted); }
+
+/* Issue blocks: separated by hairlines, not boxed */
+.tp-issue { padding: var(--atni-space-step-5) 0; border-top: 1px solid var(--atni-non-text-rule); }
+.tp-issue:first-of-type { border-top: 0; }
+.tp-headline { font-size: 1.125rem; color: var(--atni-text-heading); margin: 0 0 var(--atni-space-step-2); }
+
+/* Tables */
+.tp-table { width: 100%; max-width: 52rem; border-collapse: collapse; font-size: 0.875rem; font-variant-numeric: var(--resist-type-numerals, tabular-nums lining-nums); }
+.tp-table th, .tp-table td { padding: 8px 10px 8px 0; border-bottom: 1px solid var(--atni-non-text-rule); text-align: left; vertical-align: top; }
+.tp-table thead th { font-weight: 500; color: var(--atni-text-secondary); border-bottom: 1px solid var(--atni-text-muted); }
+.tp-table tbody th { font-weight: 500; color: var(--atni-text-heading); }
+.tp-table .tp-num { text-align: right; padding-right: 0; padding-left: 10px; white-space: nowrap; }
+.tp-ytable { width: auto; min-width: 16rem; margin-top: var(--atni-space-step-2); }
+.tp-phrase { overflow-wrap: anywhere; }
+.tp-kinds { margin-bottom: var(--atni-space-step-3); }
+.tp-laws { max-width: 52rem; }
+.tp-lawname { display: block; font-size: 1rem; }
+.tp-kind, .tp-yl { display: block; font-weight: 400; color: var(--atni-text-secondary); font-size: 0.8125rem; }
+.tp-detailrow > td, .tp-listrow > td { padding: var(--atni-space-step-3) 0 var(--atni-space-step-4); }
+.tp-forms { margin: 0; padding-left: 1.1rem; font-size: 0.875rem; }
+.tp-form { color: var(--atni-text-heading); overflow-wrap: anywhere; }
+
+/* Details */
+.tp-details { margin-top: var(--atni-space-step-3); max-width: 52rem; }
+.tp-details > summary { display: list-item; min-height: 44px; padding: 10px 0; cursor: pointer; font-family: var(--atni-type-family-display); font-weight: var(--atni-type-weight-display-medium); font-size: 0.9375rem; color: var(--atni-text-heading); }
+.tp-details[open] > summary { margin-bottom: var(--atni-space-step-2); }
+
+/* Charts */
+.tp-chart { width: 100%; margin-top: var(--atni-space-step-2); }
+.tp-svg { display: block; width: 100%; height: auto; overflow: visible; font-family: var(--atni-type-family-body); }
+.tp-svg .tp-bar { fill: var(--resist-cat-1); cursor: pointer; }
+.tp-svg .tp-bar:hover { stroke: var(--resist-mark-ring, var(--atni-text-heading)); stroke-width: 2; }
+.tp-svg .tp-bar-nr { stroke: var(--resist-cat-1); stroke-width: 1.5; }
+.tp-svg .tp-tick { font-size: 12px; fill: var(--atni-text-muted); }
+.tp-svg .tp-cnt { font-size: 12px; font-weight: 500; fill: var(--atni-text-secondary); }
+.tp-svg .tp-zero { font-size: 11px; fill: var(--atni-text-muted); }
+.tp-svg .tp-grid { stroke: var(--resist-grid, var(--atni-non-text-rule)); stroke-width: 1; }
+.tp-svg .tp-axis { stroke: var(--resist-axis, var(--atni-text-muted)); stroke-width: 1; }
+.tp-chart-sm .tp-svg .tp-tick { font-size: 11px; }
+
+/* List region */
+.tp-slot:empty { display: none; }
+.tp-slot { margin-top: var(--atni-space-step-4); }
+.tp-list { border: 1px solid var(--atni-text-muted); background: var(--atni-ground-raised); padding: var(--atni-space-step-4); max-width: 52rem; }
+.tp-list-head { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: var(--atni-space-step-2) var(--atni-space-step-4); margin-bottom: var(--atni-space-step-3); }
+.tp-list-h { font-family: var(--atni-type-family-display); font-weight: var(--atni-type-weight-display-semibold); font-size: 1.0625rem; line-height: 1.25; color: var(--atni-text-heading); margin: 0; flex: 1 1 14rem; }
+.tp-lrows { list-style: none; margin: 0 0 var(--atni-space-step-3); padding: 0; }
+.tp-lrow { display: grid; grid-template-columns: 4.5rem 1fr; gap: 0 var(--atni-space-step-3); padding: 8px 0; border-top: 1px solid var(--atni-non-text-rule); font-size: 0.875rem; }
+.tp-lnum { font-weight: 500; color: var(--atni-text-heading); }
+.tp-lyear { grid-column: 1; color: var(--atni-text-secondary); font-size: 0.8125rem; }
+.tp-ltitle { grid-column: 2; grid-row: 1 / span 2; overflow-wrap: anywhere; }
+.tp-lnote { grid-column: 2; color: var(--atni-text-secondary); font-style: italic; }
+.tp-lnum a { color: var(--atni-text-link); }
+
+/* Wording cards */
+.tp-cards { list-style: none; margin: var(--atni-space-step-4) 0 0; padding: 0; display: grid; gap: var(--atni-space-step-4); grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr)); }
+.tp-card { border-top: 3px solid var(--atni-text-muted); background: var(--atni-ground-raised); padding: var(--atni-space-step-4); min-width: 0; }
+.tp-card-open { grid-column: 1 / -1; }
+.tp-card-top { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px var(--atni-space-step-3); margin-bottom: var(--atni-space-step-2); }
+.tp-gid { margin: 0; font-size: 0.8125rem; color: var(--atni-text-secondary); }
+.tp-badge { margin: 0; padding: 0 6px; border: 1px solid var(--atni-text-muted); color: var(--atni-text-secondary); font-size: 0.8125rem; }
+.tp-words-l { margin: var(--atni-space-step-3) 0 var(--atni-space-step-1); font-size: 0.875rem; color: var(--atni-text-secondary); }
+.tp-words { list-style: none; margin: 0 0 var(--atni-space-step-3); padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.tp-words li { padding: 2px 8px; border: 1px solid var(--atni-text-muted); color: var(--atni-text-heading); font-size: 0.875rem; overflow-wrap: anywhere; }
+.tp-in { color: var(--atni-text-secondary); font-size: 0.8125rem; }
+.tp-card .tp-ytable { min-width: 0; width: 100%; }
+.tp-card .tp-open { margin: 0 0 var(--atni-space-step-2); }
+.tp-card .tp-details { margin-top: var(--atni-space-step-1); }
+.tp-card .tp-details > summary { min-height: 36px; padding: 4px 0; }
+.tp-ungrouped { margin-top: var(--atni-space-step-6); }
+
+@media (min-width: 48rem) {
+  .tp-lrow { grid-template-columns: 5rem 5.5rem 1fr; }
+  .tp-lyear { grid-column: 2; }
+  .tp-ltitle { grid-column: 3; grid-row: 1; }
+  .tp-lnote { grid-column: 3; }
+}
+@media (max-width: 30rem) {
+  .tp-big { font-size: 1.75rem; }
+  .tp-table .tp-num { white-space: normal; }
+}
+@media (prefers-reduced-motion: reduce) { .tp * { transition: none !important; animation: none !important; scroll-behavior: auto !important; } }
+@media (forced-colors: active) {
+  .tp-svg .tp-bar { fill: CanvasText; }
+  .tp-btn[aria-pressed="true"] { outline: 2px solid Highlight; }
+}

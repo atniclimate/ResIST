@@ -2,7 +2,7 @@
   "profile": "tabular-data-package",
   "name": "atni-resolution-library",
   "title": "The Resolution Library (clean, public)",
-  "description": "The Resolution Library was built by Wyatt Ash-Milby at ATNI. T0 (D-081). Cleaned through a recorded ledger; values as written are kept beside normalized values.",
+  "description": "The Resolution Library was built by Wyatt Ash-Milby at ATNI. T0 (D-081). Cleaned through a recorded ledger; values as written are kept beside normalized values; every value carries its basis (recorded, owner, likely, open; D-083).",
   "version": "1.0.0",
   "created": "2026-11-20T19:04:57Z",
   "contributors": [
@@ -26,8 +26,8 @@
       "format": "csv",
       "mediatype": "text/csv",
       "encoding": "utf-8",
-      "bytes": 5303,
-      "hash": "sha256:b1e5b064d90d124453e17ebc9b7b52b70aa63fe95e4ff17916b10eb80c8d916d",
+      "bytes": 5865,
+      "hash": "sha256:6093374f1f429120c7b342e9d918f05b6d1c94fb2065b2c6c8e0e362cd2c8cee",
       "dialect": {
         "delimiter": ",",
         "lineTerminator": "\n",
@@ -60,7 +60,7 @@
           {
             "name": "name_confirmed",
             "type": "integer",
-            "description": "1 when the ledger class of the entity is keep or auto, else 0"
+            "description": "1 when the basis of the ledger record is recorded or owner, else 0"
           },
           {
             "name": "source_names",
@@ -91,6 +91,21 @@
             "name": "ledger_id",
             "type": "string",
             "description": "id of the ledger row that defines the entity"
+          },
+          {
+            "name": "name_basis",
+            "type": "string",
+            "description": "basis of display_name (the ledger basis of the committee record): recorded, owner (decided by ATNI), likely or open"
+          },
+          {
+            "name": "kind_basis",
+            "type": "string",
+            "description": "basis of kind and parent_key (the ledger kind_basis)"
+          },
+          {
+            "name": "n_resolutions_likely",
+            "type": "integer",
+            "description": "listed resolutions whose applied links to the key are all likely (counted inside n_resolutions)"
           }
         ],
         "primaryKey": [
@@ -118,8 +133,8 @@
       "format": "csv",
       "mediatype": "text/csv",
       "encoding": "utf-8",
-      "bytes": 8650,
-      "hash": "sha256:083be8ac55159cf1e6025c01000c8a7a56e62dc1ad613bb0e0dfd1fb23ab0a4e",
+      "bytes": 9479,
+      "hash": "sha256:20d882514726192ad05408d856ca8436262ce93108d91a8c1940ec899e814de1",
       "dialect": {
         "delimiter": ",",
         "lineTerminator": "\n",
@@ -157,7 +172,7 @@
           {
             "name": "status",
             "type": "string",
-            "description": "applied when the ledger class is auto or keep, else proposed"
+            "description": "applied when the ledger class is auto, keep or likely, else proposed"
           },
           {
             "name": "first_year",
@@ -178,6 +193,11 @@
             "name": "n_resolutions",
             "type": "integer",
             "description": "copied from the ledger (counts listed resolutions)"
+          },
+          {
+            "name": "basis",
+            "type": "string",
+            "description": "the ledger basis of the label row"
           }
         ],
         "primaryKey": [
@@ -205,8 +225,8 @@
       "format": "csv",
       "mediatype": "text/csv",
       "encoding": "utf-8",
-      "bytes": 16028,
-      "hash": "sha256:ac8c17c58cce4e207bbf4db6c69db8f3d619ccbee68b9133afe9e4c82d0f6537",
+      "bytes": 17176,
+      "hash": "sha256:2a5f53ecf5bb4eb182c48d6847213a5ef78befac11e7691965e36a0ce8bc08f6",
       "dialect": {
         "delimiter": ",",
         "lineTerminator": "\n",
@@ -229,7 +249,7 @@
           {
             "name": "name_confirmed",
             "type": "integer",
-            "description": "1 when the ledger class of the entity is keep or auto, else 0"
+            "description": "1 when the basis of the ledger record is recorded or owner, else 0"
           },
           {
             "name": "forms",
@@ -255,6 +275,16 @@
             "name": "ledger_id",
             "type": "string",
             "description": "id of the ledger row that defines the entity"
+          },
+          {
+            "name": "basis",
+            "type": "string",
+            "description": "likely when a form joins the person by a likely merge or the ledger record is likely; owner when the record basis is owner; else recorded"
+          },
+          {
+            "name": "years_present",
+            "type": "integer",
+            "description": "distinct years over listed resolutions with an applied preparer row of the person"
           }
         ],
         "primaryKey": [
@@ -269,8 +299,8 @@
       "format": "csv",
       "mediatype": "text/csv",
       "encoding": "utf-8",
-      "bytes": 7206,
-      "hash": "sha256:cf8aaf4893871c86789497bbfeacd74e559cde2c97af3aa358845d7e52da2c46",
+      "bytes": 9274,
+      "hash": "sha256:05367e5c87b30280badcbb058552d6d3b54a81ed9abd803dd4de194c86955785",
       "dialect": {
         "delimiter": ",",
         "lineTerminator": "\n",
@@ -294,6 +324,11 @@
             "name": "n_resolutions",
             "type": "integer",
             "description": "listed resolutions with that form"
+          },
+          {
+            "name": "basis",
+            "type": "string",
+            "description": "basis of the form membership: the strongest basis among the ledger parts that write the form"
           }
         ],
         "primaryKey": [
@@ -321,8 +356,8 @@
       "format": "csv",
       "mediatype": "text/csv",
       "encoding": "utf-8",
-      "bytes": 7709,
-      "hash": "sha256:30a413def2e33be2e481fe8b5e752b6203da981f735e739dc53b6d7cf5ecfb8f",
+      "bytes": 9894,
+      "hash": "sha256:274edbbf6612971cecd8a8dae5778daca2822a35b4dd920e370776145e7ff493",
       "dialect": {
         "delimiter": ",",
         "lineTerminator": "\n",
@@ -386,6 +421,36 @@
             "name": "in_site",
             "type": "integer",
             "description": "listed resolutions of the session with a document_id"
+          },
+          {
+            "name": "place",
+            "type": "string",
+            "description": "town or place as written in the source named by place_source; NULL when not known or not a convention"
+          },
+          {
+            "name": "place_basis",
+            "type": "string",
+            "description": "recorded (pages/conventions.json names it), likely (a majority of the published texts give one town) or open; NULL for an Executive Board action"
+          },
+          {
+            "name": "place_source",
+            "type": "string",
+            "description": "where the place comes from; NULL when none"
+          },
+          {
+            "name": "place_texts",
+            "type": "integer",
+            "description": "distinct published documents of the session read for the place (each counted once)"
+          },
+          {
+            "name": "place_naming",
+            "type": "integer",
+            "description": "of the usable readings, the documents whose published convention_location gives the place (0 when none)"
+          },
+          {
+            "name": "place_usable",
+            "type": "integer",
+            "description": "documents read whose published convention_location gives a usable town (the denominator of the majority)"
           }
         ],
         "primaryKey": [
@@ -400,8 +465,8 @@
       "format": "csv",
       "mediatype": "text/csv",
       "encoding": "utf-8",
-      "bytes": 1145763,
-      "hash": "sha256:8faf66a16cfad03420159bec75344a03e05edb9a421918e05bad104cf17da3fc",
+      "bytes": 1151509,
+      "hash": "sha256:21cf3d85718c242aa9ecf67e3f7995377d2e0ead4bf6d6a66c1c4d82a8b2fda2",
       "dialect": {
         "delimiter": ",",
         "lineTerminator": "\n",
@@ -587,11 +652,6 @@
             "description": "YYYY-MM-DD read from a YYYYMMDD_ prefix of the last path segment; NULL if none or not a date"
           },
           {
-            "name": "file_missing",
-            "type": "integer",
-            "description": "1 when the applied ledger value file_missing is 1, else 0"
-          },
-          {
             "name": "document_id",
             "type": "string",
             "description": "SHA-256 of the site document the resolution is linked to; NULL if none"
@@ -637,8 +697,8 @@
       "format": "csv",
       "mediatype": "text/csv",
       "encoding": "utf-8",
-      "bytes": 103654,
-      "hash": "sha256:23f9e5cbfd487152ec5d08df4f33205ea1f4049cc37aef00f33b02463ff9cd06",
+      "bytes": 147255,
+      "hash": "sha256:148c7e3bad917464df649955f0b1a584d406a5b97b5eb02f65e9e4088c6a8075",
       "dialect": {
         "delimiter": ",",
         "lineTerminator": "\n",
@@ -687,6 +747,11 @@
             "name": "ledger_id",
             "type": "string",
             "description": "id of the ledger label row"
+          },
+          {
+            "name": "basis",
+            "type": "string",
+            "description": "the ledger basis of the label row: recorded or owner (solid), likely (applied, marked), open (proposed only)"
           }
         ],
         "primaryKey": [
@@ -726,8 +791,8 @@
       "format": "csv",
       "mediatype": "text/csv",
       "encoding": "utf-8",
-      "bytes": 143301,
-      "hash": "sha256:106c88475712a557e8b074873787dab4a4a02a2cba070be0bff854bab71f974e",
+      "bytes": 154617,
+      "hash": "sha256:e6f61be09595344c545925bca4583b33d1c4498a942675a65444283d3c6ccd2d",
       "dialect": {
         "delimiter": ",",
         "lineTerminator": "\n",
@@ -780,7 +845,7 @@
           {
             "name": "person_key",
             "type": "string",
-            "description": "applied person; NULL unless status is applied and part_kind is person"
+            "description": "applied person; NULL unless status is applied and part_kind is person or single_token"
           },
           {
             "name": "body",
@@ -796,6 +861,11 @@
             "name": "ledger_id",
             "type": "string",
             "description": "id of the ledger part row"
+          },
+          {
+            "name": "basis",
+            "type": "string",
+            "description": "the ledger basis of the part row"
           }
         ],
         "primaryKey": [
@@ -835,8 +905,8 @@
       "format": "csv",
       "mediatype": "text/csv",
       "encoding": "utf-8",
-      "bytes": 474446,
-      "hash": "sha256:9a34e3a81b3db2dd1527168e9cbf5214cad6c69d788af6955ce13023cc256bbe",
+      "bytes": 492899,
+      "hash": "sha256:34d723c52927ecd2a606990dca5ddd2056770ac7c9c09a0b22bafd86502304a9",
       "dialect": {
         "delimiter": ",",
         "lineTerminator": "\n",
@@ -915,6 +985,11 @@
             "name": "site_convention_name",
             "type": "string",
             "description": "convention_name in the site database; NULL if none"
+          },
+          {
+            "name": "basis",
+            "type": "string",
+            "description": "the ledger basis of the crosswalk row"
           }
         ],
         "primaryKey": [
@@ -942,8 +1017,8 @@
       "format": "csv",
       "mediatype": "text/csv",
       "encoding": "utf-8",
-      "bytes": 84328,
-      "hash": "sha256:d1e79dbbd81c7bd8ecead132b67c5932f77db504219fe2a57b9cc2426fc39051",
+      "bytes": 84326,
+      "hash": "sha256:5e338502da622a657e85e564e493721431e46a85e197aaaf512e93000b43e363",
       "dialect": {
         "delimiter": ",",
         "lineTerminator": "\n",
@@ -1014,8 +1089,8 @@
       "format": "csv",
       "mediatype": "text/csv",
       "encoding": "utf-8",
-      "bytes": 4774,
-      "hash": "sha256:1306ef79512eb56f26715f52a137dbfa1da4ffe16ddcc3476a3aa8dcc50ffc0e",
+      "bytes": 4734,
+      "hash": "sha256:2ad69afb24ca8072a805b6d0f7fca25eeb8be2a8aa0c7bd02472090686001e61",
       "dialect": {
         "delimiter": ",",
         "lineTerminator": "\n",
@@ -1118,8 +1193,8 @@
       "format": "csv",
       "mediatype": "text/csv",
       "encoding": "utf-8",
-      "bytes": 1215,
-      "hash": "sha256:074470ab7ccc60f07469c57d6a6ab759963fd835b5b18e2ec07ef4567104164a",
+      "bytes": 1216,
+      "hash": "sha256:7ca38e1367a7d0ec332dd5eb92cf70318621ffc820a9c7809ebddd3bdc62065f",
       "dialect": {
         "delimiter": ",",
         "lineTerminator": "\n",
@@ -1207,8 +1282,8 @@
       "format": "csv",
       "mediatype": "text/csv",
       "encoding": "utf-8",
-      "bytes": 41214,
-      "hash": "sha256:969ec6a6f5e9c71be7d76fc2100ac5039e2a544633cb76283c043b75afd5c8c7",
+      "bytes": 61893,
+      "hash": "sha256:ff1db3f1d2dae690acf2b8b194d4e800f8f03e6ae7e58050dcf03edeb7b0ca4f",
       "dialect": {
         "delimiter": ",",
         "lineTerminator": "\n",
@@ -1262,6 +1337,251 @@
         "primaryKey": [
           "ledger",
           "ledger_id"
+        ]
+      }
+    },
+    {
+      "name": "value_basis",
+      "path": "csv/value_basis.csv",
+      "profile": "tabular-data-resource",
+      "format": "csv",
+      "mediatype": "text/csv",
+      "encoding": "utf-8",
+      "bytes": 6172,
+      "hash": "sha256:99296476a8d5f0b1580764ddc748fee1edc3393b768be92d10be15e2fe867a6b",
+      "dialect": {
+        "delimiter": ",",
+        "lineTerminator": "\n",
+        "quoteChar": "\"",
+        "doubleQuote": true,
+        "header": true
+      },
+      "schema": {
+        "fields": [
+          {
+            "name": "rid",
+            "type": "string",
+            "description": "the resolution"
+          },
+          {
+            "name": "field",
+            "type": "string",
+            "description": "ledger field: title, session, origin, passed, to_ncai, amended, amended_link, attachment_link, ncai_link, permalink, status_hint, row_role or file_missing; a field with no row here is recorded"
+          },
+          {
+            "name": "basis",
+            "type": "string",
+            "description": "the weakest basis of the clean ledger rows on that field"
+          },
+          {
+            "name": "ledger_id",
+            "type": "string",
+            "description": "the ledger row that gives the basis (the last in id order among the weakest)"
+          },
+          {
+            "name": "q",
+            "type": "string",
+            "description": "owner question of that row; NULL if none"
+          }
+        ],
+        "primaryKey": [
+          "rid",
+          "field"
+        ],
+        "foreignKeys": [
+          {
+            "fields": [
+              "rid"
+            ],
+            "reference": {
+              "resource": "resolution",
+              "fields": [
+                "rid"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "named",
+      "path": "csv/named.csv",
+      "profile": "tabular-data-resource",
+      "format": "csv",
+      "mediatype": "text/csv",
+      "encoding": "utf-8",
+      "bytes": 1132,
+      "hash": "sha256:bdcdfa884e5da072427c2afb1bf4d669bb9d69c1ff6c9b2030f7af43e937acd7",
+      "dialect": {
+        "delimiter": ",",
+        "lineTerminator": "\n",
+        "quoteChar": "\"",
+        "doubleQuote": true,
+        "header": true
+      },
+      "schema": {
+        "fields": [
+          {
+            "name": "rid",
+            "type": "string",
+            "description": "the resolution"
+          },
+          {
+            "name": "part_order",
+            "type": "integer",
+            "description": "position of the part inside the Committee cell"
+          },
+          {
+            "name": "source_ref",
+            "type": "string",
+            "description": "the Committee cell, e.g. <sheet>!C<row>"
+          },
+          {
+            "name": "text_as_written",
+            "type": "string",
+            "description": "the whole Committee cell"
+          },
+          {
+            "name": "part_text",
+            "type": "string",
+            "description": "the name or Tribe as written"
+          },
+          {
+            "name": "part_kind",
+            "type": "string",
+            "description": "person or tribe_or_org"
+          },
+          {
+            "name": "role",
+            "type": "string",
+            "description": "always not_stated: a name in the Committee column states no role (Q07)"
+          },
+          {
+            "name": "person_key",
+            "type": "string",
+            "description": "set only when part_text is an applied form of that person"
+          },
+          {
+            "name": "basis",
+            "type": "string",
+            "description": "the ledger basis of the part row"
+          },
+          {
+            "name": "ledger_id",
+            "type": "string",
+            "description": "id of the ledger part row"
+          }
+        ],
+        "primaryKey": [
+          "rid",
+          "part_order"
+        ],
+        "foreignKeys": [
+          {
+            "fields": [
+              "rid"
+            ],
+            "reference": {
+              "resource": "resolution",
+              "fields": [
+                "rid"
+              ]
+            }
+          },
+          {
+            "fields": [
+              "person_key"
+            ],
+            "reference": {
+              "resource": "person",
+              "fields": [
+                "person_key"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "witness_cell",
+      "path": "csv/witness_cell.csv",
+      "profile": "tabular-data-resource",
+      "format": "csv",
+      "mediatype": "text/csv",
+      "encoding": "utf-8",
+      "bytes": 17198,
+      "hash": "sha256:a589a3bf4b82c337a681f290d51b95be92b4e19f1c78279b3147b29272642a56",
+      "dialect": {
+        "delimiter": ",",
+        "lineTerminator": "\n",
+        "quoteChar": "\"",
+        "doubleQuote": true,
+        "header": true
+      },
+      "schema": {
+        "fields": [
+          {
+            "name": "ref",
+            "type": "string",
+            "description": "cell on Wyatt Ash-Milby's Sparklines + Charts sheet, B3..Z27"
+          },
+          {
+            "name": "row_label",
+            "type": "string",
+            "description": "column A of that row, as written"
+          },
+          {
+            "name": "year",
+            "type": "integer",
+            "description": "row 2 of that column"
+          },
+          {
+            "name": "value_as_written",
+            "type": "string",
+            "description": "the cell as written (a cached formula result counts); NULL when blank"
+          },
+          {
+            "name": "value",
+            "type": "integer",
+            "description": "integer reading of value_as_written; NULL when blank or not an integer"
+          }
+        ],
+        "primaryKey": [
+          "ref"
+        ]
+      }
+    },
+    {
+      "name": "coverage_limit",
+      "path": "csv/coverage_limit.csv",
+      "profile": "tabular-data-resource",
+      "format": "csv",
+      "mediatype": "text/csv",
+      "encoding": "utf-8",
+      "bytes": 1409,
+      "hash": "sha256:150f24d30bb30d00e6a2520861c6a8b8f56b6de866f7b499cc04e9384409e9cb",
+      "dialect": {
+        "delimiter": ",",
+        "lineTerminator": "\n",
+        "quoteChar": "\"",
+        "doubleQuote": true,
+        "header": true
+      },
+      "schema": {
+        "fields": [
+          {
+            "name": "id",
+            "type": "string",
+            "description": "ledger/coverage_limits.csv id"
+          },
+          {
+            "name": "text",
+            "type": "string",
+            "description": "the sentence"
+          }
+        ],
+        "primaryKey": [
+          "id"
         ]
       }
     }

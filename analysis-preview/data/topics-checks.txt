@@ -1,0 +1,58 @@
+resist-topics/1 checks
+ok input.pin issues 9 sha256 165b5c4f0f1a6e787d15ed39c27c21077b8489dd287bd61720158d11d2d850f2
+ok input.site_db sha256 41caf84cc4668218404eb428325dce9f5ca9265c7f3ff348107888e5c8ce6645 resolutions 1129
+ok input.export_tables tables 11
+ok input.tokenizer d013
+ok input.library sha256 21cf3d85718c242aa9ecf67e3f7995377d2e0ead4bf6d6a66c1c4d82a8b2fda2 listed 1724 titled 1723
+ok issues.tribal-consultation.rejoin phrases 5
+ok issues.tribal-consultation.named n 120 phrases 6
+ok issues.tribal-consultation.by_year years 19
+ok issues.tribal-consultation.search n 134 named 120
+ok issues.icwa.rejoin phrases 7
+ok issues.icwa.named n 13 phrases 8
+ok issues.icwa.by_year years 9
+ok issues.icwa.search n 42 named 13
+ok issues.indian-self-determination-contracting.rejoin phrases 10
+ok issues.indian-self-determination-contracting.named n 40 phrases 11
+ok issues.indian-self-determination-contracting.by_year years 16
+ok issues.indian-self-determination-contracting.search n 82 named 40
+ok issues.nagpra.rejoin phrases 7
+ok issues.nagpra.named n 8 phrases 8
+ok issues.nagpra.by_year years 6
+ok issues.nagpra.search n 8 named 8
+ok issues.roadless-area-conservation.rejoin phrases 6
+ok issues.roadless-area-conservation.named n 5 phrases 7
+ok issues.roadless-area-conservation.by_year years 5
+ok issues.roadless-area-conservation.search n 5 named 5
+ok issues.section-106.rejoin phrases 8
+ok issues.section-106.named n 16 phrases 9
+ok issues.section-106.by_year years 9
+ok issues.section-106.search n 17 named 16
+ok issues.tribal-general-welfare-exclusion.rejoin phrases 5
+ok issues.tribal-general-welfare-exclusion.named n 21 phrases 6
+ok issues.tribal-general-welfare-exclusion.by_year years 10
+ok issues.tribal-general-welfare-exclusion.search n 21 named 21
+ok issues.us-israel-defense-technology-cooperation.rejoin not applied; the key adds no other names
+ok issues.us-israel-defense-technology-cooperation.named n 0 phrases 1
+ok issues.us-israel-defense-technology-cooperation.by_year years 0
+ok issues.us-israel-defense-technology-cooperation.search not applied n 0
+ok issues.water-quality-standards-fish-consumption.rejoin phrases 6
+ok issues.water-quality-standards-fish-consumption.named n 10 phrases 7
+ok issues.water-quality-standards-fish-consumption.by_year years 9
+ok issues.water-quality-standards-fish-consumption.search n 13 named 10
+ok issues.seam exact 15 broad 17 added 2 refs 0
+ok laws.rows placed 512 unplaced 29
+ok laws.groups groups 220
+ok laws.forms groups 220
+ok laws.unplaced_all unplaced 96 in_scope 29
+ok laws.resolutions unreadable 4
+ok wording.text.documents documents 1129 grouped 999 ungrouped 130
+ok wording.text.floors groups 81
+ok wording.text.words groups 81
+ok wording.text.params components=100 group_floor=5 lift=3 max_df=0.5 max_distance=0.6 min_df=3 min_words=3 repeated_clause_floor=5 seed=0 words_shown=6
+ok wording.text.membership sha256 ad0d5631b59f4735c1a951091fba3d98e5383fd0fa1588230927671e72939552
+ok wording.titles.documents documents 1723 grouped 763 ungrouped 960
+ok wording.titles.floors groups 84
+ok wording.titles.words groups 84
+ok wording.titles.params components=100 group_floor=5 lift=3 max_df=0.5 max_distance=0.5 min_df=2 min_words=2 seed=0 words_shown=6
+ok wording.titles.membership sha256 96b1730c50bfec31d230be5afd9d2346cb5861dac8999c65d1cf021f4596e9f9

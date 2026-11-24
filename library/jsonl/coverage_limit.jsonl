@@ -1,0 +1,11 @@
+{"id":"L01","text":"Outcome and TO NCAI are recorded only in some years; blank means \"not recorded\", never No (see the coverage table)."}
+{"id":"L02","text":"Prepared By is not recorded for 2000-2004, the 2005 Winter, 2012 Annual and 2019 Mid Year conventions, or most 2026 rows; a preparer is what the workbook records, and the PDFs do not print one."}
+{"id":"L03","text":"Committee counts use applied committee links: links recorded or decided by ATNI are drawn solid, likely links are drawn apart and counted, and every label as written is kept."}
+{"id":"L04","text":"The workbook stops at 2019-39 and 2026-33; the site holds 2019-40..69 and 2026-34..54, starts at 2007 and holds only 2007-01..29."}
+{"id":"L05","text":"A number gap is a missing number, not a missing resolution."}
+{"id":"L06","text":"Executive Board actions are a fourth kind of session."}
+{"id":"L07","text":"Wyatt's analysis tabs (Committee Breakdown, Sparklines + Charts) are witnesses with typed totals; this library recounts."}
+{"id":"L08","text":"Titles are the workbook's; the site's title from the PDF is in the Crosswalk where they differ."}
+{"id":"L09","text":"The committee tabs are copies of Master Library and are never counted."}
+{"id":"L10","text":"A draft-numbered entry of a resolution that is listed under its final number is kept as written, marked not listed (D-080 item 3) and left out of every count."}
+{"id":"L11","text":"A value marked likely is the most likely answer, applied and counted; a value marked open stays as written; both are listed for Wyatt Ash-Milby to verify (D-083)."}

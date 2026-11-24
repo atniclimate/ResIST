@@ -17,6 +17,8 @@
   <pattern id="pat-wait" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(135)"><line class="pat-wait" x1="0" y1="0" x2="0" y2="5"/></pattern>
   <pattern id="tex45" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line class="pat-tex" x1="0" y1="0" x2="0" y2="5"/></pattern>
   <pattern id="tex135" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(135)"><line class="pat-tex" x1="0" y1="0" x2="0" y2="5"/></pattern>
+  <pattern id="pat-likely" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect class="pat-lk-bg" width="6" height="6"/><line class="pat-lk" x1="0" y1="0" x2="0" y2="6"/></pattern>
+  <pattern id="texh" width="5" height="5" patternUnits="userSpaceOnUse"><line class="pat-tex" x1="0" y1="0" x2="5" y2="0"/></pattern>
   <pattern id="texv" width="5" height="5" patternUnits="userSpaceOnUse"><line class="pat-tex" x1="0" y1="0" x2="0" y2="5"/></pattern>
 </defs></svg>
 
@@ -25,9 +27,10 @@
 <div class="mock-banner" role="note">
   <div class="wrap">
     <strong>Preview, under review</strong>
-    <span>Counts are as recorded in The Resolution Library, built by Wyatt Ash-Milby at ATNI. Some committee names and spellings are still being reviewed, and wording may change. <a href="../../">Back to the ResIST site</a>.</span>
+    <span>This is not ResIST 1.0. Counts are as recorded in The Resolution Library, built by Wyatt Ash-Milby at ATNI. Values marked likely are applied and counted; values marked open stay as written. Both are listed for Wyatt Ash-Milby to verify: see <a href="#/record" data-goto="verify">To verify</a>. <a href="../../">Back to the ResIST site</a>.</span>
     <label for="names-sw"><input type="checkbox" id="names-sw" checked> Show names</label>
   </div>
+  <div class="wrap banner-keyrow" id="banner-key"></div>
 </div>
 
 <header class="site-header glass" id="site-header">
@@ -52,7 +55,7 @@
     <h1 id="page-title">ATNI Resolutions in Numbers</h1>
     <p class="lead">These counts describe ATNI's own record of its resolutions. ATNI governs which records ResIST holds and releases. Each chart says what it counts and what it leaves out.</p>
     <p class="credit-line" id="credit-line"></p>
-    <p class="slot" role="note">[PERSONAL VOICE -- Patrick writes this section]</p>
+    <p class="slot" role="note" hidden><!-- A slot for the owner's own words; shown once he has written them. --></p>
     <p class="source" id="band-source"></p>
     <nav class="tabs tabs-band" aria-label="Analysis views">
       <a data-tab="overview" href="#/overview">Overview</a>
@@ -60,6 +63,7 @@
       <a data-tab="committees" href="#/committees">Committees</a>
       <a data-tab="people" href="#/people">People</a>
       <a data-tab="words" href="#/words">Words and Titles</a>
+      <a data-tab="topics" href="#/topics">Issues, Laws and Wording</a>
       <a data-tab="record" href="#/record">The Record</a>
     </nav>
   </div>
@@ -74,6 +78,7 @@
       <a data-tab="committees" href="#/committees">Committees</a>
       <a data-tab="people" href="#/people">People</a>
       <a data-tab="words" href="#/words">Words and Titles</a>
+      <a data-tab="topics" href="#/topics">Issues, Laws and Wording</a>
       <a data-tab="record" href="#/record">The Record</a>
     </nav>
     <button type="button" class="btn" id="filter-btn" aria-haspopup="dialog"><span>Filters:</span> <span id="filter-btn-text">2000 to 2026, all conventions, all committees</span></button>
@@ -95,7 +100,7 @@
   <div id="view"></div>
 </main>
 
-<footer class="mock-foot"><div class="wrap"><p>Preview, under review. Every count on this page is read from the files beside it; nothing is sent anywhere.</p></div></footer>
+<footer class="mock-foot"><div class="wrap"><p>Preview, under review. Every count on this page is read from the files beside it; nothing is sent anywhere. <span id="build-id"></span></p></div></footer>
 
 <dialog id="list-dialog" class="sheet" aria-labelledby="list-title">
   <div class="sheet-head"><h2 id="list-title"></h2><button type="button" class="btn small" id="list-close">Close</button></div>

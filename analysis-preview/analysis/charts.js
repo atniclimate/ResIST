@@ -37,8 +37,11 @@ export function unrecordedRuns(cells, years) {
 /* ---------------------------------------------------------------------------------------------------------- */
 /* Vertical year bars (48rem and wider). One column per year on the shared year spine; each coverage strip is
    drawn on the same columns directly under the baseline, so a dip in a bar lines up with its "not recorded".     */
-/* o: { width, height, rows:[{year, total, segs:[{key,n,label,spec}], outline:{key,n,label}|null, yearSpec}],
-        max, href(spec), strips:[{name, cells:[{state,share,text}]}], rise, id }                                  */
+/* o: { width, height, rows:[{year, total, segs:[{key,n,label,spec}], outline:{key,n,label}|null, tick:{n,label}|null, yearSpec}],
+        max, href(spec), strips:[{name, cells:[{state,share,text}]}], line:{values:[number|null], titles:[string|null]}|null, rise, id }
+   A seg with key "likely" is drawn hatched in the second colour, a seg with key "open" as a dashed outline; both carry
+   their word in the label. A tick is a short bar across the column at the highest number of the year. The line is the
+   moving average: it breaks at every null and never crosses one.                                                      */
 export function yearBarsSvg(o) {
   const W = Math.max(280, Math.round(o.width));
   const n = o.rows.length;
@@ -81,8 +84,22 @@ export function yearBarsSvg(o) {
       cum += h;
     }
     s += `</g>`;
-    if (showCounts && r.total > 0) s += `<text class="cnt" aria-hidden="true" x="${(x + bw / 2).toFixed(1)}" y="${(base - cum - 4).toFixed(1)}" text-anchor="middle">${fmt(r.total)}</text>`;
+    if (r.tick && r.tick.n > 0) s += `<g data-tip="${esc(r.tick.label)}"><line class="num-tick" x1="${(x - 1).toFixed(1)}" x2="${(x + bw + 1).toFixed(1)}" y1="${(base - y(r.tick.n)).toFixed(1)}" y2="${(base - y(r.tick.n)).toFixed(1)}"/></g>`;
+    const above = r.tick && r.tick.n > 0 ? Math.max(cum, y(r.tick.n)) : cum;
+    if (showCounts && r.total > 0) s += `<text class="cnt" aria-hidden="true" x="${(x + bw / 2).toFixed(1)}" y="${(base - above - 5).toFixed(1)}" text-anchor="middle">${fmt(r.total)}</text>`;
   });
+  // the moving average: polyline segments that break at every null
+  if (o.line) {
+    const px = i => padL + i * slot + 1 + bw / 2, py = v => base - y(v);
+    let d = "", pen = false, dots = "";
+    o.line.values.forEach((v, i) => {
+      if (v == null) { pen = false; return; }
+      d += `${pen ? "L" : "M"}${px(i).toFixed(1)} ${py(v).toFixed(1)}`;
+      pen = true;
+      dots += `<rect class="smooth-dot" x="${(px(i) - 2.5).toFixed(1)}" y="${(py(v) - 2.5).toFixed(1)}" width="5" height="5"><title>${esc(o.line.titles[i])}</title></rect>`;
+    });
+    if (d) s += `<g class="smooth" aria-hidden="true"><path class="smooth-line" d="${d}"/>${dots}</g>`;
+  }
   // coverage strips
   o.strips.forEach((st, si) => {
     const ty = stripsTop + si * stripBlock;
@@ -142,23 +159,24 @@ export function rowBarsHtml(o) {
 }
 
 /* ---------------------------------------------------------------------------------------------------------- */
-/* Heatmap: committee rows by year columns. Every cell prints its count. A hatched chip prints the count of labels
-   still waiting for ATNI. A recorded zero prints "0" on the bare ground; a not-recorded cell never prints 0.    */
-/* o: { years:[..], rows:[{key, name, href, cells:[{c,w,spec,wspec,label}], hatched:boolean}], id }               */
+/* Heatmap: committee rows by year columns. Every cell prints its recorded count. A chip hatched in the second colour
+   prints the likely count beside it. A recorded zero prints "0" on the bare ground; a not-recorded cell never prints 0.
+   A cell where Wyatt's number differs carries a corner flag when the switch is on.                              */
+/* o: { years:[..], rows:[{key, name, nameHtml?, href, cells:[{c,l,spec,diff,label}], hatched:boolean}], id }     */
 export function heatmapHtml(o) {
   let h = `<table class="heat" data-grid aria-labelledby="${esc(o.id)}-sum"><thead><tr><th scope="col" class="heat-corner"><span class="sr-only">Committee</span></th>`;
   for (const y of o.years) h += `<th scope="col" class="heat-year"><span>${y}</span></th>`;
   h += `</tr></thead><tbody>`;
   let first = true;
   for (const r of o.rows) {
-    h += `<tr class="${r.hatched ? "heat-none-row" : ""}"><th scope="row" class="heat-name">${r.href ? `<a href="${esc(r.href)}">${esc(r.name)}</a>` : esc(r.name)}</th>`;
+    h += `<tr class="${r.hatched ? "heat-none-row" : ""}"><th scope="row" class="heat-name">${r.href ? `<a href="${esc(r.href)}">${esc(r.name)}</a>` : esc(r.name)}${r.nameHtml || ""}</th>`;
     for (const c of r.cells) {
       const st = r.hatched ? "none" : step(c.c);
       const tab = first ? "0" : "-1";
       first = false;
       h += `<td><button type="button" class="hc step-${st}${c.diff ? " wdiff" : ""}" tabindex="${tab}" data-list="${esc(c.spec)}" aria-label="${esc(c.label)}">`
         + (r.hatched ? `<span class="hc-hatch" aria-hidden="true"></span><span class="hc-n hc-n-chip" aria-hidden="true">${fmt(c.c)}</span>`
-          : `<span class="hc-n" aria-hidden="true">${fmt(c.c)}</span>${c.w ? `<span class="hc-w" aria-hidden="true">${fmt(c.w)}</span>` : ""}`)
+          : `<span class="hc-n" aria-hidden="true">${fmt(c.c)}</span>${c.l ? `<span class="hc-l" aria-hidden="true">${fmt(c.l)}</span>` : ""}`)
         + `</button></td>`;
     }
     h += `</tr>`;

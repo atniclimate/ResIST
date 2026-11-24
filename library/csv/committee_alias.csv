@@ -1,112 +1,112 @@
-ledger_id,label_as_written,part_order,relation,committee_key,status,first_year,last_year,n_cells,n_resolutions
-CM-00031,Off the Floor: Economic Development,1,procedural,,proposed,2001,2001,2,1
-CM-00032,Off the Floor: Economic Development,2,procedural+committee,economic_development,proposed,2001,2001,2,1
-CM-00033,Transportation,1,canonical,transportation,applied,2000,2025,248,131
-CM-00034,Education,1,canonical,education,applied,2000,2026,345,180
-CM-00035,Law & Justice,1,canonical,law_justice,applied,2001,2022,103,52
-CM-00036,Housing,1,canonical,housing,applied,2000,2025,180,92
-CM-00037,Natural Resources/Land,1,era_or_rename,natural_resources,proposed,2000,2021,332,170
-CM-00038,Economic Development,1,canonical,economic_development,applied,2000,2026,299,162
-CM-00039,Youth,1,canonical,youth,applied,2001,2025,20,10
-CM-00040,Health,1,canonical,health,applied,2000,2025,455,233
-CM-00041,Culture/Elders,1,era_or_rename,culture_elders,applied,2000,2022,65,32
-CM-00042,Ernie Stensgar,1,person,,proposed,2001,2001,4,2
-CM-00043,Indian Child Welfare/Social Services,1,era_or_rename,icwa,proposed,2001,2004,15,10
-CM-00044,Gaming,1,canonical,gaming,applied,2001,2025,48,25
-CM-00045,"Ken Leask, Tlingit & Haida",1,person,,proposed,2001,2001,4,2
-CM-00046,Off the Floor,1,procedural,,proposed,2001,2021,42,38
-CM-00047,WITHDRAWN (Refer to 01-02),1,status,,proposed,2001,2001,2,1
-CM-00048,Economic Development (TABLED),1,status+committee,economic_development,proposed,2001,2001,2,1
-CM-00049,Economic Development (TABLED),2,status,,proposed,2001,2001,2,1
-CM-00050,Veterans,1,canonical,veterans,applied,2000,2023,78,40
-CM-00051,Judicial,1,canonical,judicial,applied,2001,2001,2,1
-CM-00052,ICW/Social Services,1,alias:sheet1_only,icwa,proposed,2000,2000,2,2
-CM-00053,Executive Board,1,origin_body,,proposed,2000,2026,11,11
-CM-00054,"Economic Development, Taxation",1,multi,economic_development,proposed,2026,2026,2,2
-CM-00055,"Economic Development, Taxation",2,multi,taxation,proposed,2026,2026,2,2
-CM-00056,From the Floor,1,procedural,,proposed,2026,2026,2,2
-CM-00057,Telecommunications and Technology,1,canonical,telecom,applied,2024,2026,6,4
-CM-00058,Taxation,1,canonical,taxation,applied,2009,2026,71,36
-CM-00059,TERO,1,canonical,tero,applied,2011,2026,22,11
-CM-00060,Natural Resources,1,canonical,natural_resources,applied,2004,2026,151,79
-CM-00061,Law and Justice,1,spelling,law_justice,applied,2004,2026,27,15
-CM-00062,International Affairs,1,canonical,international_affairs,applied,2025,2026,3,3
-CM-00063,"ICWA, Health",1,multi,icwa,proposed,2025,2026,2,2
-CM-00064,"ICWA, Health",2,multi,health,proposed,2025,2026,2,2
-CM-00065,Food Sovereignty,1,canonical,food_sovereignty,applied,2026,2026,1,1
-CM-00066,"Culture and Elders, Education",1,multi,culture_elders,proposed,2026,2026,2,2
-CM-00067,"Culture and Elders, Education",2,multi,education,proposed,2026,2026,2,2
-CM-00068,Trust Reform,1,canonical,trust_reform,applied,2010,2025,19,19
-CM-00069,ICWA,1,canonical,icwa,applied,2004,2025,9,7
-CM-00070,Energy,1,canonical,energy,applied,2018,2025,18,10
-CM-00071,"Education, Culture and Elders",1,multi,culture_elders,proposed,2025,2025,2,2
-CM-00072,"Education, Culture and Elders",2,multi,education,proposed,2025,2025,2,2
-CM-00073,"Taxation, Economic Development",1,multi,economic_development,proposed,2025,2025,1,1
-CM-00074,"Taxation, Economic Development",2,multi,taxation,proposed,2025,2025,1,1
-CM-00075,"Trust Reform, Gaming",1,multi,trust_reform,proposed,2025,2025,1,1
-CM-00076,"Trust Reform, Gaming",2,multi,gaming,proposed,2025,2025,1,1
-CM-00077,Culture and Elders,1,spelling,culture_elders,applied,2025,2025,6,3
-CM-00078,Climate,1,era_or_rename,climate_resilience,proposed,2024,2025,4,2
-CM-00079,Native Vote,1,canonical,native_vote,applied,2008,2025,34,17
-CM-00080,Education (Higher),1,canonical,education_higher,applied,2024,2025,15,7
-CM-00081,General Assembly,1,origin_body,,proposed,2025,2025,1,1
-CM-00082,Climate Resilience,1,canonical,climate_resilience,applied,2023,2024,6,3
-CM-00083,Culture & Elders,1,canonical,culture_elders,applied,2006,2024,17,8
-CM-00084,MMIW,1,canonical,mmiw,applied,2024,2024,2,2
-CM-00085,TANF,1,canonical,tanf,applied,2003,2024,64,31
-CM-00086,Telecommunications & Tech,1,era_or_rename,telecom,applied,2023,2023,4,2
-CM-00087,Health; Drug Abuse & Prevention,1,multi,health,proposed,2023,2023,3,3
-CM-00088,Health; Drug Abuse & Prevention,2,multi,drug_abuse,proposed,2023,2023,3,3
-CM-00089,Education K-12,1,spelling,education_k12,applied,2023,2023,6,3
-CM-00090,Culture & Elders; Native Vote,1,multi,culture_elders,proposed,2023,2023,3,1
-CM-00091,Culture & Elders; Native Vote,2,multi,native_vote,proposed,2023,2023,3,1
-CM-00092,Climate Change,1,era_or_rename,climate_resilience,proposed,2023,2023,2,1
-CM-00093,Off the Floor Natural Resources,1,procedural,,proposed,2023,2023,2,1
-CM-00094,Off the Floor Natural Resources,2,procedural+committee,natural_resources,proposed,2023,2023,2,1
-CM-00095,Natural Resources/ Lands,1,era_or_rename,natural_resources,proposed,2023,2023,2,1
-CM-00096,Law and Justice/ Trust Reform,1,multi,law_justice,proposed,2023,2023,2,1
-CM-00097,Law and Justice/ Trust Reform,2,multi,trust_reform,proposed,2023,2023,2,1
-CM-00098,Off the Floor Health,1,procedural,,proposed,2023,2023,2,1
-CM-00099,Off the Floor Health,2,procedural+committee,health,proposed,2023,2023,2,1
-CM-00100,Telecommunication,1,era_or_rename,telecom,proposed,2018,2023,4,2
-CM-00101,Philanthropy,1,canonical,philanthropy,applied,2022,2023,2,2
-CM-00102,Law and Order,1,alias_unresolved,law_justice,proposed,2018,2022,4,2
-CM-00103,Off Floor,1,procedural,,proposed,2022,2022,1,1
-CM-00104,Office the Floor,1,procedural,,proposed,2021,2021,2,2
-CM-00105,Natural Resources/Lands,1,era_or_rename,natural_resources,proposed,2018,2020,4,2
-CM-00106,Natural Resources & Land,1,era_or_rename,natural_resources,proposed,2019,2019,6,3
-CM-00107,Natural Resources & Lands,1,era_or_rename,natural_resources,proposed,2019,2019,4,2
-CM-00108,Telecommunications,1,era_or_rename,telecom,proposed,2018,2018,2,1
-CM-00109,Indian Child Welfare/Social Service,1,spelling,icwa,proposed,2008,2018,20,10
-CM-00110,Culture & Elders Committee,1,spelling,culture_elders,applied,2007,2018,62,30
-CM-00111,Telecommunications & Utility,1,era_or_rename,telecom,proposed,2009,2018,102,48
-CM-00112,Drug Abuse,1,small_or_topic,drug_abuse,proposed,2018,2018,2,1
-CM-00113,TERO+C496,1,typo,tero,applied,2017,2017,2,1
-CM-00114,Economic Development Committtee: Human Resources,1,subcommittee:parent,economic_development,proposed,2010,2010,2,1
-CM-00115,Economic Development Committtee: Human Resources,2,subcommittee,human_resources,proposed,2010,2010,2,1
-CM-00116,Economic Development Sub-Committtee: Tourism,1,subcommittee:parent,economic_development,proposed,2009,2009,2,1
-CM-00117,Economic Development Sub-Committtee: Tourism,2,subcommittee,tourism,proposed,2009,2009,2,1
-CM-00118,Steering Committee,1,origin_body,,proposed,2006,2006,1,1
-CM-00119,Tourism,1,canonical,tourism,applied,2003,2006,3,3
-CM-00120,Health ,1,whitespace,health,applied,2006,2006,8,4
-CM-00121,Telecommunications & Utilitv,1,typo,telecom,proposed,2006,2006,2,1
-CM-00122,Gaming ,1,whitespace,gaming,applied,2006,2006,4,2
-CM-00123,ICW /Social Services,1,era_or_rename,icwa,proposed,2006,2006,4,2
-CM-00124,Utilities and Telecommunications,1,era_or_rename,telecom,proposed,2005,2005,2,1
-CM-00125,Cultural/Elders,1,era_or_rename,culture_elders,applied,2004,2005,9,4
-CM-00126,OFF THE FLOOR,1,procedural,,proposed,2005,2005,3,3
-CM-00127,Indian Child Welfare,1,era_or_rename,icwa,applied,2005,2005,4,2
-CM-00128,Duplicate,1,status,,proposed,2003,2005,3,2
-CM-00129,Off the Floor - Education,1,procedural,,proposed,2004,2004,2,1
-CM-00130,Off the Floor - Education,2,procedural+committee,education,proposed,2004,2004,2,1
-CM-00131,Off the Floor - Jewell James,1,procedural,,proposed,2004,2004,1,1
-CM-00132,Off the Floor - Jewell James,2,procedural+sponsor,,proposed,2004,2004,1,1
-CM-00133,Off the Floor - Umatilla Tribe,1,procedural,,proposed,2004,2004,1,1
-CM-00134,Off the Floor - Umatilla Tribe,2,procedural+sponsor,,proposed,2004,2004,1,1
-CM-00135,ATNI Executive Board Member,1,origin_body,,proposed,2003,2003,1,1
-CM-00136,Off the Floor - Nooksack Tribe,1,procedural,,proposed,2003,2003,1,1
-CM-00137,Off the Floor - Nooksack Tribe,2,procedural+sponsor,,proposed,2003,2003,1,1
-CM-00138,Off the Floor - Transportation,1,procedural,,proposed,2003,2003,1,1
-CM-00139,Off the Floor - Transportation,2,procedural+committee,transportation,proposed,2003,2003,1,1
-CM-00140,Off the Floor - Health,1,procedural,,proposed,2003,2003,1,1
-CM-00141,Off the Floor - Health,2,procedural+committee,health,proposed,2003,2003,1,1
+ledger_id,label_as_written,part_order,relation,committee_key,status,first_year,last_year,n_cells,n_resolutions,basis
+CM-00031,Off the Floor: Economic Development,1,procedural,,applied,2001,2001,2,1,recorded
+CM-00032,Off the Floor: Economic Development,2,procedural+committee,economic_development,applied,2001,2001,2,1,recorded
+CM-00033,Transportation,1,canonical,transportation,applied,2000,2025,248,131,recorded
+CM-00034,Education,1,canonical,education,applied,2000,2026,345,180,recorded
+CM-00035,Law & Justice,1,canonical,law_justice,applied,2001,2022,103,52,recorded
+CM-00036,Housing,1,canonical,housing,applied,2000,2025,180,92,recorded
+CM-00037,Natural Resources/Land,1,era_or_rename,natural_resources,applied,2000,2021,332,170,owner
+CM-00038,Economic Development,1,canonical,economic_development,applied,2000,2026,299,162,recorded
+CM-00039,Youth,1,canonical,youth,applied,2001,2025,20,10,recorded
+CM-00040,Health,1,canonical,health,applied,2000,2025,455,233,recorded
+CM-00041,Culture/Elders,1,era_or_rename,culture_elders,applied,2000,2022,65,32,likely
+CM-00042,Ernie Stensgar,1,person,,applied,2001,2001,4,2,recorded
+CM-00043,Indian Child Welfare/Social Services,1,era_or_rename,icwa,applied,2001,2004,15,10,likely
+CM-00044,Gaming,1,canonical,gaming,applied,2001,2025,48,25,recorded
+CM-00045,"Ken Leask, Tlingit & Haida",1,person,,applied,2001,2001,4,2,recorded
+CM-00046,Off the Floor,1,procedural,,applied,2001,2021,42,38,recorded
+CM-00047,WITHDRAWN (Refer to 01-02),1,status,,applied,2001,2001,2,1,likely
+CM-00048,Economic Development (TABLED),1,status+committee,economic_development,applied,2001,2001,2,1,likely
+CM-00049,Economic Development (TABLED),2,status,,applied,2001,2001,2,1,likely
+CM-00050,Veterans,1,canonical,veterans,applied,2000,2023,78,40,recorded
+CM-00051,Judicial,1,canonical,judicial,applied,2001,2001,2,1,recorded
+CM-00052,ICW/Social Services,1,alias:sheet1_only,icwa,applied,2000,2000,2,2,likely
+CM-00053,Executive Board,1,origin_body,,applied,2000,2026,11,11,owner
+CM-00054,"Economic Development, Taxation",1,multi,economic_development,applied,2026,2026,2,2,likely
+CM-00055,"Economic Development, Taxation",2,multi,taxation,applied,2026,2026,2,2,likely
+CM-00056,From the Floor,1,procedural,,applied,2026,2026,2,2,recorded
+CM-00057,Telecommunications and Technology,1,canonical,telecom,applied,2024,2026,6,4,recorded
+CM-00058,Taxation,1,canonical,taxation,applied,2009,2026,71,36,recorded
+CM-00059,TERO,1,canonical,tero,applied,2011,2026,22,11,recorded
+CM-00060,Natural Resources,1,canonical,natural_resources,applied,2004,2026,151,79,recorded
+CM-00061,Law and Justice,1,spelling,law_justice,applied,2004,2026,27,15,recorded
+CM-00062,International Affairs,1,canonical,international_affairs,applied,2025,2026,3,3,recorded
+CM-00063,"ICWA, Health",1,multi,icwa,applied,2025,2026,2,2,likely
+CM-00064,"ICWA, Health",2,multi,health,applied,2025,2026,2,2,likely
+CM-00065,Food Sovereignty,1,canonical,food_sovereignty,applied,2026,2026,1,1,recorded
+CM-00066,"Culture and Elders, Education",1,multi,culture_elders,applied,2026,2026,2,2,likely
+CM-00067,"Culture and Elders, Education",2,multi,education,applied,2026,2026,2,2,likely
+CM-00068,Trust Reform,1,canonical,trust_reform,applied,2010,2025,19,19,recorded
+CM-00069,ICWA,1,canonical,icwa,applied,2004,2025,9,7,recorded
+CM-00070,Energy,1,canonical,energy,applied,2018,2025,18,10,recorded
+CM-00071,"Education, Culture and Elders",1,multi,culture_elders,applied,2025,2025,2,2,likely
+CM-00072,"Education, Culture and Elders",2,multi,education,applied,2025,2025,2,2,likely
+CM-00073,"Taxation, Economic Development",1,multi,economic_development,applied,2025,2025,1,1,likely
+CM-00074,"Taxation, Economic Development",2,multi,taxation,applied,2025,2025,1,1,likely
+CM-00075,"Trust Reform, Gaming",1,multi,trust_reform,applied,2025,2025,1,1,likely
+CM-00076,"Trust Reform, Gaming",2,multi,gaming,applied,2025,2025,1,1,likely
+CM-00077,Culture and Elders,1,spelling,culture_elders,applied,2025,2025,6,3,recorded
+CM-00078,Climate,1,era_or_rename,climate_resilience,applied,2024,2025,4,2,likely
+CM-00079,Native Vote,1,canonical,native_vote,applied,2008,2025,34,17,recorded
+CM-00080,Education (Higher),1,canonical,education_higher,applied,2024,2025,15,7,recorded
+CM-00081,General Assembly,1,origin_body,,applied,2025,2025,1,1,recorded
+CM-00082,Climate Resilience,1,canonical,climate_resilience,applied,2023,2024,6,3,recorded
+CM-00083,Culture & Elders,1,canonical,culture_elders,applied,2006,2024,17,8,recorded
+CM-00084,MMIW,1,canonical,mmiw,applied,2024,2024,2,2,recorded
+CM-00085,TANF,1,canonical,tanf,applied,2003,2024,64,31,recorded
+CM-00086,Telecommunications & Tech,1,era_or_rename,telecom,applied,2023,2023,4,2,likely
+CM-00087,Health; Drug Abuse & Prevention,1,multi,health,applied,2023,2023,3,3,likely
+CM-00088,Health; Drug Abuse & Prevention,2,multi,drug_abuse,applied,2023,2023,3,3,likely
+CM-00089,Education K-12,1,spelling,education_k12,applied,2023,2023,6,3,recorded
+CM-00090,Culture & Elders; Native Vote,1,multi,culture_elders,applied,2023,2023,3,1,likely
+CM-00091,Culture & Elders; Native Vote,2,multi,native_vote,applied,2023,2023,3,1,likely
+CM-00092,Climate Change,1,era_or_rename,climate_resilience,applied,2023,2023,2,1,likely
+CM-00093,Off the Floor Natural Resources,1,procedural,,applied,2023,2023,2,1,recorded
+CM-00094,Off the Floor Natural Resources,2,procedural+committee,natural_resources,applied,2023,2023,2,1,recorded
+CM-00095,Natural Resources/ Lands,1,era_or_rename,natural_resources,applied,2023,2023,2,1,likely
+CM-00096,Law and Justice/ Trust Reform,1,multi,law_justice,applied,2023,2023,2,1,likely
+CM-00097,Law and Justice/ Trust Reform,2,multi,trust_reform,applied,2023,2023,2,1,likely
+CM-00098,Off the Floor Health,1,procedural,,applied,2023,2023,2,1,recorded
+CM-00099,Off the Floor Health,2,procedural+committee,health,applied,2023,2023,2,1,recorded
+CM-00100,Telecommunication,1,era_or_rename,telecom,applied,2018,2023,4,2,likely
+CM-00101,Philanthropy,1,canonical,philanthropy,applied,2022,2023,2,2,recorded
+CM-00102,Law and Order,1,alias_unresolved,law_justice,applied,2018,2022,4,2,likely
+CM-00103,Off Floor,1,procedural,,applied,2022,2022,1,1,recorded
+CM-00104,Office the Floor,1,procedural,,applied,2021,2021,2,2,recorded
+CM-00105,Natural Resources/Lands,1,era_or_rename,natural_resources,applied,2018,2020,4,2,likely
+CM-00106,Natural Resources & Land,1,era_or_rename,natural_resources,applied,2019,2019,6,3,likely
+CM-00107,Natural Resources & Lands,1,era_or_rename,natural_resources,applied,2019,2019,4,2,likely
+CM-00108,Telecommunications,1,era_or_rename,telecom,applied,2018,2018,2,1,likely
+CM-00109,Indian Child Welfare/Social Service,1,spelling,icwa,applied,2008,2018,20,10,likely
+CM-00110,Culture & Elders Committee,1,spelling,culture_elders,applied,2007,2018,62,30,recorded
+CM-00111,Telecommunications & Utility,1,era_or_rename,telecom,applied,2009,2018,102,48,likely
+CM-00112,Drug Abuse,1,small_or_topic,drug_abuse,applied,2018,2018,2,1,likely
+CM-00113,TERO+C496,1,typo,tero,applied,2017,2017,2,1,recorded
+CM-00114,Economic Development Committtee: Human Resources,1,subcommittee:parent,economic_development,applied,2010,2010,2,1,likely
+CM-00115,Economic Development Committtee: Human Resources,2,subcommittee,human_resources,applied,2010,2010,2,1,likely
+CM-00116,Economic Development Sub-Committtee: Tourism,1,subcommittee:parent,economic_development,applied,2009,2009,2,1,likely
+CM-00117,Economic Development Sub-Committtee: Tourism,2,subcommittee,tourism,applied,2009,2009,2,1,likely
+CM-00118,Steering Committee,1,origin_body,,applied,2006,2006,1,1,recorded
+CM-00119,Tourism,1,canonical,tourism,applied,2003,2006,3,3,recorded
+CM-00120,Health ,1,whitespace,health,applied,2006,2006,8,4,recorded
+CM-00121,Telecommunications & Utilitv,1,typo,telecom,applied,2006,2006,2,1,likely
+CM-00122,Gaming ,1,whitespace,gaming,applied,2006,2006,4,2,recorded
+CM-00123,ICW /Social Services,1,era_or_rename,icwa,applied,2006,2006,4,2,likely
+CM-00124,Utilities and Telecommunications,1,era_or_rename,telecom,applied,2005,2005,2,1,likely
+CM-00125,Cultural/Elders,1,era_or_rename,culture_elders,applied,2004,2005,9,4,likely
+CM-00126,OFF THE FLOOR,1,procedural,,applied,2005,2005,3,3,recorded
+CM-00127,Indian Child Welfare,1,era_or_rename,icwa,applied,2005,2005,4,2,likely
+CM-00128,Duplicate,1,status,,applied,2003,2005,3,2,likely
+CM-00129,Off the Floor - Education,1,procedural,,applied,2004,2004,2,1,recorded
+CM-00130,Off the Floor - Education,2,procedural+committee,education,applied,2004,2004,2,1,recorded
+CM-00131,Off the Floor - Jewell James,1,procedural,,applied,2004,2004,1,1,recorded
+CM-00132,Off the Floor - Jewell James,2,procedural+sponsor,,applied,2004,2004,1,1,recorded
+CM-00133,Off the Floor - Umatilla Tribe,1,procedural,,applied,2004,2004,1,1,recorded
+CM-00134,Off the Floor - Umatilla Tribe,2,procedural+sponsor,,applied,2004,2004,1,1,recorded
+CM-00135,ATNI Executive Board Member,1,origin_body,,applied,2003,2003,1,1,owner
+CM-00136,Off the Floor - Nooksack Tribe,1,procedural,,applied,2003,2003,1,1,recorded
+CM-00137,Off the Floor - Nooksack Tribe,2,procedural+sponsor,,applied,2003,2003,1,1,recorded
+CM-00138,Off the Floor - Transportation,1,procedural,,applied,2003,2003,1,1,recorded
+CM-00139,Off the Floor - Transportation,2,procedural+committee,transportation,applied,2003,2003,1,1,recorded
+CM-00140,Off the Floor - Health,1,procedural,,applied,2003,2003,1,1,recorded
+CM-00141,Off the Floor - Health,2,procedural+committee,health,applied,2003,2003,1,1,recorded
